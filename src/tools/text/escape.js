@@ -128,6 +128,14 @@ export default {
       output.placeholder = '错误: ' + msg
     }
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick() {
+        input.value = `Hello <World> & "Friends"!\n包含特殊字符: '单引号' & "双引号" <标签>\n路径: C:\\Users\\test\\file.txt\nURL: https://example.com/search?q=hello world&lang=zh\n换行符:\\t制表符\\n换行符\\r回车符`
+      }
+    })
+
     const escapeBtn = createElement('button', {
       className: 'btn btn-primary',
       textContent: '转义',
@@ -157,6 +165,7 @@ export default {
     const copyBtn = createCopyButton(() => output.value)
 
     const actionsRow = createElement('div', { className: 'btn-group' })
+    actionsRow.appendChild(exampleBtn)
     actionsRow.appendChild(escapeBtn)
     actionsRow.appendChild(unescapeBtn)
     actionsRow.appendChild(copyBtn)

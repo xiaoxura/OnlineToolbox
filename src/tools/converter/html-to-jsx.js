@@ -27,7 +27,11 @@ export default {
       className: 'btn btn-primary',
       textContent: '转换'
     })
-    btnGroup.append(convertBtn)
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
+    btnGroup.append(convertBtn, exampleBtn)
 
     // Output area
     const outputGroup = createElement('div', { className: 'form-group' })
@@ -142,6 +146,10 @@ export default {
       if (output.value) {
         copyToClipboard(output.value)
       }
+    })
+
+    exampleBtn.addEventListener('click', () => {
+      input.value = `<div class="container" id="app">\n  <h1 class="title" style="color: #333; font-size: 24px;">Hello World</h1>\n  <input type="text" class="input-field" placeholder="请输入..." disabled />\n  <label for="username" class="form-label">用户名</label>\n  <button class="btn" onclick="handleSubmit()" tabindex="0">提交</button>\n  <img src="logo.png" alt="Logo" />\n  <p style="margin-top: 10px; text-align: center;">这是一段示例文本</p>\n  <!-- 这是注释 -->\n</div>`
     })
   }
 }

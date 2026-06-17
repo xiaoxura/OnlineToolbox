@@ -68,6 +68,17 @@ export default {
     })
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        messageTextarea.value = 'Hello, World! 这是一条测试消息'
+        keyInput.value = 'my-hmac-secret-key'
+        computeHmac()
+      }
+    })
+
+    const btnGroup = createElement('div', { className: 'btn-group' }, [sampleBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(messageLabel)
@@ -75,6 +86,7 @@ export default {
     container.appendChild(keyLabel)
     container.appendChild(keyInput)
     container.appendChild(tabs)
+    container.appendChild(btnGroup)
     container.appendChild(outputSection)
   }
 }

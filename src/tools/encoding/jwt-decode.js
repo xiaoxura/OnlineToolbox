@@ -117,6 +117,26 @@ export default {
       onClick: decode
     }, ['解析'])
 
+    // Sample JWT (HS256, valid structure)
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IuW8oOS4iSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxODAwMDAwMDAwLCJyb2xlIjoiYWRtaW4ifQ.4q2AxBv0PjOZ4U2J2v6k8QJ6b7yP1mN5cR3tV9wX0yA
+        inputTextarea.value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IuW8oOS4iSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxODAwMDAwMDAwLCJyb2xlIjoiYWRtaW4ifQ.4q2AxBv0PjOZ4U2J2v6k8QJ6b7yP1mN5cR3tV9wX0yA'
+        decode()
+      }
+    })
+
+    const clearBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '清空',
+      onClick: () => {
+        inputTextarea.value = ''
+        decode()
+      }
+    })
+
     const headerSection = createElement('div', { className: 'result-box' }, [
       headerLabel,
       headerOutput,
@@ -136,7 +156,7 @@ export default {
     ])
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
-    const btnGroup = createElement('div', { className: 'btn-group' }, [decodeBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [decodeBtn, sampleBtn, clearBtn])
 
     container.appendChild(inputGroup)
     container.appendChild(btnGroup)

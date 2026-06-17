@@ -72,7 +72,12 @@ export default {
       className: 'btn btn-primary',
       textContent: '测试匹配'
     })
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
     btnGroup.appendChild(testBtn)
+    btnGroup.appendChild(exampleBtn)
 
     const resultBox = createElement('div', { className: 'result-box' })
     const errorText = createElement('div', { className: 'error-text', style: 'display:none' })
@@ -277,5 +282,17 @@ export default {
     }
 
     testBtn.addEventListener('click', runTest)
+
+    // Real-time matching on input
+    patternInput.addEventListener('input', runTest)
+    testInput.addEventListener('input', runTest)
+    flagsInput.addEventListener('input', runTest)
+
+    exampleBtn.addEventListener('click', () => {
+      patternInput.value = '(\\w+)@(\\w+\\.\\w+)'
+      flagsInput.value = 'g'
+      testInput.value = '联系方式：\n张三的邮箱是 zhangsan@gmail.com\n李四的邮箱是 lisi@company.cn\n无效格式：user@, @domain.com'
+      runTest()
+    })
   }
 }

@@ -14,7 +14,8 @@ export default {
     const inputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '请输入文本...',
-      rows: 6
+      rows: 6,
+      onInput: () => convertBtn.click()
     })
 
     const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
@@ -104,10 +105,25 @@ export default {
       }
     }, ['转换'])
 
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        const samples = {
+          'text-to-hex': 'Hello, World! 你好世界',
+          'hex-to-text': '48 65 6C 6C 6F 2C 20 57 6F 72 6C 64 21',
+          'hex-to-dec': 'FF 0A 1F 7B',
+          'dec-to-hex': '255 10 31 123'
+        }
+        inputTextarea.value = samples[mode]
+        convertBtn.click()
+      }
+    })
+
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
-    const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn, sampleBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(tabs)

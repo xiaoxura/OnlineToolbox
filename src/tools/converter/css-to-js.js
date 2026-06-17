@@ -27,7 +27,11 @@ export default {
       className: 'btn btn-primary',
       textContent: '转换'
     })
-    btnGroup.append(convertBtn)
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
+    btnGroup.append(convertBtn, exampleBtn)
 
     // Output area with tabs
     const outputGroup = createElement('div', { className: 'form-group' })
@@ -196,6 +200,21 @@ export default {
       if (text) {
         copyToClipboard(text)
       }
+    })
+
+    exampleBtn.addEventListener('click', () => {
+      input.value = `.container {
+  background-color: #f5f5f5;
+  padding: 20px;
+  margin: 10px auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: #333;
+}`
     })
   }
 }

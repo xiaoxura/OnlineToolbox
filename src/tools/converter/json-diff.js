@@ -40,7 +40,11 @@ export default {
       className: 'btn btn-primary',
       textContent: '对比差异'
     })
-    btnGroup.append(compareBtn)
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
+    btnGroup.append(compareBtn, exampleBtn)
 
     // Output area
     const outputGroup = createElement('div', { className: 'form-group' })
@@ -226,6 +230,27 @@ export default {
       if (lastDiffText) {
         copyToClipboard(lastDiffText)
       }
+    })
+
+    exampleBtn.addEventListener('click', () => {
+      leftInput.value = JSON.stringify({
+        name: '张三',
+        age: 28,
+        email: 'zhangsan@example.com',
+        address: { city: '北京', district: '朝阳区' },
+        hobbies: ['阅读', '游泳'],
+        active: true
+      }, null, 2)
+      rightInput.value = JSON.stringify({
+        name: '张三',
+        age: 29,
+        email: 'zhangsan@newdomain.com',
+        phone: '13800138000',
+        address: { city: '北京', district: '海淀区', street: '中关村大街' },
+        hobbies: ['阅读', '跑步', '编程'],
+        active: false,
+        role: 'admin'
+      }, null, 2)
     })
   }
 }

@@ -252,9 +252,14 @@ export default {
 
     const copyBtn = createCopyButton(() => output.value)
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
+
     const btnGroup = createElement('div', {
       className: 'btn-group'
-    }, [tabs, processBtn, copyBtn])
+    }, [tabs, processBtn, exampleBtn, copyBtn])
 
     const inputSection = createSection('输入 XML', input)
     const outputSection = createSection('输出结果', output, [copyBtn])
@@ -263,5 +268,9 @@ export default {
     container.appendChild(btnGroup)
     container.appendChild(errorEl)
     container.appendChild(outputSection)
+
+    exampleBtn.addEventListener('click', () => {
+      input.value = `<?xml version="1.0" encoding="UTF-8"?><library><book id="1"><title>JavaScript高级程序设计</title><author>Nicholas C. Zakas</author><price currency="CNY">89.00</price><tags><tag>编程</tag><tag>前端</tag></tags></book><book id="2"><title>深入理解计算机系统</title><author>Randal E. Bryant</author><price currency="CNY">139.00</price><tags><tag>计算机科学</tag><tag>系统</tag></tags></book></library>`
+    })
   }
 }

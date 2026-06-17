@@ -155,7 +155,8 @@ export default {
     const inputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '请输入中文域名或 Punycode...',
-      rows: 4
+      rows: 4,
+      onInput: () => convertBtn.click()
     })
 
     const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
@@ -209,8 +210,21 @@ export default {
       }
     }, ['转换'])
 
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        const samples = {
+          'text-to-punycode': '例子.测试',
+          'punycode-to-text': 'xn--fsq028c.xn--0zwm56d'
+        }
+        inputTextarea.value = samples[mode]
+        convertBtn.click()
+      }
+    })
+
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
-    const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn, sampleBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(tabs)

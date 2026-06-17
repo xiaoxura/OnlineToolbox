@@ -35,6 +35,37 @@ export default {
 
     const outputEl = createElement('div', { className: 'diff-output' })
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick() {
+        leftInput.value = `function hello(name) {
+  console.log("Hello " + name)
+  return true
+}
+
+// 计算两数之和
+function add(a, b) {
+  return a + b
+}
+
+const message = "welcome"`
+        rightInput.value = `function hello(name, greeting) {
+  console.log(greeting + ", " + name + "!")
+  return true
+}
+
+// 计算两数之和
+function add(a, b) {
+  const result = a + b
+  return result
+}
+
+const message = "welcome"
+const version = "2.0"`
+      }
+    })
+
     const compareBtn = createElement('button', {
       className: 'btn btn-primary',
       textContent: '对比差异',
@@ -79,6 +110,7 @@ export default {
     })
 
     const actionsRow = createElement('div', { className: 'btn-group' })
+    actionsRow.appendChild(exampleBtn)
     actionsRow.appendChild(compareBtn)
     actionsRow.appendChild(copyBtn)
 

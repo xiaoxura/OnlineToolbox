@@ -64,6 +64,16 @@ export default {
       className: 'inline-result'
     })
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick() {
+        input.value = 'Hello World!\n你好世界！\nHello JavaScript!\nHello Python!\nhello world!\n文本替换测试数据\n包含Hello的多行文本'
+        searchInput.value = 'Hello'
+        replaceInput.value = 'Hi'
+      }
+    })
+
     const replaceBtn = createElement('button', {
       className: 'btn btn-primary',
       textContent: '替换',
@@ -116,7 +126,61 @@ export default {
 
     const copyBtn = createCopyButton(() => output.value)
 
+    // Real-time preview on input
+    function doReplace() {
+      const text = input.value
+      const search = searchInput.value
+      const replacement = replaceInput.value
+      countEl.textContent = ''
+
+      if (!search) {
+        output.value = text
+        return
+      }
+
+      let flags = ''
+      if (globalReplaceCb.checked) flags += 'g'
+      if (ignoreCaseCb.checked) flags += 'i'
+
+      let regex
+
+      if (useRegexCb.checked) {
+        try {
+          regex = new RegExp(search, flags)
+        } catch (e) {
+          countEl.innerHTML = `<span class="error-text">正则表达式语法错误: ${e.message}</span>`
+          return
+        }
+      } else {
+        const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        regex = new RegExp(escaped, flags)
+      }
+
+      let count = 0
+      if (globalReplaceCb.checked) {
+        const tempRegex = new RegExp(regex.source, regex.flags)
+        const matches = text.match(tempRegex)
+        count = matches ? matches.length : 0
+      } else {
+        count = regex.test(text) ? 1 : 0
+        regex.lastIndex = 0
+      }
+
+      output.value = text.replace(regex, replacement)
+      if (count > 0) {
+        countEl.innerHTML = `已替换 <strong>${count}</strong> 处`
+      }
+    }
+
+    input.addEventListener('input', doReplace)
+    searchInput.addEventListener('input', doReplace)
+    replaceInput.addEventListener('input', doReplace)
+    useRegexCb.addEventListener('change', doReplace)
+    globalReplaceCb.addEventListener('change', doReplace)
+    ignoreCaseCb.addEventListener('change', doReplace)
+
     const actionsRow = createElement('div', { className: 'btn-group' })
+    actionsRow.appendChild(exampleBtn)
     actionsRow.appendChild(replaceBtn)
 
     const inputSection = createSection('输入文本', input)

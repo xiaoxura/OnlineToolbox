@@ -46,6 +46,23 @@ export default {
       className: 'btn-group'
     })
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick() {
+        input.value = `张三
+李四
+王五
+赵六
+孙七
+周八
+吴九
+郑十
+钱十一
+陈十二`
+      }
+    })
+
     sortFunctions.forEach(({ label, fn }) => {
       const btn = createElement('button', {
         className: 'btn btn-secondary',
@@ -64,7 +81,11 @@ export default {
     const inputSection = createSection('输入文本', input)
     const resultSection = createSection('排序结果', output, [copyBtn])
 
+    const exampleRow = createElement('div', { className: 'btn-group' })
+    exampleRow.appendChild(exampleBtn)
+
     container.appendChild(inputSection)
+    container.appendChild(exampleRow)
     container.appendChild(btnGrid)
     container.appendChild(resultSection)
   }

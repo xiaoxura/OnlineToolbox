@@ -43,6 +43,15 @@ export default {
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick() {
+        inputTextarea.value = '这是一段需要加密的机密文本，包含中文和English混合内容。'
+        keyInput.value = 'MySecretKey123'
+      }
+    })
+
     const actionBtn = createElement('button', {
       className: 'btn btn-primary',
       textContent: '执行',
@@ -72,7 +81,7 @@ export default {
       }
     })
 
-    const btnGroup = createElement('div', { className: 'btn-group' }, [tabs, actionBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [tabs, exampleBtn, actionBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [
       createElement('div', { className: 'form-group' }, [outputLabel, outputTextarea]),
       copyBtn

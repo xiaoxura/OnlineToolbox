@@ -179,9 +179,14 @@ export default {
 
     const copyBtn = createCopyButton(() => output.value)
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
+
     const btnGroup = createElement('div', {
       className: 'btn-group'
-    }, [tabs, processBtn, copyBtn])
+    }, [tabs, processBtn, exampleBtn, copyBtn])
 
     const inputSection = createSection('输入 HTML', input)
     const outputSection = createSection('输出结果', output, [copyBtn])
@@ -189,5 +194,9 @@ export default {
     container.appendChild(inputSection)
     container.appendChild(btnGroup)
     container.appendChild(outputSection)
+
+    exampleBtn.addEventListener('click', () => {
+      input.value = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>示例页面</title><link rel="stylesheet" href="style.css"></head><body><div class="container"><header class="header"><h1>欢迎来到我的网站</h1><nav><a href="#home" class="nav-link active">首页</a><a href="#about" class="nav-link">关于</a><a href="#contact" class="nav-link">联系</a></nav></header><main><section class="content"><p>这是一段示例文本内容。</p><ul><li>项目一</li><li>项目二</li><li>项目三</li></ul><button onclick="alert('Hello!')">点击我</button><img src="photo.jpg" alt="示例图片" width="300"></section></main><footer><p>&copy; 2024 示例网站</p></footer></div></body></html>`
+    })
   }
 }

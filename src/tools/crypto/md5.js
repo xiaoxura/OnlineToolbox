@@ -34,25 +34,38 @@ export default {
       onClick: () => {
         isUppercase = !isUppercase
         toggleBtn.textContent = isUppercase ? '小写' : '大写'
-        if (outputTextarea.value) {
-          outputTextarea.value = isUppercase
-            ? outputTextarea.value.toUpperCase()
-            : outputTextarea.value.toLowerCase()
-        }
+        compute()
       }
     })
 
+    // Real-time computation
+    function compute() {
+      const text = inputTextarea.value
+      if (!text) {
+        outputTextarea.value = ''
+        return
+      }
+      const hash = CryptoJS.MD5(text).toString()
+      outputTextarea.value = isUppercase ? hash.toUpperCase() : hash
+    }
+
+    inputTextarea.addEventListener('input', compute)
+
     const calcBtn = createElement('button', {
       className: 'btn btn-primary',
-      onClick: () => {
-        const text = inputTextarea.value
-        if (!text) return
-        const hash = CryptoJS.MD5(text).toString()
-        outputTextarea.value = isUppercase ? hash.toUpperCase() : hash
-      }
+      onClick: compute
     }, ['计算 MD5'])
 
-    const btnGroup = createElement('div', { className: 'btn-group' }, [calcBtn, toggleBtn])
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        inputTextarea.value = 'Hello, World! 你好世界'
+        compute()
+      }
+    })
+
+    const btnGroup = createElement('div', { className: 'btn-group' }, [calcBtn, toggleBtn, sampleBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(inputLabel)

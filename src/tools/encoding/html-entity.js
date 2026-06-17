@@ -37,7 +37,12 @@ export default {
     const inputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '请输入要转义或反转义的HTML文本...',
-      rows: 6
+      rows: 6,
+      onInput: () => {
+        const text = inputTextarea.value
+        if (!text) { outputTextarea.value = ''; return }
+        outputTextarea.value = escapeHtml(text)
+      }
     })
 
     const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
@@ -68,8 +73,26 @@ export default {
       }
     }, ['反转义'])
 
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        inputTextarea.value = '<div class="container">\n  <h1>Hello & Welcome</h1>\n  <p>他说："你好！" & \'世界\'</p>\n  <a href="https://example.com?a=1&b=2">链接</a>\n</div>'
+        inputTextarea.dispatchEvent(new Event('input'))
+      }
+    })
+
+    const clearBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '清空',
+      onClick: () => {
+        inputTextarea.value = ''
+        outputTextarea.value = ''
+      }
+    })
+
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
-    const btnGroup = createElement('div', { className: 'btn-group' }, [escapeBtn, unescapeBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [escapeBtn, unescapeBtn, sampleBtn, clearBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(inputGroup)

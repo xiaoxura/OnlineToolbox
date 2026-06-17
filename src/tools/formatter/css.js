@@ -127,9 +127,14 @@ export default {
 
     const copyBtn = createCopyButton(() => output.value)
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
+
     const btnGroup = createElement('div', {
       className: 'btn-group'
-    }, [tabs, processBtn, copyBtn])
+    }, [tabs, processBtn, exampleBtn, copyBtn])
 
     const inputSection = createSection('输入 CSS', input)
     const outputSection = createSection('输出结果', output, [copyBtn])
@@ -137,5 +142,9 @@ export default {
     container.appendChild(inputSection)
     container.appendChild(btnGroup)
     container.appendChild(outputSection)
+
+    exampleBtn.addEventListener('click', () => {
+      input.value = `.header{background-color:#4CAF50;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,0.1)}.nav-item{color:#fff;font-size:14px;margin:0 10px;cursor:pointer;transition:opacity 0.3s}.nav-item:hover{opacity:0.8}.logo{font-weight:bold;font-size:20px}`
+    })
   }
 }

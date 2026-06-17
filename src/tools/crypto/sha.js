@@ -53,11 +53,23 @@ export default {
     })
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
+
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        inputTextarea.value = 'Hello, World! 你好世界'
+        computeHash()
+      }
+    })
+
+    const btnGroup = createElement('div', { className: 'btn-group' }, [sampleBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(inputLabel)
     container.appendChild(inputTextarea)
     container.appendChild(tabs)
+    container.appendChild(btnGroup)
     container.appendChild(outputSection)
   }
 }

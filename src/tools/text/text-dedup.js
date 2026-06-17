@@ -39,6 +39,29 @@ export default {
       className: 'inline-result'
     })
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick() {
+        input.value = `apple
+banana
+cherry
+apple
+date
+banana
+elderberry
+fig
+cherry
+grape
+apple
+date
+honeydew
+elderberry
+fig
+grape`
+      }
+    })
+
     const dedupeBtn = createElement('button', {
       className: 'btn btn-primary',
       textContent: '去重',
@@ -71,6 +94,7 @@ export default {
     const copyBtn = createCopyButton(() => output.value)
 
     const actionsRow = createElement('div', { className: 'btn-group' })
+    actionsRow.appendChild(exampleBtn)
     actionsRow.appendChild(dedupeBtn)
 
     const inputSection = createSection('输入文本', input)

@@ -147,9 +147,14 @@ export default {
 
     const copyBtn = createCopyButton(() => output.value)
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据'
+    })
+
     const btnGroup = createElement('div', {
       className: 'btn-group'
-    }, [beautifyBtn, copyBtn])
+    }, [beautifyBtn, exampleBtn, copyBtn])
 
     const inputSection = createSection('输入 SQL', input)
     const outputSection = createSection('输出结果', output, [copyBtn])
@@ -157,5 +162,9 @@ export default {
     container.appendChild(inputSection)
     container.appendChild(btnGroup)
     container.appendChild(outputSection)
+
+    exampleBtn.addEventListener('click', () => {
+      input.value = `select u.id, u.name, u.email, o.order_id, o.total_amount, o.created_at from users u left join orders o on u.id = o.user_id where u.status = 'active' and o.total_amount > 100 group by u.id, o.order_id order by o.created_at desc limit 50`
+    })
   }
 }

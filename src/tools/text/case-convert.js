@@ -185,6 +185,18 @@ export default {
       className: 'btn-group'
     })
 
+    const exampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick() {
+        input.value = `Hello World 你好世界
+ｊａｖａＳｃｒｉｐｔ编程语言
+ＨＴＭＬ　ＣＳＳ　ＪＳ
+繁體中文測試數據
+ｈｅｌｌｏ　ＷＯＲＬＤ　１２３`
+      }
+    })
+
     conversions.forEach(({ label, fn }) => {
       const btn = createElement('button', {
         className: 'btn btn-secondary',
@@ -201,7 +213,11 @@ export default {
     const inputSection = createSection('输入文本', input)
     const resultSection = createSection('转换结果', output, [copyBtn])
 
+    const exampleRow = createElement('div', { className: 'btn-group' })
+    exampleRow.appendChild(exampleBtn)
+
     container.appendChild(inputSection)
+    container.appendChild(exampleRow)
     container.appendChild(btnGrid)
     container.appendChild(resultSection)
   }

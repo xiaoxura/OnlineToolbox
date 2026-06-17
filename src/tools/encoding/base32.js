@@ -56,7 +56,20 @@ export default {
     const inputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '请输入要编码或解码的文本...',
-      rows: 6
+      rows: 6,
+      onInput: () => {
+        const text = inputTextarea.value
+        if (!text) { outputTextarea.value = ''; return }
+        try {
+          if (/^[A-Za-z2-7=\s]+$/.test(text)) {
+            outputTextarea.value = base32Decode(text)
+          } else {
+            outputTextarea.value = base32Encode(text)
+          }
+        } catch (e) {
+          outputTextarea.value = '转换错误: ' + e.message
+        }
+      }
     })
 
     const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
@@ -95,8 +108,17 @@ export default {
       }
     }, ['解码'])
 
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        inputTextarea.value = 'Hello, World! 你好世界'
+        encodeBtn.click()
+      }
+    })
+
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
-    const btnGroup = createElement('div', { className: 'btn-group' }, [encodeBtn, decodeBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [encodeBtn, decodeBtn, sampleBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(inputGroup)

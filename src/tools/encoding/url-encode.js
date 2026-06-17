@@ -14,7 +14,20 @@ export default {
     const inputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '请输入要编码或解码的文本...',
-      rows: 6
+      rows: 6,
+      onInput: () => {
+        const text = inputTextarea.value
+        if (!text) { outputTextarea.value = ''; return }
+        try {
+          if (mode === 'component') {
+            outputTextarea.value = encodeURIComponent(text)
+          } else {
+            outputTextarea.value = encodeURI(text)
+          }
+        } catch (e) {
+          outputTextarea.value = '编码错误: ' + e.message
+        }
+      }
     })
 
     const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
@@ -68,8 +81,26 @@ export default {
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        inputTextarea.value = 'https://example.com/search?q=你好世界&lang=zh-CN&page=1#section2'
+        inputTextarea.dispatchEvent(new Event('input'))
+      }
+    })
+
+    const clearBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '清空',
+      onClick: () => {
+        inputTextarea.value = ''
+        outputTextarea.value = ''
+      }
+    })
+
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
-    const btnGroup = createElement('div', { className: 'btn-group' }, [encodeBtn, decodeBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [encodeBtn, decodeBtn, sampleBtn, clearBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(tabs)

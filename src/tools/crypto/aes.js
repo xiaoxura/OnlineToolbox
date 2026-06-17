@@ -149,7 +149,16 @@ export default {
       }
     }, ['解密'])
 
-    const btnGroup = createElement('div', { className: 'btn-group' }, [encryptBtn, decryptBtn])
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        inputTextarea.value = '这是一段需要加密的测试文本 Hello World!'
+        keyInput.value = 'my-secret-key-16'
+      }
+    })
+
+    const btnGroup = createElement('div', { className: 'btn-group' }, [encryptBtn, decryptBtn, sampleBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(inputLabel)

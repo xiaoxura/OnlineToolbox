@@ -14,7 +14,20 @@ export default {
     const inputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '请输入文本或 Unicode 编码...',
-      rows: 6
+      rows: 6,
+      onInput: () => {
+        const text = inputTextarea.value
+        if (!text) { outputTextarea.value = ''; return }
+        try {
+          if (mode === 'text-to-unicode') {
+            outputTextarea.value = textToUnicode(text)
+          } else {
+            outputTextarea.value = unicodeToText(text)
+          }
+        } catch (e) {
+          outputTextarea.value = '转换错误: ' + e.message
+        }
+      }
     })
 
     const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
@@ -79,8 +92,30 @@ export default {
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
+    const sampleBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '示例数据',
+      onClick: () => {
+        if (mode === 'text-to-unicode') {
+          inputTextarea.value = '你好世界！Hello 🌍🎉 程序员的日常：写Bug→修Bug→循环'
+        } else {
+          inputTextarea.value = '\\u4f60\\u597d\\u4e16\\u754c\\uff01Hello \\u{1F30D}\\u{1F389}'
+        }
+        inputTextarea.dispatchEvent(new Event('input'))
+      }
+    })
+
+    const clearBtn = createElement('button', {
+      className: 'btn btn-secondary btn-sm',
+      textContent: '清空',
+      onClick: () => {
+        inputTextarea.value = ''
+        outputTextarea.value = ''
+      }
+    })
+
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
-    const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn, sampleBtn, clearBtn])
     const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
 
     container.appendChild(tabs)
