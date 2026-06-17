@@ -35,6 +35,10 @@ import password from './generator/password.js'
 import random from './generator/random.js'
 import lorem from './generator/lorem.js'
 import qrcode from './generator/qrcode.js'
+import placeholderImg from './generator/placeholder-img.js'
+import gradientGen from './generator/gradient-gen.js'
+import shadowGen from './generator/shadow-gen.js'
+import paletteGen from './generator/palette-gen.js'
 
 // Converters
 import timestamp from './converter/timestamp.js'
@@ -46,6 +50,14 @@ import jsonXml from './converter/json-xml.js'
 import jsonCsv from './converter/json-csv.js'
 import csvJson from './converter/csv-json.js'
 import jsonPath from './converter/json-path.js'
+import mdToHtml from './converter/md-to-html.js'
+import htmlToJsx from './converter/html-to-jsx.js'
+import cssToJs from './converter/css-to-js.js'
+import jsonDiff from './converter/json-diff.js'
+import timezone from './converter/timezone.js'
+import dateCalc from './converter/date-calc.js'
+import amountCn from './converter/amount-cn.js'
+import regexVisual from './converter/regex-visual.js'
 
 // Formatters
 import jsonFmt from './formatter/json.js'
@@ -59,6 +71,15 @@ import cron from './devtool/cron.js'
 import httpStatus from './devtool/http-status.js'
 import userAgent from './devtool/user-agent.js'
 import regexRef from './devtool/regex-ref.js'
+import cssUnit from './devtool/css-unit.js'
+import jsonSchema from './devtool/json-schema.js'
+import mockData from './devtool/mock-data.js'
+import gitRef from './devtool/git-ref.js'
+import linuxRef from './devtool/linux-ref.js'
+import idCard from './devtool/id-card.js'
+import bankCard from './devtool/bank-card.js'
+import creditCode from './devtool/credit-code.js'
+import formatCheck from './devtool/format-check.js'
 
 // Image Tools
 import imgToBase64 from './image/img-to-base64.js'
@@ -67,6 +88,9 @@ import svgCompress from './image/svg-compress.js'
 // Network Tools
 import ipInfo from './network/ip-info.js'
 import portCheck from './network/port-check.js'
+import urlParser from './network/url-parser.js'
+import headerParse from './network/header-parse.js'
+import cookieViewer from './network/cookie-viewer.js'
 
 // Math Tools
 import calculator from './math/calculator.js'
@@ -95,17 +119,19 @@ export const tools = [
   charCount, textDiff, caseConvert, textDedup, textSort, regexTest, textReplace, escapeTool,
   markdown, textEncrypt,
   // Generators
-  uuid, password, random, lorem, qrcode,
+  uuid, password, random, lorem, qrcode, placeholderImg, gradientGen, shadowGen, paletteGen,
   // Converters
   timestamp, radix, color, unit, jsonYaml, jsonXml, jsonCsv, csvJson, jsonPath,
+  mdToHtml, htmlToJsx, cssToJs, jsonDiff, timezone, dateCalc, amountCn, regexVisual,
   // Formatters
   jsonFmt, cssFmt, htmlFmt, sqlFmt, xmlFmt,
   // Developer Tools
-  cron, httpStatus, userAgent, regexRef,
+  cron, httpStatus, userAgent, regexRef, cssUnit, jsonSchema, mockData, gitRef, linuxRef,
+  idCard, bankCard, creditCode, formatCheck,
   // Image Tools
   imgToBase64, svgCompress,
   // Network Tools
-  ipInfo, portCheck,
+  ipInfo, portCheck, urlParser, headerParse, cookieViewer,
   // Math Tools
   calculator, bigNumber,
 ]
