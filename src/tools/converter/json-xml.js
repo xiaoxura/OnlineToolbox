@@ -9,16 +9,18 @@ export default {
   icon: 'json-xml',
   render(container) {
     // Root element name input
-    const rootLabel = createElement('span', { className: 'option-label', textContent: 'XML 根元素名:' })
+    const rootLabel = createElement('label', { className: 'option-label', for: 'json-xml-root', textContent: 'XML 根元素名:' })
     const rootInput = createElement('input', {
       className: 'option-input',
+      id: 'json-xml-root',
       type: 'text',
       value: 'root',
       placeholder: 'root'
     })
-    const indentLabel = createElement('span', { className: 'option-label', textContent: '缩进:' })
+    const indentLabel = createElement('label', { className: 'option-label', for: 'json-xml-indent', textContent: '缩进:' })
     const indentInput = createElement('input', {
       className: 'option-input',
+      id: 'json-xml-indent',
       type: 'number',
       value: '2',
       min: '0',

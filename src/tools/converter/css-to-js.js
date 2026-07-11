@@ -33,59 +33,35 @@ export default {
     })
     btnGroup.append(convertBtn, exampleBtn)
 
-    // Output area with tabs
-    const outputGroup = createElement('div', { className: 'form-group' })
-    const outputLabel = createElement('label', { className: 'label', textContent: '转换结果' })
+    // Output area with accessible tabs
+    let currentTab = 'inline'
+    const inlineOutput = createElement('textarea', { className: 'textarea', readOnly: true, rows: 10, 'aria-label': '内联样式对象' })
+    const modulesOutput = createElement('textarea', { className: 'textarea', readOnly: true, rows: 10, 'aria-label': 'CSS Modules 输出' })
+    const styledOutput = createElement('textarea', { className: 'textarea', readOnly: true, rows: 10, 'aria-label': 'styled-components 输出' })
+    const inlinePanel = createElement('div', { className: 'tool-section' }, [inlineOutput])
+    const modulesPanel = createElement('div', { className: 'tool-section', hidden: true }, [modulesOutput])
+    const styledPanel = createElement('div', { className: 'tool-section', hidden: true }, [styledOutput])
 
     const tabs = createTabGroup([
-      { id: 'inline', label: '内联样式对象', active: true },
-      { id: 'modules', label: 'CSS Modules' },
-      { id: 'styled', label: 'styled-components' }
+      { value: 'inline', label: '内联样式对象' },
+      { value: 'modules', label: 'CSS Modules' },
+      { value: 'styled', label: 'styled-components' }
+    ], value => {
+      currentTab = value
+      inlinePanel.hidden = value !== 'inline'
+      modulesPanel.hidden = value !== 'modules'
+      styledPanel.hidden = value !== 'styled'
+    })
+
+    const copyBtn = createElement('button', { className: 'btn btn-secondary', textContent: '复制结果' })
+    const outputGroup = createElement('div', { className: 'form-group' }, [
+      createElement('div', { className: 'label', textContent: '转换结果' }),
+      tabs,
+      inlinePanel,
+      modulesPanel,
+      styledPanel,
+      createElement('div', { className: 'btn-group' }, [copyBtn])
     ])
-
-    const inlinePanel = createElement('div', { className: 'tool-section' })
-    const inlineOutput = createElement('textarea', {
-      className: 'textarea',
-      readOnly: true,
-      rows: 10
-    })
-    inlinePanel.append(inlineOutput)
-
-    const modulesPanel = createElement('div', {
-      className: 'tool-section',
-      style: 'display: none'
-    })
-    const modulesOutput = createElement('textarea', {
-      className: 'textarea',
-      readOnly: true,
-      rows: 10
-    })
-    modulesPanel.append(modulesOutput)
-
-    const styledPanel = createElement('div', {
-      className: 'tool-section',
-      style: 'display: none'
-    })
-    const styledOutput = createElement('textarea', {
-      className: 'textarea',
-      readOnly: true,
-      rows: 10
-    })
-    styledPanel.append(styledOutput)
-
-    tabs.panel.append(inlinePanel, modulesPanel, styledPanel)
-
-    // Copy button
-    const copyGroup = createElement('div', { className: 'btn-group' })
-    const copyBtn = createElement('button', {
-      className: 'btn btn-secondary',
-      textContent: '复制结果'
-    })
-    copyGroup.append(copyBtn)
-
-    outputGroup.append(outputLabel, tabs.container, copyGroup)
-
-    // Error display
     const errorEl = createElement('div', { className: 'error-text' })
 
     section.append(inputGroup, btnGroup, outputGroup, errorEl)
@@ -151,22 +127,6 @@ export default {
       const lines = pairs.map(p => `  ${p.property}: ${p.value};`)
       return `import styled from 'styled-components'\n\nconst Container = styled.div\`\n${lines.join('\n')}\n\`\n\n// 使用方式：\n// <Container>内容</Container>`
     }
-
-    let currentTab = 'inline'
-
-    // Tab switching
-    tabs.container.querySelectorAll('[data-tab]').forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.container.querySelectorAll('[data-tab]').forEach(t => {
-          t.classList.remove('active')
-        })
-        tab.classList.add('active')
-        currentTab = tab.dataset.tab
-        inlinePanel.style.display = currentTab === 'inline' ? '' : 'none'
-        modulesPanel.style.display = currentTab === 'modules' ? '' : 'none'
-        styledPanel.style.display = currentTab === 'styled' ? '' : 'none'
-      })
-    })
 
     convertBtn.addEventListener('click', () => {
       errorEl.textContent = ''

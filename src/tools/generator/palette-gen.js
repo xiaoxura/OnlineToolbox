@@ -1,4 +1,4 @@
-import { createElement, createSection } from '../../utils/dom.js'
+import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {

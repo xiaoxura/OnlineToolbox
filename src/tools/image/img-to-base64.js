@@ -76,6 +76,7 @@ export default {
 
     const fileInput = createElement('input', {
       type: 'file',
+      'aria-label': '选择要转换的图片',
       accept: 'image/*',
       style: { display: 'none' },
       onChange: (e) => {

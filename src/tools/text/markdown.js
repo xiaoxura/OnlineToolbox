@@ -1,5 +1,6 @@
-import { createElement, createSection } from '../../utils/dom.js'
+import { createElement } from '../../utils/dom.js'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 
 marked.setOptions({
   gfm: true,
@@ -29,7 +30,7 @@ export default {
         preview.innerHTML = '<p style="color:var(--color-text-muted)">预览区域</p>'
         return
       }
-      preview.innerHTML = marked.parse(raw)
+      preview.innerHTML = DOMPurify.sanitize(marked.parse(raw))
     }
 
     input.addEventListener('input', updatePreview)

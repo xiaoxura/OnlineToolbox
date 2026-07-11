@@ -90,11 +90,11 @@ export default {
 
       const unitKeys = Object.keys(cat.units)
 
-      const fromSelect = createElement('select', { className: 'select' },
+      const fromSelect = createElement('select', { className: 'select', 'aria-label': `${cat.name}源单位` },
         unitKeys.map(k => createElement('option', { value: k, textContent: cat.units[k].name }))
       )
 
-      const toSelect = createElement('select', { className: 'select' },
+      const toSelect = createElement('select', { className: 'select', 'aria-label': `${cat.name}目标单位` },
         unitKeys.map((k, i) => createElement('option', { value: k, textContent: cat.units[k].name }))
       )
       if (unitKeys.length > 1) toSelect.selectedIndex = 1

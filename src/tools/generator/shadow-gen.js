@@ -22,6 +22,7 @@ export default {
         className: 'input',
         type: 'range',
         id: `sg-${id}-slider`,
+        'aria-label': `${labelText}滑块`,
         value: String(defaultValue),
         min: String(min),
         max: String(max),

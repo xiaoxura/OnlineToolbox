@@ -216,3 +216,141 @@
     grid-template-columns: repeat(6, 1fr);
   }
 }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.theme-toggle:hover {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.theme-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.theme-icon-moon,
+:root[data-theme='dark'] .theme-icon-sun {
+  display: none;
+}
+
+:root[data-theme='dark'] .theme-icon-moon {
+  display: block;
+}
+
+:root[data-theme='dark'] .site-header {
+  background: rgba(17, 24, 39, 0.88);
+}
+
+/* Home dashboard */
+.home-intro,
+.home-tool-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+.home-intro { padding-top: var(--space-xl); }
+
+.privacy-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--color-text-secondary);
+  background: var(--color-primary-light);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 24%, transparent);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+}
+
+.privacy-banner div { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.privacy-banner strong { color: var(--color-text); }
+.privacy-icon { font-size: 18px; }
+
+.home-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-xl);
+}
+
+.home-section-header h2 { font-size: var(--font-size-lg); }
+.home-section-header span { color: var(--color-text-muted); font-size: var(--font-size-sm); }
+.home-tool-section .tool-grid { padding: var(--space-md) 0 var(--space-sm); }
+.home-tool-section + .home-tool-section .home-section-header { padding-top: var(--space-lg); }
+
+.tool-card-wrap { position: relative; min-width: 0; }
+.tool-card-wrap .tool-card { height: 100%; }
+.favorite-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transition: opacity .2s, color .2s, background-color .2s;
+}
+.tool-card-wrap:hover .favorite-btn,
+.favorite-btn:focus-visible,
+.favorite-btn.active { opacity: 1; }
+.favorite-btn:hover,
+.favorite-btn.active { color: var(--color-warning); background: var(--color-surface); border-color: var(--color-border); }
+
+.category-tab { display: inline-flex; align-items: center; gap: 7px; }
+.category-count {
+  min-width: 20px;
+  padding: 0 5px;
+  color: var(--color-text-muted);
+  background: var(--color-bg-secondary);
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 19px;
+  text-align: center;
+}
+.category-tab.active .category-count { color: var(--color-primary); background: var(--color-surface); }
+
+.empty-state { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.empty-state p { color: var(--color-text-secondary); }
+.empty-state > span { margin-bottom: var(--space-sm); font-size: var(--font-size-sm); }
+.empty-search-icon { font-size: 48px; line-height: 1; opacity: .45; }
+
+.load-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: var(--space-lg);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 35%, transparent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-danger) 6%, var(--color-surface));
+}
+.load-error p { color: var(--color-text-secondary); }
+
+@media (max-width: 768px) {
+  .home-intro, .home-tool-section { padding-left: var(--space-md); padding-right: var(--space-md); }
+  .home-intro { padding-top: var(--space-md); }
+  .home-tool-section .tool-grid { padding-left: 0; padding-right: 0; }
+  .favorite-btn { opacity: 1; width: 36px; height: 36px; }
+  .privacy-banner { align-items: flex-start; }
+  .search-box input { font-size: 16px; }
+}

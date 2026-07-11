@@ -1,0 +1,11 @@
+{
+  "name": "在线工具箱",
+  "short_name": "工具箱",
+  "description": "86 个常用编解码、文本处理、格式化和生成器工具",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#4263eb",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

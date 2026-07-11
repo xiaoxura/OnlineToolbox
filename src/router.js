@@ -21,11 +21,11 @@ function handleRoute() {
 
   if (routes.has(path)) {
     routes.get(path)()
-  } else if (path === '/') {
-    // Home - handled by main.js
-    if (routes.has('/')) {
-      routes.get('/')()
-    }
+  } else {
+    // Unknown hashes fall back to a rendered home page instead of a blank screen.
+    currentRoute = '/'
+    routes.get('/')?.()
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/`)
   }
 }
 
