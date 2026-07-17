@@ -1,4 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
+import { createElement, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
   id: 'big-number',
@@ -219,7 +219,7 @@ export default {
     panels['base'] = basePanel
     panels['arith'] = arithPanel
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { label: '进制转换', value: 'base' },
       { label: '大数运算', value: 'arith' }
     ], (value) => {

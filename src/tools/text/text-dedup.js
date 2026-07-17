@@ -1,5 +1,4 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'text-dedup',
@@ -40,7 +39,7 @@ export default {
     })
 
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick() {
         input.value = `apple

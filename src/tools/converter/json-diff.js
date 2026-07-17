@@ -1,5 +1,4 @@
-import { createElement, createSection } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 
 export default {
   id: 'json-diff',
@@ -9,8 +8,6 @@ export default {
   icon: 'json-yaml',
 
   render(container) {
-    const section = createSection('JSON 对比')
-
     // Two input areas side by side
     const inputRow = createElement('div', { className: 'form-row' })
 
@@ -41,32 +38,24 @@ export default {
       textContent: '对比差异'
     })
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据'
     })
     btnGroup.append(compareBtn, exampleBtn)
 
     // Output area
-    const outputGroup = createElement('div', { className: 'form-group' })
-    const outputLabel = createElement('label', { className: 'label', textContent: '差异结果' })
-    const resultBox = createElement('div', { className: 'result-box' })
+    const resultBox = createElement('div', { className: 'diff-output json-diff-output', role: 'status' }, [
+      createElement('div', { className: 'diff-empty', textContent: '输入两组 JSON 后点击“对比差异”' })
+    ])
 
-    const copyGroup = createElement('div', { className: 'btn-group' })
-    const copyBtn = createElement('button', {
-      className: 'btn btn-secondary',
-      textContent: '复制结果'
-    })
-    copyGroup.append(copyBtn)
-
-    outputGroup.append(outputLabel, resultBox, copyGroup)
+    let lastDiffText = ''
+    const copyBtn = createCopyButton(() => lastDiffText)
+    const outputSection = createSection('差异结果', resultBox, [copyBtn])
 
     // Error display
     const errorEl = createElement('div', { className: 'error-text' })
 
-    section.append(inputRow, btnGroup, outputGroup, errorEl)
-    container.append(section)
-
-    let lastDiffText = ''
+    container.append(inputRow, btnGroup, errorEl, outputSection)
 
     // Deep diff between two objects
     function diffObjects(obj1, obj2, path) {
@@ -144,7 +133,7 @@ export default {
 
       if (diffs.length === 0) {
         const msg = createElement('div', {
-          className: 'inline-result',
+          className: 'diff-empty',
           textContent: '两个 JSON 完全相同，没有差异。'
         })
         resultBox.append(msg)
@@ -156,7 +145,7 @@ export default {
       const removed = diffs.filter(d => d.type === 'removed')
       const changed = diffs.filter(d => d.type === 'changed')
 
-      const summary = createElement('div', { className: 'inline-result' })
+      const summary = createElement('div', { className: 'diff-summary' })
       summary.textContent = `共 ${diffs.length} 处差异：新增 ${added.length}，删除 ${removed.length}，修改 ${changed.length}`
       resultBox.append(summary)
 
@@ -165,29 +154,28 @@ export default {
 
       // Render each diff
       diffs.forEach(d => {
-        const line = createElement('div', { className: 'result-box' })
+        let lineClass = ''
+        let text = ''
 
         if (d.type === 'added') {
-          line.style.borderLeft = '3px solid #4caf50'
-          line.style.color = '#4caf50'
           const val = typeof d.newValue === 'object' ? JSON.stringify(d.newValue, null, 2) : String(d.newValue)
-          line.textContent = `+ ${d.path}: ${val}`
+          lineClass = 'diff-added'
+          text = `+ ${d.path}: ${val}`
           lines.push(`[新增] ${d.path}: ${val}`)
         } else if (d.type === 'removed') {
-          line.style.borderLeft = '3px solid #f44336'
-          line.style.color = '#f44336'
           const val = typeof d.oldValue === 'object' ? JSON.stringify(d.oldValue, null, 2) : String(d.oldValue)
-          line.textContent = `- ${d.path}: ${val}`
+          lineClass = 'diff-removed'
+          text = `- ${d.path}: ${val}`
           lines.push(`[删除] ${d.path}: ${val}`)
         } else if (d.type === 'changed') {
-          line.style.borderLeft = '3px solid #ff9800'
-          line.style.color = '#ff9800'
           const oldVal = typeof d.oldValue === 'object' ? JSON.stringify(d.oldValue, null, 2) : String(d.oldValue)
           const newVal = typeof d.newValue === 'object' ? JSON.stringify(d.newValue, null, 2) : String(d.newValue)
-          line.textContent = `~ ${d.path}: ${oldVal} -> ${newVal}`
+          lineClass = 'diff-changed'
+          text = `~ ${d.path}: ${oldVal} → ${newVal}`
           lines.push(`[修改] ${d.path}: ${oldVal} -> ${newVal}`)
         }
 
+        const line = createElement('div', { className: `diff-line ${lineClass}`, textContent: text })
         resultBox.append(line)
       })
 
@@ -224,12 +212,6 @@ export default {
 
       const diffs = diffObjects(leftObj, rightObj, '')
       renderDiff(diffs)
-    })
-
-    copyBtn.addEventListener('click', () => {
-      if (lastDiffText) {
-        copyToClipboard(lastDiffText)
-      }
     })
 
     exampleBtn.addEventListener('click', () => {

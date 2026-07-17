@@ -1,5 +1,4 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'json-csv',
@@ -10,20 +9,23 @@ export default {
   render(container) {
     // Separator option
     const separatorLabel = createElement('label', { className: 'label', textContent: '分隔符:' })
-    const separatorSelect = createElement('select', { className: 'input' }, [
+    const separatorSelect = createElement('select', { className: 'select' }, [
       createElement('option', { value: ',', textContent: '逗号 (,)' }),
       createElement('option', { value: '\t', textContent: '制表符 (Tab)' }),
       createElement('option', { value: ';', textContent: '分号 (;)' })
     ])
 
     // Header option
-    const headerLabel = createElement('label', { className: 'label', textContent: '包含表头:' })
-    const headerCheckbox = createElement('input', { type: 'checkbox' })
+    const headerCheckbox = createElement('input', { className: 'checkbox', type: 'checkbox' })
     headerCheckbox.checked = true
+    const headerOption = createElement('label', { className: 'option-item' }, [
+      headerCheckbox,
+      createElement('span', { textContent: '包含表头' })
+    ])
 
     const separatorRow = createElement('div', { className: 'form-row' }, [
       createElement('div', { className: 'form-group' }, [separatorLabel, separatorSelect]),
-      createElement('div', { className: 'form-group' }, [headerLabel, headerCheckbox])
+      createElement('div', { className: 'form-group option-control-group' }, [headerOption])
     ])
 
     // Input textarea
@@ -100,7 +102,7 @@ export default {
 
     // Sample button
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = JSON.stringify([

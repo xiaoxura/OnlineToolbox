@@ -1,5 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
   id: 'html-entity',
@@ -45,7 +44,6 @@ export default {
       }
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -74,7 +72,7 @@ export default {
     }, ['反转义'])
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = '<div class="container">\n  <h1>Hello & Welcome</h1>\n  <p>他说："你好！" & \'世界\'</p>\n  <a href="https://example.com?a=1&b=2">链接</a>\n</div>'
@@ -83,7 +81,7 @@ export default {
     })
 
     const clearBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '清空',
       onClick: () => {
         inputTextarea.value = ''
@@ -93,7 +91,7 @@ export default {
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
     const btnGroup = createElement('div', { className: 'btn-group' }, [escapeBtn, unescapeBtn, sampleBtn, clearBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(inputGroup)
     container.appendChild(btnGroup)

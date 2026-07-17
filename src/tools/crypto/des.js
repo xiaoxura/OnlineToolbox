@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import CryptoJS from 'crypto-js'
 
 export default {
@@ -49,25 +48,24 @@ export default {
 
     // Algorithm tabs
     const algoLabel = createElement('label', { className: 'label' }, ['算法'])
-    const algoTabs = createTabGroup([
+    const algoTabs = createSegmentedGroup([
       { label: 'DES', value: 'des' },
       { label: 'Triple DES', value: '3des' }
     ], (value) => {
       currentAlgo = value
-    })
+    }, { label: '算法' })
 
     // Mode tabs
     const modeLabel = createElement('label', { className: 'label' }, ['加密模式'])
-    const modeTabs = createTabGroup([
+    const modeTabs = createSegmentedGroup([
       { label: 'CBC', value: 'CBC' },
       { label: 'ECB', value: 'ECB' }
     ], (value) => {
       currentMode = value
       updateIvVisibility()
-    })
+    }, { label: '加密模式' })
 
     // Output
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -149,7 +147,7 @@ export default {
     }, ['解密'])
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = '这是一段需要加密的测试文本 Hello World!'
@@ -158,7 +156,7 @@ export default {
     })
 
     const btnGroup = createElement('div', { className: 'btn-group' }, [encryptBtn, decryptBtn, sampleBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(inputLabel)
     container.appendChild(inputTextarea)

@@ -1,4 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
@@ -45,7 +45,7 @@ export default {
         createElement('button', { className: 'btn btn-secondary', type: 'button', textContent: '解码', onClick: () => run(decodeBase58) }),
         createElement('button', { className: 'btn btn-secondary', type: 'button', textContent: '示例数据', onClick: () => { input.value = 'Hello 世界'; run(encodeBase58) } })
       ]), error,
-      createElement('div', { className: 'result-box' }, [createElement('label', { className: 'label', textContent: '输出结果' }), output, createCopyButton(() => output.value)])
+      createSection('输出结果', output, [createCopyButton(() => output.value)])
     )
   }
 }

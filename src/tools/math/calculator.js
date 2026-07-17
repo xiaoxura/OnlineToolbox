@@ -10,7 +10,7 @@ export default {
     // --- Display ---
     const exprEl = createElement('div', { className: 'stat-label', textContent: '' })
     const resultEl = createElement('div', { className: 'stat-value', textContent: '0' })
-    const display = createElement('div', { className: 'result-box' }, [exprEl, resultEl])
+    const display = createElement('div', { className: 'result-box calculator-display', role: 'status', 'aria-live': 'polite' }, [exprEl, resultEl])
 
     // --- State ---
     let currentExpr = ''
@@ -224,6 +224,11 @@ export default {
 
     // --- Keyboard support ---
     function handleKeydown(e) {
+      if (!container.isConnected) {
+        document.removeEventListener('keydown', handleKeydown)
+        return
+      }
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement || e.target?.isContentEditable) return
       const key = e.key
       if (key >= '0' && key <= '9') { appendToExpr(key); e.preventDefault() }
       else if (key === '.') { appendToExpr('.'); e.preventDefault() }
@@ -254,11 +259,10 @@ export default {
         return
       }
       history.forEach(item => {
-        const row = createElement('div', { className: 'stat-item' }, [
+        const row = createElement('button', { className: 'stat-item calculator-history-item', type: 'button' }, [
           createElement('span', { className: 'stat-label', textContent: item.expr + ' =' }),
           createElement('span', { className: 'stat-value', textContent: item.result })
         ])
-        row.style.cursor = 'pointer'
         row.addEventListener('click', () => {
           currentExpr = item.result
           updateDisplay()

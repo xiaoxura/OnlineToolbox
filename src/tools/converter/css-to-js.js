@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection, createTabGroup } from '../../utils/dom.js'
 
 export default {
   id: 'css-to-js',
@@ -9,8 +8,6 @@ export default {
   icon: 'css',
 
   render(container) {
-    const section = createSection('CSS 转 JS 对象')
-
     // Input area
     const inputGroup = createElement('div', { className: 'form-group' })
     const inputLabel = createElement('label', { className: 'label', textContent: '输入 CSS' })
@@ -28,7 +25,7 @@ export default {
       textContent: '转换'
     })
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据'
     })
     btnGroup.append(convertBtn, exampleBtn)
@@ -38,34 +35,23 @@ export default {
     const inlineOutput = createElement('textarea', { className: 'textarea', readOnly: true, rows: 10, 'aria-label': '内联样式对象' })
     const modulesOutput = createElement('textarea', { className: 'textarea', readOnly: true, rows: 10, 'aria-label': 'CSS Modules 输出' })
     const styledOutput = createElement('textarea', { className: 'textarea', readOnly: true, rows: 10, 'aria-label': 'styled-components 输出' })
-    const inlinePanel = createElement('div', { className: 'tool-section' }, [inlineOutput])
-    const modulesPanel = createElement('div', { className: 'tool-section', hidden: true }, [modulesOutput])
-    const styledPanel = createElement('div', { className: 'tool-section', hidden: true }, [styledOutput])
-
     const tabs = createTabGroup([
-      { value: 'inline', label: '内联样式对象' },
-      { value: 'modules', label: 'CSS Modules' },
-      { value: 'styled', label: 'styled-components' }
+      { value: 'inline', label: '内联样式对象', content: panel => panel.appendChild(inlineOutput) },
+      { value: 'modules', label: 'CSS Modules', content: panel => panel.appendChild(modulesOutput) },
+      { value: 'styled', label: 'styled-components', content: panel => panel.appendChild(styledOutput) }
     ], value => {
       currentTab = value
-      inlinePanel.hidden = value !== 'inline'
-      modulesPanel.hidden = value !== 'modules'
-      styledPanel.hidden = value !== 'styled'
-    })
+    }, { label: '转换结果格式' })
 
-    const copyBtn = createElement('button', { className: 'btn btn-secondary', textContent: '复制结果' })
-    const outputGroup = createElement('div', { className: 'form-group' }, [
-      createElement('div', { className: 'label', textContent: '转换结果' }),
-      tabs,
-      inlinePanel,
-      modulesPanel,
-      styledPanel,
-      createElement('div', { className: 'btn-group' }, [copyBtn])
-    ])
+    const copyBtn = createCopyButton(() => {
+      if (currentTab === 'inline') return inlineOutput.value
+      if (currentTab === 'modules') return modulesOutput.value
+      return styledOutput.value
+    })
+    const outputSection = createSection('转换结果', tabs.element, [copyBtn])
     const errorEl = createElement('div', { className: 'error-text' })
 
-    section.append(inputGroup, btnGroup, outputGroup, errorEl)
-    container.append(section)
+    container.append(inputGroup, btnGroup, errorEl, outputSection)
 
     // Parse CSS into key-value pairs
     function parseCss(cssStr) {
@@ -148,17 +134,6 @@ export default {
         styledOutput.value = toStyledComponents(pairs)
       } catch (e) {
         errorEl.textContent = '转换失败: ' + e.message
-      }
-    })
-
-    copyBtn.addEventListener('click', () => {
-      let text = ''
-      if (currentTab === 'inline') text = inlineOutput.value
-      else if (currentTab === 'modules') text = modulesOutput.value
-      else text = styledOutput.value
-
-      if (text) {
-        copyToClipboard(text)
       }
     })
 

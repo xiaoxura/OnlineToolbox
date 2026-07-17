@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
 
 export default {
   id: 'random',
@@ -43,8 +42,10 @@ export default {
       id: 'random-repeat',
       checked: 'true'
     })
-    const numRepeatLabel = createElement('label', { className: 'checkbox-label', for: 'random-repeat' }, ['允许重复'])
-    const numRepeatGroup = createElement('div', { className: 'form-group' }, [numRepeatCheck, numRepeatLabel])
+    const numRepeatGroup = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      numRepeatCheck,
+      createElement('span', { textContent: '允许重复' })
+    ])
 
     const numTypeInt = createElement('input', {
       className: 'radio',
@@ -54,7 +55,10 @@ export default {
       id: 'random-int',
       checked: 'true'
     })
-    const numTypeIntLabel = createElement('label', { className: 'radio-label', for: 'random-int' }, ['整数'])
+    const numTypeIntLabel = createElement('label', { className: 'radio-label' }, [
+      numTypeInt,
+      createElement('span', { textContent: '整数' })
+    ])
     const numTypeDec = createElement('input', {
       className: 'radio',
       type: 'radio',
@@ -62,8 +66,17 @@ export default {
       value: 'decimal',
       id: 'random-dec'
     })
-    const numTypeDecLabel = createElement('label', { className: 'radio-label', for: 'random-dec' }, ['小数'])
-    const numTypeGroup = createElement('div', { className: 'form-group' }, [numTypeInt, numTypeIntLabel, numTypeDec, numTypeDecLabel])
+    const numTypeDecLabel = createElement('label', { className: 'radio-label' }, [
+      numTypeDec,
+      createElement('span', { textContent: '小数' })
+    ])
+    const numTypeGroup = createElement('fieldset', {
+      className: 'form-group option-control-group'
+    }, [
+      createElement('legend', { className: 'sr-only', textContent: '数值类型' }),
+      numTypeIntLabel,
+      numTypeDecLabel
+    ])
 
     const numberPanel = createElement('div', { className: 'tab-panel' }, [
       createElement('div', { className: 'form-row' }, [numMinGroup, numMaxGroup]),
@@ -97,7 +110,10 @@ export default {
       id: 'random-str-upper',
       checked: 'true'
     })
-    const strUpperLabel = createElement('label', { className: 'checkbox-label', for: 'random-str-upper' }, ['大写字母'])
+    const strUpperLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      strUpperCheck,
+      createElement('span', { textContent: '大写字母' })
+    ])
 
     const strLowerCheck = createElement('input', {
       className: 'checkbox',
@@ -105,7 +121,10 @@ export default {
       id: 'random-str-lower',
       checked: 'true'
     })
-    const strLowerLabel = createElement('label', { className: 'checkbox-label', for: 'random-str-lower' }, ['小写字母'])
+    const strLowerLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      strLowerCheck,
+      createElement('span', { textContent: '小写字母' })
+    ])
 
     const strDigitCheck = createElement('input', {
       className: 'checkbox',
@@ -113,22 +132,28 @@ export default {
       id: 'random-str-digit',
       checked: 'true'
     })
-    const strDigitLabel = createElement('label', { className: 'checkbox-label', for: 'random-str-digit' }, ['数字'])
+    const strDigitLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      strDigitCheck,
+      createElement('span', { textContent: '数字' })
+    ])
 
     const strSymbolCheck = createElement('input', {
       className: 'checkbox',
       type: 'checkbox',
       id: 'random-str-symbol'
     })
-    const strSymbolLabel = createElement('label', { className: 'checkbox-label', for: 'random-str-symbol' }, ['特殊字符'])
+    const strSymbolLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      strSymbolCheck,
+      createElement('span', { textContent: '特殊字符' })
+    ])
 
     const stringPanel = createElement('div', { className: 'tab-panel' }, [
       createElement('div', { className: 'form-row' }, [strLenGroup, strCountGroup]),
       createElement('div', { className: 'form-row' }, [
-        createElement('div', { className: 'form-group' }, [strUpperCheck, strUpperLabel]),
-        createElement('div', { className: 'form-group' }, [strLowerCheck, strLowerLabel]),
-        createElement('div', { className: 'form-group' }, [strDigitCheck, strDigitLabel]),
-        createElement('div', { className: 'form-group' }, [strSymbolCheck, strSymbolLabel])
+        strUpperLabel,
+        strLowerLabel,
+        strDigitLabel,
+        strSymbolLabel
       ])
     ])
 
@@ -146,7 +171,6 @@ export default {
     })
 
     // Output
-    const outputLabel = createElement('label', { className: 'label' }, ['生成结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '点击"生成"按钮...',
@@ -251,8 +275,8 @@ export default {
       onClick: generate
     }, ['生成'])
 
-    const btnGroup = createElement('div', { className: 'btn-group' }, [generateBtn, copyBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [generateBtn])
+    const outputSection = createSection('生成结果', outputTextarea, [copyBtn])
 
     container.appendChild(tabs)
     container.appendChild(numberPanel)

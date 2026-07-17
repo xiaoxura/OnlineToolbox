@@ -1,5 +1,4 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'uuid',
@@ -25,8 +24,10 @@ export default {
       type: 'checkbox',
       id: 'uuid-uppercase'
     })
-    const uppercaseLabel = createElement('label', { className: 'checkbox-label', for: 'uuid-uppercase' }, ['大写'])
-    const uppercaseGroup = createElement('div', { className: 'form-group' }, [uppercaseCheck, uppercaseLabel])
+    const uppercaseGroup = createElement('label', { className: 'option-item option-control-group' }, [
+      uppercaseCheck,
+      createElement('span', { textContent: '大写' })
+    ])
 
     // Hyphen toggle
     const hyphenCheck = createElement('input', {
@@ -35,14 +36,15 @@ export default {
       id: 'uuid-hyphen',
       checked: 'true'
     })
-    const hyphenLabel = createElement('label', { className: 'checkbox-label', for: 'uuid-hyphen' }, ['带连字符'])
-    const hyphenGroup = createElement('div', { className: 'form-group' }, [hyphenCheck, hyphenLabel])
+    const hyphenGroup = createElement('label', { className: 'option-item option-control-group' }, [
+      hyphenCheck,
+      createElement('span', { textContent: '带连字符' })
+    ])
 
     // Options row
     const optionsRow = createElement('div', { className: 'form-row' }, [countGroup, uppercaseGroup, hyphenGroup])
 
     // Output
-    const outputLabel = createElement('label', { className: 'label' }, ['生成结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '点击"生成"按钮生成 UUID...',
@@ -77,8 +79,8 @@ export default {
       onClick: generate
     }, ['生成'])
 
-    const btnGroup = createElement('div', { className: 'btn-group' }, [generateBtn, copyBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [generateBtn])
+    const outputSection = createSection('生成结果', outputTextarea, [copyBtn])
 
     container.appendChild(optionsRow)
     container.appendChild(btnGroup)

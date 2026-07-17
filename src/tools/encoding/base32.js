@@ -1,5 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
   id: 'base32',
@@ -72,7 +71,6 @@ export default {
       }
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -109,7 +107,7 @@ export default {
     }, ['解码'])
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = 'Hello, World! 你好世界'
@@ -119,7 +117,7 @@ export default {
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
     const btnGroup = createElement('div', { className: 'btn-group' }, [encodeBtn, decodeBtn, sampleBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(inputGroup)
     container.appendChild(btnGroup)

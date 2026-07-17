@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
   id: 'base64',
@@ -61,7 +60,7 @@ export default {
     })
 
     // --- Tab group ---
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { value: 'encode', label: '编码' },
       { value: 'decode', label: '解码' }
     ], (key) => {

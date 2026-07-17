@@ -1,5 +1,4 @@
 import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'sql',
@@ -148,7 +147,7 @@ export default {
     const copyBtn = createCopyButton(() => output.value)
 
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据'
     })
 

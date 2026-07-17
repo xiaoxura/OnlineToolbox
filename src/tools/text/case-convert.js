@@ -1,5 +1,4 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'case-convert',
@@ -186,7 +185,7 @@ export default {
     })
 
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick() {
         input.value = `Hello World 你好世界

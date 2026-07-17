@@ -1,5 +1,4 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 import QRCode from 'qrcode'
 
 export default {

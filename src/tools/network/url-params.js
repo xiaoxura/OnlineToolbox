@@ -1,4 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export function updateUrlParams(rawUrl, params) {
   const url = new URL(rawUrl)
@@ -24,7 +24,19 @@ export default {
       ;[keyInput,valueInput].forEach(input=>input.addEventListener('input',generate));rows.appendChild(row)
     }
     const parse = () => { error.textContent='';try{const url=new URL(urlInput.value);rows.innerHTML='';url.searchParams.forEach((value,key)=>addRow(key,value));if(!rows.children.length)addRow();generate()}catch{error.textContent='请输入包含协议的有效 URL'} }
-    container.append(createElement('div',{className:'form-group'},[createElement('label',{className:'label',textContent:'完整 URL'}),urlInput]),createElement('div',{className:'btn-group'},[createElement('button',{className:'btn btn-primary',type:'button',textContent:'解析 URL',onClick:parse}),createElement('button',{className:'btn btn-secondary',type:'button',textContent:'添加参数',onClick:()=>addRow()}),createElement('button',{className:'btn btn-secondary',type:'button',textContent:'示例数据',onClick:()=>{urlInput.value='https://example.com/search?q=online+tools&page=1';parse()}})]),error,createElement('div',{className:'param-heading'},[createElement('span',{textContent:'参数名'}),createElement('span',{textContent:'参数值'})]),rows,createElement('div',{className:'result-box'},[createElement('label',{className:'label',textContent:'生成的 URL'}),output,createCopyButton(()=>output.value)]))
+    const outputSection = createSection('生成的 URL', output, [createCopyButton(() => output.value)])
+    container.append(
+      createElement('div', { className: 'form-group' }, [createElement('label', { className: 'label', textContent: '完整 URL' }), urlInput]),
+      createElement('div', { className: 'btn-group' }, [
+        createElement('button', { className: 'btn btn-primary', type: 'button', textContent: '解析 URL', onClick: parse }),
+        createElement('button', { className: 'btn btn-secondary', type: 'button', textContent: '添加参数', onClick: () => addRow() }),
+        createElement('button', { className: 'btn btn-secondary', type: 'button', textContent: '示例数据', onClick: () => { urlInput.value = 'https://example.com/search?q=online+tools&page=1'; parse() } })
+      ]),
+      error,
+      createElement('div', { className: 'param-heading' }, [createElement('span', { textContent: '参数名' }), createElement('span', { textContent: '参数值' })]),
+      rows,
+      outputSection
+    )
     addRow()
   }
 }

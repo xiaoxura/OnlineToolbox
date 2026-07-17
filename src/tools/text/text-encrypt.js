@@ -1,4 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import CryptoJS from 'crypto-js'
 
 export default {
@@ -26,14 +26,13 @@ export default {
 
     const keyGroup = createElement('div', { className: 'form-group' }, [keyLabel, keyInput])
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { label: '加密', value: 'encrypt' },
       { label: '解密', value: 'decrypt' }
     ], (value) => {
       mode = value
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -44,7 +43,7 @@ export default {
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick() {
         inputTextarea.value = '这是一段需要加密的机密文本，包含中文和English混合内容。'
@@ -81,15 +80,13 @@ export default {
       }
     })
 
-    const btnGroup = createElement('div', { className: 'btn-group' }, [tabs, exampleBtn, actionBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [
-      createElement('div', { className: 'form-group' }, [outputLabel, outputTextarea]),
-      copyBtn
-    ])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [exampleBtn, actionBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(inputLabel)
     container.appendChild(inputTextarea)
     container.appendChild(keyGroup)
+    container.appendChild(tabs)
     container.appendChild(btnGroup)
     container.appendChild(outputSection)
   }

@@ -1,5 +1,4 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'json-xml',
@@ -100,7 +99,7 @@ export default {
     })
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         jsonTextarea.value = JSON.stringify({

@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection, createTableScroll } from '../../utils/dom.js'
 
 export default {
   id: 'cookie-viewer',
@@ -9,35 +8,27 @@ export default {
   icon: 'search',
 
   render(container) {
-    const section = createSection('Cookie 查看器')
-
-    const noteGroup = createElement('div', { className: 'form-group' })
-    const noteLabel = createElement('label', {
-      className: 'label',
-      textContent: '注意：仅能查看非 HttpOnly 的 Cookie'
+    const notice = createElement('div', {
+      className: 'privacy-notice',
+      textContent: '仅能查看当前页面中非 HttpOnly 的 Cookie。'
     })
-    noteGroup.appendChild(noteLabel)
-    section.appendChild(noteGroup)
 
     const btnGroup = createElement('div', { className: 'btn-group' })
     const refreshBtn = createElement('button', {
       className: 'btn btn-primary',
       textContent: '刷新 Cookie'
     })
-    const copyAllBtn = createElement('button', {
-      className: 'btn btn-secondary',
-      textContent: '复制全部'
-    })
+    const copyAllBtn = createCopyButton(() => document.cookie || '（无 Cookie）')
+    copyAllBtn.title = '复制全部 Cookie'
+    copyAllBtn.setAttribute('aria-label', '复制全部 Cookie')
     btnGroup.appendChild(refreshBtn)
     btnGroup.appendChild(copyAllBtn)
-    section.appendChild(btnGroup)
 
-    const resultBox = createElement('div', { className: 'result-box' })
-    section.appendChild(resultBox)
-    container.appendChild(section)
+    const resultContainer = createElement('div', { className: 'tool-stack' })
+    container.append(notice, btnGroup, resultContainer)
 
     function parseCookies() {
-      resultBox.innerHTML = ''
+      resultContainer.innerHTML = ''
       const cookieStr = document.cookie
 
       if (!cookieStr || !cookieStr.trim()) {
@@ -45,7 +36,7 @@ export default {
           className: 'stat-item',
           textContent: '当前页面无 Cookie'
         })
-        resultBox.appendChild(emptyMsg)
+        resultContainer.appendChild(createSection('Cookie 列表', emptyMsg))
         return
       }
 
@@ -61,13 +52,9 @@ export default {
       countItem.appendChild(countLabel)
       countItem.appendChild(countValue)
       statsRow.appendChild(countItem)
-      resultBox.appendChild(statsRow)
+      resultContainer.appendChild(createSection('Cookie 摘要', statsRow))
 
-      const tableSection = createElement('div', { className: 'tool-section' })
-      const tableLabel = createElement('label', { className: 'label', textContent: 'Cookie 列表' })
-      tableSection.appendChild(tableLabel)
-
-      const table = createElement('table', { className: 'result-box' })
+      const table = createElement('table', { className: 'result-table' })
       const thead = createElement('thead')
       thead.innerHTML = '<tr><th>名称</th><th>值</th><th>操作</th></tr>'
       table.appendChild(thead)
@@ -83,15 +70,7 @@ export default {
         const tdValue = createElement('td', { textContent: value })
         const tdAction = createElement('td')
 
-        const copyBtn = createElement('button', {
-          className: 'btn btn-secondary',
-          textContent: '复制'
-        })
-        copyBtn.addEventListener('click', () => {
-          copyToClipboard(`${name}=${value}`)
-          copyBtn.textContent = '已复制'
-          setTimeout(() => { copyBtn.textContent = '复制' }, 1500)
-        })
+        const copyBtn = createCopyButton(() => `${name}=${value}`)
         tdAction.appendChild(copyBtn)
         tr.appendChild(tdName)
         tr.appendChild(tdValue)
@@ -100,16 +79,13 @@ export default {
       })
 
       table.appendChild(tbody)
-      tableSection.appendChild(table)
-      resultBox.appendChild(tableSection)
+      resultContainer.appendChild(createSection(
+        'Cookie 列表',
+        createTableScroll(table, 'Cookie 列表')
+      ))
     }
 
     refreshBtn.addEventListener('click', parseCookies)
-    copyAllBtn.addEventListener('click', () => {
-      copyToClipboard(document.cookie || '（无 Cookie）')
-      copyAllBtn.textContent = '已复制'
-      setTimeout(() => { copyAllBtn.textContent = '复制全部' }, 1500)
-    })
 
     parseCookies()
   }

@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 
 const CN_DIGITS = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖']
 const CN_UNITS = ['', '拾', '佰', '仟']
@@ -13,8 +12,6 @@ export default {
   icon: 'radix',
 
   render(container) {
-    const section = createSection('中文大写金额')
-
     const inputGroup = createElement('div', { className: 'form-group' })
     const inputLabel = createElement('label', { className: 'label', textContent: '输入金额（支持小数）' })
     const input = createElement('input', {
@@ -31,14 +28,19 @@ export default {
     })
     btnGroup.appendChild(convertBtn)
 
-    const resultBox = createElement('div', { className: 'result-box' })
+    let cnCopyValue = ''
+    let numberCopyValue = ''
+    const copyCnBtn = createCopyButton(() => cnCopyValue)
+    copyCnBtn.title = '复制中文大写金额'
+    copyCnBtn.setAttribute('aria-label', '复制中文大写金额')
+    const copyNumBtn = createCopyButton(() => numberCopyValue)
+    copyNumBtn.title = '复制数字金额'
+    copyNumBtn.setAttribute('aria-label', '复制数字金额')
+    const resultContent = createElement('div', { className: 'section-result' })
+    const resultSection = createSection('转换结果', resultContent, [copyCnBtn, copyNumBtn])
     const errorText = createElement('div', { className: 'error-text', style: 'display:none' })
 
-    section.appendChild(inputGroup)
-    section.appendChild(btnGroup)
-    section.appendChild(errorText)
-    section.appendChild(resultBox)
-    container.appendChild(section)
+    container.append(inputGroup, btnGroup, errorText, resultSection)
 
     function convertSection(num) {
       if (num === 0) return '零'
@@ -148,7 +150,9 @@ export default {
 
     function convert() {
       errorText.style.display = 'none'
-      resultBox.innerHTML = ''
+      resultContent.innerHTML = ''
+      cnCopyValue = ''
+      numberCopyValue = ''
 
       const val = input.value.trim()
       if (!val) {
@@ -185,33 +189,9 @@ export default {
       cnItem.appendChild(cnValue)
       statsRow.appendChild(cnItem)
 
-      resultBox.appendChild(statsRow)
-
-      const copyGroup = createElement('div', { className: 'btn-group' })
-
-      const copyCnBtn = createElement('button', {
-        className: 'btn btn-secondary',
-        textContent: '复制大写'
-      })
-      copyCnBtn.addEventListener('click', () => {
-        copyToClipboard(cnResult)
-        copyCnBtn.textContent = '已复制'
-        setTimeout(() => { copyCnBtn.textContent = '复制大写' }, 1500)
-      })
-
-      const copyNumBtn = createElement('button', {
-        className: 'btn btn-secondary',
-        textContent: '复制数字'
-      })
-      copyNumBtn.addEventListener('click', () => {
-        copyToClipboard(numDisplay)
-        copyNumBtn.textContent = '已复制'
-        setTimeout(() => { copyNumBtn.textContent = '复制数字' }, 1500)
-      })
-
-      copyGroup.appendChild(copyCnBtn)
-      copyGroup.appendChild(copyNumBtn)
-      resultBox.appendChild(copyGroup)
+      resultContent.appendChild(statsRow)
+      cnCopyValue = cnResult
+      numberCopyValue = numDisplay
     }
 
     convertBtn.addEventListener('click', convert)

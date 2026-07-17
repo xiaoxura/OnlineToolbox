@@ -1,5 +1,4 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'password',
@@ -44,7 +43,10 @@ export default {
       id: 'pw-upper',
       checked: 'true'
     })
-    const upperLabel = createElement('label', { className: 'checkbox-label', for: 'pw-upper' }, ['大写字母'])
+    const upperLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      upperCheck,
+      createElement('span', { textContent: '大写字母' })
+    ])
 
     const lowerCheck = createElement('input', {
       className: 'checkbox',
@@ -52,7 +54,10 @@ export default {
       id: 'pw-lower',
       checked: 'true'
     })
-    const lowerLabel = createElement('label', { className: 'checkbox-label', for: 'pw-lower' }, ['小写字母'])
+    const lowerLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      lowerCheck,
+      createElement('span', { textContent: '小写字母' })
+    ])
 
     const digitCheck = createElement('input', {
       className: 'checkbox',
@@ -60,7 +65,10 @@ export default {
       id: 'pw-digits',
       checked: 'true'
     })
-    const digitLabel = createElement('label', { className: 'checkbox-label', for: 'pw-digits' }, ['数字'])
+    const digitLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      digitCheck,
+      createElement('span', { textContent: '数字' })
+    ])
 
     const symbolCheck = createElement('input', {
       className: 'checkbox',
@@ -68,13 +76,16 @@ export default {
       id: 'pw-symbols',
       checked: 'true'
     })
-    const symbolLabel = createElement('label', { className: 'checkbox-label', for: 'pw-symbols' }, ['特殊符号'])
+    const symbolLabel = createElement('label', { className: 'form-group option-control-group option-item' }, [
+      symbolCheck,
+      createElement('span', { textContent: '特殊符号' })
+    ])
 
     const checkboxesRow = createElement('div', { className: 'form-row' }, [
-      createElement('div', { className: 'form-group' }, [upperCheck, upperLabel]),
-      createElement('div', { className: 'form-group' }, [lowerCheck, lowerLabel]),
-      createElement('div', { className: 'form-group' }, [digitCheck, digitLabel]),
-      createElement('div', { className: 'form-group' }, [symbolCheck, symbolLabel])
+      upperLabel,
+      lowerLabel,
+      digitLabel,
+      symbolLabel
     ])
 
     // Strength indicator
@@ -87,7 +98,6 @@ export default {
     ])
 
     // Output
-    const outputLabel = createElement('label', { className: 'label' }, ['生成结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '点击"生成密码"按钮生成...',
@@ -162,7 +172,7 @@ export default {
 
     const optionsRow = createElement('div', { className: 'form-row' }, [lengthGroup, countGroup])
     const btnGroup = createElement('div', { className: 'btn-group' }, [generateBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea])
+    const outputSection = createSection('生成结果', outputTextarea, [copyBtn])
 
     container.appendChild(optionsRow)
     container.appendChild(checkboxesRow)

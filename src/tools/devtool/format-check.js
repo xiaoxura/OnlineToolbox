@@ -1,4 +1,4 @@
-import { createElement, createTabGroup } from '../../utils/dom.js'
+import { createElement, createSegmentedGroup, createTableScroll } from '../../utils/dom.js'
 
 export default {
   id: 'format-check',
@@ -130,11 +130,10 @@ export default {
         resultContainer.setAttribute('hidden', 'true')
       }
     })
-    const modeLabel = createElement('label', {
-      className: 'checkbox-label',
-      for: 'fc-batch'
-    }, ['批量模式'])
-    const modeRow = createElement('div', { className: 'form-group' }, [modeCheck, modeLabel])
+    const modeRow = createElement('label', { className: 'option-item' }, [
+      modeCheck,
+      createElement('span', { textContent: '批量模式' })
+    ])
 
     const singleInput = createElement('input', {
       className: 'input',
@@ -181,7 +180,7 @@ export default {
     const resultContainer = createElement('div', { className: 'result-box' })
     resultContainer.setAttribute('hidden', 'true')
 
-    const tabGroup = createTabGroup(CHECKS.map(c => ({ label: c.label, value: c.value })), (value) => {
+    const tabGroup = createSegmentedGroup(CHECKS.map(c => ({ label: c.label, value: c.value })), (value) => {
       currentMode = value
       const check = CHECKS.find(c => c.value === value)
       singleInput.setAttribute('placeholder', check.placeholder)
@@ -274,7 +273,7 @@ export default {
       })
 
       table.appendChild(tbody)
-      resultContainer.appendChild(table)
+      resultContainer.appendChild(createTableScroll(table, '批量格式校验结果'))
 
       const summary = createElement('div', { className: 'stat-item' }, [
         createElement('span', { className: 'stat-label', textContent: '统计' }),

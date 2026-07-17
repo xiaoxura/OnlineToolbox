@@ -177,22 +177,19 @@ export default {
       onClick: doParse
     })
 
-    const inputRow = createElement('div', { className: 'form-row' }, [
+    const inputRow = createElement('div', { className: 'form-row form-action-row' }, [
       createElement('div', { className: 'form-group' }, [
         createElement('label', { className: 'label', textContent: 'Cron 表达式' }),
         cronInput
       ]),
-      createElement('div', { className: 'form-group' }, [
-        createElement('label', { className: 'label', textContent: ' ' }),
-        parseBtn
-      ])
+      parseBtn
     ])
 
     // --- Presets ---
     const presetBtns = createElement('div', { className: 'btn-group' })
     PRESETS.forEach(p => {
       const btn = createElement('button', {
-        className: 'btn',
+        className: 'btn btn-secondary',
         textContent: p.label,
         onClick: () => {
           cronInput.value = p.value

@@ -1,5 +1,4 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'palette-gen',
@@ -136,26 +135,19 @@ export default {
     function renderSwatches(colors) {
       currentColors = colors
       swatchContainer.innerHTML = ''
-      colors.forEach((hex, index) => {
+      colors.forEach(hex => {
         const rgb = hexToRgb(hex)
-        const swatchColor = createElement('div', { className: 'stat-item' })
+        const swatchColor = createElement('div', { className: 'palette-swatch', 'aria-hidden': 'true' })
         swatchColor.setAttribute('style', `background-color: ${hex}`)
 
         const hexLabel = createElement('div', { className: 'stat-value', textContent: hex })
         const rgbLabel = createElement('div', { className: 'stat-label', textContent: rgb })
+        const labels = createElement('div', { className: 'palette-swatch-meta' }, [hexLabel, rgbLabel])
+        const copyBtn = createCopyButton(hex)
 
-        const copyBtn = createElement('button', {
-          className: 'btn btn-secondary',
-          textContent: '复制',
-          onClick: () => {
-            copyToClipboard(hex)
-          }
-        })
-
-        const swatchItem = createElement('div', { className: 'stat-item' }, [
+        const swatchItem = createElement('div', { className: 'stat-item palette-swatch-item' }, [
           swatchColor,
-          hexLabel,
-          rgbLabel,
+          labels,
           copyBtn
         ])
 

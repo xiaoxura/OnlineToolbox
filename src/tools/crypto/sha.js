@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import CryptoJS from 'crypto-js'
 
 export default {
@@ -35,7 +34,7 @@ export default {
       onInput: computeHash
     })
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { label: 'SHA-1', value: 'sha1' },
       { label: 'SHA-256', value: 'sha256' },
       { label: 'SHA-512', value: 'sha512' }
@@ -44,7 +43,6 @@ export default {
       computeHash()
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['哈希值'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -55,7 +53,7 @@ export default {
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = 'Hello, World! 你好世界'
@@ -64,7 +62,7 @@ export default {
     })
 
     const btnGroup = createElement('div', { className: 'btn-group' }, [sampleBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('哈希值', outputTextarea, [copyBtn])
 
     container.appendChild(inputLabel)
     container.appendChild(inputTextarea)

@@ -47,21 +47,21 @@ export default {
 
     // JSON Tree container
     const treeContainer = createElement('div', {
-      className: 'json-tree-container',
-      style: 'max-height:400px;overflow:auto;border:1px solid var(--color-border);border-radius:6px;padding:12px;font-family:monospace;font-size:13px;line-height:1.8;'
+      className: 'json-tree-container'
     })
 
     // Selected path display
-    const selectedPathDisplay = createElement('div', {
-      className: 'inline-result',
-      style: 'display:none;font-family:monospace;cursor:pointer;',
+    const selectedPathDisplay = createElement('button', {
+      className: 'inline-result json-selected-path',
+      type: 'button',
+      hidden: true,
       title: '点击复制路径'
     })
     selectedPathDisplay.addEventListener('click', () => {
-      if (selectedPathDisplay.textContent) {
-        copyToClipboard(selectedPathDisplay.textContent.replace('选中路径: ', ''))
-        selectedPathDisplay.style.background = 'var(--color-primary-light)'
-        setTimeout(() => { selectedPathDisplay.style.background = '' }, 500)
+      if (pathInput.value) {
+        copyToClipboard(pathInput.value)
+        selectedPathDisplay.classList.add('copied')
+        setTimeout(() => selectedPathDisplay.classList.remove('copied'), 500)
       }
     })
 
@@ -74,9 +74,16 @@ export default {
     // Current parsed data
     let currentData = null
 
+    function renderTreeMessage(message, isError = false) {
+      treeContainer.replaceChildren(createElement('div', {
+        className: `json-tree-empty${isError ? ' error' : ''}`,
+        textContent: message
+      }))
+    }
+
     // Build JSON tree recursively
     function buildJsonTree(data, path, depth = 0) {
-      const wrapper = createElement('div', { style: `margin-left:${depth > 0 ? 20 : 0}px` })
+      const wrapper = createElement('div', { className: depth > 0 ? 'json-tree-branch' : '' })
 
       if (data === null) {
         const node = createTreeNode(path, 'null', 'json-null')
@@ -102,17 +109,18 @@ export default {
         }
 
         // Collapsed header
-        const header = createElement('div', { className: 'json-tree-node' })
-        const toggle = createElement('span', {
+        const header = createElement('div', { className: 'json-tree-node', role: 'button', tabindex: '0' })
+        const toggle = createElement('button', {
           className: 'json-toggle',
+          type: 'button',
+          'aria-label': '折叠或展开数组',
+          'aria-expanded': 'true',
           textContent: '▼',
-          style: 'cursor:pointer;display:inline-block;width:16px;text-align:center;font-size:10px;transition:transform 0.15s;'
         })
         const keySpan = createElement('span', { className: 'json-bracket', textContent: openBracket })
         const preview = createElement('span', {
           className: 'json-preview',
-          textContent: ` ${data.length} items...`,
-          style: 'color:var(--color-text-muted);font-size:12px;'
+          textContent: ` ${data.length} items...`
         })
         const closeSpan = createElement('span', { className: 'json-bracket', textContent: closeBracket })
 
@@ -126,11 +134,10 @@ export default {
 
         data.forEach((item, index) => {
           const itemPath = path + '[' + index + ']'
-          const row = createElement('div', { className: 'json-tree-row', style: 'display:flex;align-items:flex-start;' })
+          const row = createElement('div', { className: 'json-tree-row' })
           const indexSpan = createElement('span', {
             className: 'json-index',
-            textContent: index + ': ',
-            style: 'color:var(--color-text-muted);min-width:24px;'
+            textContent: index + ': '
           })
           const childTree = buildJsonTree(item, itemPath, depth + 1)
           row.appendChild(indexSpan)
@@ -139,7 +146,7 @@ export default {
         })
 
         // Close bracket
-        const closeRow = createElement('div', { style: `margin-left:0` })
+        const closeRow = createElement('div')
         closeRow.appendChild(createElement('span', { className: 'json-bracket', textContent: closeBracket }))
         children.appendChild(closeRow)
 
@@ -149,13 +156,19 @@ export default {
           e.stopPropagation()
           collapsed = !collapsed
           children.style.display = collapsed ? 'none' : ''
-          preview.style.display = collapsed ? '' : 'none'
+          preview.style.display = collapsed ? 'inline' : 'none'
           toggle.style.transform = collapsed ? 'rotate(-90deg)' : ''
+          toggle.setAttribute('aria-expanded', String(!collapsed))
         })
 
         // Click header to select path
         header.addEventListener('click', (e) => {
           if (e.target === toggle) return
+          selectPath(path, data)
+        })
+        header.addEventListener('keydown', (e) => {
+          if (e.target !== header || !['Enter', ' '].includes(e.key)) return
+          e.preventDefault()
           selectPath(path, data)
         })
 
@@ -172,17 +185,18 @@ export default {
         return wrapper
       }
 
-      const header = createElement('div', { className: 'json-tree-node' })
-      const toggle = createElement('span', {
+      const header = createElement('div', { className: 'json-tree-node', role: 'button', tabindex: '0' })
+      const toggle = createElement('button', {
         className: 'json-toggle',
+        type: 'button',
+        'aria-label': '折叠或展开对象',
+        'aria-expanded': 'true',
         textContent: '▼',
-        style: 'cursor:pointer;display:inline-block;width:16px;text-align:center;font-size:10px;transition:transform 0.15s;'
       })
       const openBrace = createElement('span', { className: 'json-bracket', textContent: '{' })
       const preview = createElement('span', {
         className: 'json-preview',
-        textContent: ` ${keys.length} keys...`,
-        style: 'color:var(--color-text-muted);font-size:12px;'
+        textContent: ` ${keys.length} keys...`
       })
       const closeBrace = createElement('span', { className: 'json-bracket', textContent: '}' })
 
@@ -195,11 +209,11 @@ export default {
 
       keys.forEach(key => {
         const childPath = path + '.' + key
-        const row = createElement('div', { className: 'json-tree-row', style: 'display:flex;align-items:flex-start;' })
-        const keySpan = createElement('span', {
+        const row = createElement('div', { className: 'json-tree-row' })
+        const keySpan = createElement('button', {
           className: 'json-key',
+          type: 'button',
           textContent: key + ': ',
-          style: 'color:#7c3aed;font-weight:500;cursor:pointer;min-width:fit-content;',
           title: '点击选中此字段的路径'
         })
         keySpan.addEventListener('click', (e) => {
@@ -222,12 +236,18 @@ export default {
         e.stopPropagation()
         collapsed = !collapsed
         children.style.display = collapsed ? 'none' : ''
-        preview.style.display = collapsed ? '' : 'none'
+        preview.style.display = collapsed ? 'inline' : 'none'
         toggle.style.transform = collapsed ? 'rotate(-90deg)' : ''
+        toggle.setAttribute('aria-expanded', String(!collapsed))
       })
 
       header.addEventListener('click', (e) => {
         if (e.target === toggle) return
+        selectPath(path, data)
+      })
+      header.addEventListener('keydown', (e) => {
+        if (e.target !== header || !['Enter', ' '].includes(e.key)) return
+        e.preventDefault()
         selectPath(path, data)
       })
 
@@ -237,10 +257,15 @@ export default {
     }
 
     function createTreeNode(path, value, className) {
-      const node = createElement('div', { className: 'json-tree-node', style: 'cursor:pointer;' })
+      const node = createElement('div', { className: 'json-tree-node', role: 'button', tabindex: '0' })
       const valSpan = createElement('span', { className: className, textContent: value })
       node.appendChild(valSpan)
       node.addEventListener('click', () => selectPath(path, null))
+      node.addEventListener('keydown', (event) => {
+        if (!['Enter', ' '].includes(event.key)) return
+        event.preventDefault()
+        selectPath(path, null)
+      })
       return node
     }
 
@@ -262,12 +287,9 @@ export default {
       })
 
       // Find and highlight the clicked node
-      const allNodes = treeContainer.querySelectorAll('.json-tree-node, .json-tree-row')
-      // We'll use a different approach - highlight by path display
-
       // Show selected path
-      selectedPathDisplay.style.display = 'block'
-      selectedPathDisplay.innerHTML = `<strong>选中路径:</strong> <code style="background:var(--color-bg-secondary);padding:2px 6px;border-radius:3px;">${escapeHtml(path)}</code> <span style="color:var(--color-text-muted);font-size:12px;">(点击复制)</span>`
+      selectedPathDisplay.hidden = false
+      selectedPathDisplay.innerHTML = `<strong>选中路径:</strong> <code>${escapeHtml(path)}</code> <span>(点击复制)</span>`
 
       // Run query with the selected path
       runQuery()
@@ -286,7 +308,7 @@ export default {
 
     // Sample button
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = JSON.stringify({
@@ -307,15 +329,15 @@ export default {
 
     // Clear button
     const clearBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '清空',
       onClick: () => {
         inputTextarea.value = ''
         pathInput.value = '$'
-        treeContainer.innerHTML = '<div style="color:var(--color-text-muted);text-align:center;padding:20px;">请粘贴 JSON 数据</div>'
+        renderTreeMessage('请粘贴 JSON 数据')
         resultBox.innerHTML = ''
         errorEl.textContent = ''
-        selectedPathDisplay.style.display = 'none'
+        selectedPathDisplay.hidden = true
         currentData = null
       }
     })
@@ -333,7 +355,7 @@ export default {
       currentData = null
 
       if (!input) {
-        treeContainer.innerHTML = '<div style="color:var(--color-text-muted);text-align:center;padding:20px;">请粘贴 JSON 数据</div>'
+        renderTreeMessage('请粘贴 JSON 数据')
         return
       }
 
@@ -343,7 +365,7 @@ export default {
         treeContainer.innerHTML = ''
         treeContainer.appendChild(tree)
       } catch (e) {
-        treeContainer.innerHTML = `<div style="color:var(--color-error);text-align:center;padding:20px;">JSON 解析错误: ${escapeHtml(e.message)}</div>`
+        renderTreeMessage('JSON 解析错误: ' + e.message, true)
         errorEl.textContent = 'JSON 解析错误: ' + e.message
       }
     }
@@ -407,25 +429,8 @@ export default {
     container.appendChild(selectedPathDisplay)
     container.appendChild(resultSection)
 
-    // Add CSS for JSON tree
-    const style = document.createElement('style')
-    style.textContent = `
-      .json-tree-container { background: var(--color-bg-secondary); }
-      .json-tree-node { display: inline; }
-      .json-tree-row { padding: 1px 0; }
-      .json-tree-row:hover { background: var(--color-primary-light); border-radius: 3px; }
-      .json-key:hover { text-decoration: underline; }
-      .json-string { color: #16a34a; }
-      .json-number { color: #2563eb; }
-      .json-boolean { color: #dc2626; }
-      .json-null { color: var(--color-text-muted); font-style: italic; }
-      .json-bracket { color: var(--color-text-muted); font-weight: bold; }
-      .json-index { user-select: none; }
-    `
-    document.head.appendChild(style)
-
     // Initialize
-    treeContainer.innerHTML = '<div style="color:var(--color-text-muted);text-align:center;padding:20px;">请粘贴 JSON 数据，或点击「示例数据」</div>'
+    renderTreeMessage('请粘贴 JSON 数据，或点击「示例数据」')
   }
 }
 

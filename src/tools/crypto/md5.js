@@ -1,5 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 import CryptoJS from 'crypto-js'
 
 export default {
@@ -18,7 +17,6 @@ export default {
       rows: 6
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['MD5 哈希值'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -57,7 +55,7 @@ export default {
     }, ['计算 MD5'])
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = 'Hello, World! 你好世界'
@@ -66,7 +64,7 @@ export default {
     })
 
     const btnGroup = createElement('div', { className: 'btn-group' }, [calcBtn, toggleBtn, sampleBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('MD5 哈希值', outputTextarea, [copyBtn])
 
     container.appendChild(inputLabel)
     container.appendChild(inputTextarea)

@@ -26,6 +26,9 @@ describe('application routing', () => {
       expect(document.querySelector('.tool-body textarea')).not.toBeNull()
     })
     expect(document.title).toBe('Base64 编解码 - 在线工具箱')
+    expect(document.querySelector('.tool-header-icon')).not.toBeNull()
+    expect(document.querySelector('.tool-body')?.getAttribute('aria-busy')).toBe('false')
+    expect(window.scrollTo).toHaveBeenCalledWith(0, 0)
   })
 
   it('falls back from an unknown route instead of showing a blank page', async () => {
@@ -60,6 +63,7 @@ describe('application routing', () => {
     window.dispatchEvent(new HashChangeEvent('hashchange'))
     await vi.waitFor(() => expect(document.querySelector('#searchInput').value).toBe('token'))
     expect(document.querySelector('[data-category="encoding"]').getAttribute('aria-pressed')).toBe('true')
+    await vi.waitFor(() => expect(document.activeElement?.getAttribute('href')).toBe('#/jwt'))
   })
 
 })

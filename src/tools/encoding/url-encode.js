@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
   id: 'url-encode',
@@ -30,7 +29,6 @@ export default {
       }
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -38,7 +36,7 @@ export default {
       readOnly: true
     })
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { value: 'component', label: '组件编码' },
       { value: 'full', label: '完整URL编码' }
     ], (key) => {
@@ -82,7 +80,7 @@ export default {
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = 'https://example.com/search?q=你好世界&lang=zh-CN&page=1#section2'
@@ -91,7 +89,7 @@ export default {
     })
 
     const clearBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '清空',
       onClick: () => {
         inputTextarea.value = ''
@@ -101,7 +99,7 @@ export default {
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
     const btnGroup = createElement('div', { className: 'btn-group' }, [encodeBtn, decodeBtn, sampleBtn, clearBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(tabs)
     container.appendChild(inputGroup)

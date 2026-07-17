@@ -1,4 +1,5 @@
 let generatedId = 0
+const choiceScrollObservers = new WeakMap()
 
 export function $(selector, parent = document) {
   return parent.querySelector(selector)
@@ -98,27 +99,143 @@ export function createSection(title, contentEl, actions = []) {
   return createElement('section', { className: 'tool-section', 'aria-labelledby': headingId }, [header, body])
 }
 
-// Tab group helper
-export function createTabGroup(tabs, onChange = () => {}) {
-  const container = createElement('div', { className: 'tab-group', role: 'tablist' })
+export function createTableScroll(table, label = '可横向滚动的数据表格') {
+  const wrapper = createElement('div', {
+    className: 'table-scroll',
+    tabindex: '0',
+    role: 'region',
+    'aria-label': label
+  })
+  table.before(wrapper)
+  wrapper.appendChild(table)
+  return wrapper
+}
+
+function keepChoiceVisible(button) {
+  const group = button?.closest?.('.tab-group, .segmented-group, .filter-group')
+  if (!group || group.scrollWidth <= group.clientWidth) return
+
+  const buttonStart = button.offsetLeft
+  const buttonEnd = buttonStart + button.offsetWidth
+  const visibleStart = group.scrollLeft
+  const visibleEnd = visibleStart + group.clientWidth
+  let target = visibleStart
+  if (buttonStart < visibleStart) target = buttonStart
+  else if (buttonEnd > visibleEnd) target = buttonEnd - group.clientWidth
+  if (target === visibleStart) return
+
+  if (group.scrollTo) group.scrollTo({ left: target, behavior: 'smooth' })
+  else group.scrollLeft = target
+}
+
+function bindRovingKeyboard(container, buttons, activate) {
+  container.addEventListener('keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key) || !buttons.length) return
+    event.preventDefault()
+    const current = buttons.indexOf(document.activeElement)
+    let next = current < 0 ? 0 : current
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (next - 1 + buttons.length) % buttons.length
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (next + 1) % buttons.length
+    if (event.key === 'Home') next = 0
+    if (event.key === 'End') next = buttons.length - 1
+    activate(buttons[next], { focus: true })
+  })
+}
+
+function createSelectableGroup(items, onChange, options, config) {
+  const values = items.map((item, index) => item.value ?? item.id ?? String(index))
+  const container = createElement('div', {
+    className: config.groupClass,
+    role: config.groupRole,
+    'aria-label': options.label || config.defaultLabel
+  })
+  const buttons = items.map((item, index) => {
+    const active = index === 0
+    const button = createElement('button', {
+      className: config.buttonClass,
+      type: 'button',
+      role: config.buttonRole,
+      textContent: item.label,
+      'data-value': values[index],
+      [config.stateAttribute]: String(active),
+      tabindex: active ? '0' : '-1'
+    })
+    if (active) button.classList.add('active')
+    button.addEventListener('click', () => activate(button))
+    return button
+  })
+
+  function activate(activeButton, { focus = false, notify = true } = {}) {
+    const activeIndex = buttons.indexOf(activeButton)
+    if (activeIndex < 0) return false
+    buttons.forEach((button, index) => {
+      const active = index === activeIndex
+      button.classList.toggle('active', active)
+      button.setAttribute(config.stateAttribute, String(active))
+      button.tabIndex = active ? 0 : -1
+    })
+    if (focus) activeButton.focus()
+    keepChoiceVisible(activeButton)
+    if (notify) onChange(values[activeIndex])
+    return true
+  }
+
+  bindRovingKeyboard(container, buttons, activate)
+  container.append(...buttons)
+  container.setValue = (value, settings = {}) => {
+    const index = values.findIndex(itemValue => String(itemValue) === String(value))
+    return index >= 0 && activate(buttons[index], { notify: false, ...settings })
+  }
+  container.getValue = () => values[buttons.findIndex(button => button.getAttribute(config.stateAttribute) === 'true')]
+  return container
+}
+
+export function createSegmentedGroup(items, onChange = () => {}, options = {}) {
+  return createSelectableGroup(items, onChange, options, {
+    groupClass: 'segmented-group',
+    groupRole: 'radiogroup',
+    buttonClass: 'segmented-btn',
+    buttonRole: 'radio',
+    stateAttribute: 'aria-checked',
+    defaultLabel: '模式选择'
+  })
+}
+
+export function createFilterGroup(items, onChange = () => {}, options = {}) {
+  return createSelectableGroup(items, onChange, options, {
+    groupClass: 'filter-group',
+    groupRole: 'group',
+    buttonClass: 'filter-btn',
+    buttonRole: undefined,
+    stateAttribute: 'aria-pressed',
+    defaultLabel: '筛选选项'
+  })
+}
+
+// Tab group helper for controls that switch distinct content panels.
+export function createTabGroup(tabs, onChange = () => {}, options = {}) {
+  const container = createElement('div', { className: 'tab-group', role: 'tablist', 'aria-label': options.label || '内容视图' })
+  const tabSetId = `tool-tabs-${++generatedId}`
+  const values = tabs.map((tab, index) => tab.value ?? tab.id ?? String(index))
   let contentPanels = []
   const buttons = tabs.map((tab, index) => {
-    const value = tab.value ?? tab.id ?? String(index)
     const btn = createElement('button', {
       className: 'tab-btn',
       type: 'button',
       role: 'tab',
+      id: `${tabSetId}-tab-${index}`,
       textContent: tab.label,
-      'data-value': value,
+      'data-value': values[index],
       'aria-selected': String(index === 0),
       tabindex: index === 0 ? '0' : '-1'
     })
-    btn.addEventListener('click', () => activateTab(btn, value))
+    btn.addEventListener('click', () => activateTab(btn))
     return btn
   })
 
-  function activateTab(activeButton, value, focus = false) {
+  function activateTab(activeButton, { focus = false, notify = true } = {}) {
     const activeIndex = buttons.indexOf(activeButton)
+    if (activeIndex < 0) return false
     buttons.forEach((button, index) => {
       const active = index === activeIndex
       button.classList.toggle('active', active)
@@ -127,29 +244,32 @@ export function createTabGroup(tabs, onChange = () => {}) {
       if (contentPanels[index]) contentPanels[index].hidden = !active
     })
     if (focus) activeButton.focus()
-    onChange(value)
+    keepChoiceVisible(activeButton)
+    if (notify) onChange(values[activeIndex])
+    return true
   }
 
-  container.addEventListener('keydown', event => {
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
-    event.preventDefault()
-    const current = buttons.indexOf(document.activeElement)
-    let next = current < 0 ? 0 : current
-    if (event.key === 'ArrowLeft') next = (next - 1 + buttons.length) % buttons.length
-    if (event.key === 'ArrowRight') next = (next + 1) % buttons.length
-    if (event.key === 'Home') next = 0
-    if (event.key === 'End') next = buttons.length - 1
-    activateTab(buttons[next], buttons[next].dataset.value, true)
-  })
-
+  bindRovingKeyboard(container, buttons, activateTab)
   if (buttons.length) buttons[0].classList.add('active')
   container.append(...buttons)
+  container.setValue = (value, settings = {}) => {
+    const index = values.findIndex(itemValue => String(itemValue) === String(value))
+    return index >= 0 && activateTab(buttons[index], { notify: false, ...settings })
+  }
 
   if (tabs.some(tab => typeof tab.content === 'function')) {
     const wrapper = createElement('div', { className: 'tab-layout' }, [container])
     const content = createElement('div', { className: 'tab-content' })
     contentPanels = tabs.map((tab, index) => {
-      const panel = createElement('div', { role: 'tabpanel', hidden: index !== 0 })
+      const panelId = `${tabSetId}-panel-${index}`
+      buttons[index].setAttribute('aria-controls', panelId)
+      const panel = createElement('div', {
+        id: panelId,
+        role: 'tabpanel',
+        'aria-labelledby': buttons[index].id,
+        hidden: index !== 0,
+        tabindex: '0'
+      })
       tab.content?.(panel)
       content.appendChild(panel)
       return panel
@@ -161,7 +281,94 @@ export function createTabGroup(tabs, onChange = () => {}) {
   return container
 }
 
+function enhanceChoiceScrolling(group) {
+  if (group.parentElement?.classList.contains('choice-scroll-wrap')) return
+  const wrapper = createElement('div', { className: 'choice-scroll-wrap' })
+  const previous = createElement('button', {
+    className: 'choice-scroll-button choice-scroll-prev',
+    type: 'button',
+    textContent: '‹',
+    'aria-label': '向左滚动选项'
+  })
+  const next = createElement('button', {
+    className: 'choice-scroll-button choice-scroll-next',
+    type: 'button',
+    textContent: '›',
+    'aria-label': '向右滚动选项'
+  })
+  group.before(wrapper)
+  wrapper.append(previous, group, next)
+
+  const update = () => {
+    const maxScroll = Math.max(0, group.scrollWidth - group.clientWidth)
+    previous.hidden = maxScroll < 6 || group.scrollLeft <= 6
+    next.hidden = maxScroll < 6 || group.scrollLeft >= maxScroll - 6
+  }
+  const scroll = direction => {
+    const distance = Math.max(160, Math.round(group.clientWidth * 0.7)) * direction
+    if (group.scrollBy) group.scrollBy({ left: distance, behavior: 'smooth' })
+    else group.scrollLeft += distance
+  }
+  previous.addEventListener('click', () => scroll(-1))
+  next.addEventListener('click', () => scroll(1))
+  group.addEventListener('scroll', update, { passive: true })
+  group.addEventListener('focusin', update)
+  update()
+  globalThis.requestAnimationFrame?.(update)
+  if (globalThis.ResizeObserver) {
+    const observer = new globalThis.ResizeObserver(update)
+    observer.observe(group)
+    choiceScrollObservers.set(group, observer)
+  }
+}
+
+export function cleanupFormAccessibility(root = document) {
+  const groups = root.matches?.('.tab-group, .segmented-group, .filter-group')
+    ? [root]
+    : [...root.querySelectorAll('.tab-group, .segmented-group, .filter-group')]
+  groups.forEach(group => {
+    choiceScrollObservers.get(group)?.disconnect()
+    choiceScrollObservers.delete(group)
+  })
+}
+
 export function enhanceFormAccessibility(root = document) {
+  root.querySelectorAll('.tool-section').forEach(section => {
+    const body = section.querySelector(':scope > .tool-section-body')
+    const header = section.querySelector(':scope > .tool-section-header')
+    if (!body || !header) return
+    const strayChildren = [...section.children].filter(child => child !== header && child !== body)
+    if (strayChildren.length) body.append(...strayChildren)
+  })
+
+  root.querySelectorAll('table.result-box').forEach(table => {
+    table.classList.remove('result-box')
+    table.classList.add('result-table')
+  })
+
+  root.querySelectorAll('table.result-table').forEach(table => {
+    if (table.parentElement?.classList.contains('table-scroll')) return
+    createTableScroll(table)
+  })
+
+  const tabGroups = [...root.querySelectorAll('.tab-group[role="tablist"]')]
+  const externalPanels = [...root.querySelectorAll('.tab-panel')]
+  if (tabGroups.length === 1) {
+    const buttons = [...tabGroups[0].querySelectorAll('[role="tab"]')]
+    if (buttons.length === externalPanels.length && buttons.every(button => !button.hasAttribute('aria-controls'))) {
+      buttons.forEach((button, index) => {
+        const panel = externalPanels[index]
+        if (!panel.id) panel.id = `tool-tab-panel-${++generatedId}`
+        button.setAttribute('aria-controls', panel.id)
+        panel.setAttribute('role', 'tabpanel')
+        panel.setAttribute('aria-labelledby', button.id)
+        panel.setAttribute('tabindex', '0')
+      })
+    }
+  }
+
+  root.querySelectorAll('.tab-group, .segmented-group, .filter-group').forEach(enhanceChoiceScrolling)
+
   root.querySelectorAll('.form-group').forEach(group => {
     const labels = [...group.querySelectorAll('label')].filter(label => !label.control)
     const controls = [...group.querySelectorAll('input, textarea, select')].filter(control => {
@@ -186,4 +393,6 @@ export function enhanceFormAccessibility(root = document) {
   root.querySelectorAll('button:not([aria-label])').forEach(button => {
     if (!button.textContent.trim() && button.title) button.setAttribute('aria-label', button.title)
   })
+
+  root.querySelectorAll('button:not([type])').forEach(button => button.setAttribute('type', 'button'))
 }

@@ -1,5 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
   id: 'jwt',
@@ -44,16 +43,14 @@ export default {
       rows: 4
     })
 
-    const headerLabel = createElement('label', { className: 'label' }, ['Header'])
     const headerOutput = createElement('pre', { className: 'code-block' }, ['等待输入...'])
     const headerCopyBtn = createCopyButton(() => headerOutput.textContent === '等待输入...' ? '' : headerOutput.textContent)
 
-    const payloadLabel = createElement('label', { className: 'label' }, ['Payload'])
     const payloadOutput = createElement('pre', { className: 'code-block' }, ['等待输入...'])
     const payloadCopyBtn = createCopyButton(() => payloadOutput.textContent === '等待输入...' ? '' : payloadOutput.textContent)
 
-    const signatureLabel = createElement('label', { className: 'label' }, ['Signature'])
     const signatureOutput = createElement('pre', { className: 'code-block' }, ['等待输入...'])
+    const signatureCopyBtn = createCopyButton(() => signatureOutput.textContent === '等待输入...' ? '' : signatureOutput.textContent)
 
     const expiryInfo = createElement('div', { className: 'expiry-info' })
 
@@ -119,7 +116,7 @@ export default {
 
     // Sample JWT (HS256, valid structure)
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IuW8oOS4iSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxODAwMDAwMDAwLCJyb2xlIjoiYWRtaW4ifQ.4q2AxBv0PjOZ4U2J2v6k8QJ6b7yP1mN5cR3tV9wX0yA
@@ -129,7 +126,7 @@ export default {
     })
 
     const clearBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '清空',
       onClick: () => {
         inputTextarea.value = ''
@@ -137,23 +134,13 @@ export default {
       }
     })
 
-    const headerSection = createElement('div', { className: 'result-box' }, [
-      headerLabel,
-      headerOutput,
-      headerCopyBtn
-    ])
-
-    const payloadSection = createElement('div', { className: 'result-box' }, [
-      payloadLabel,
+    const headerSection = createSection('Header', headerOutput, [headerCopyBtn])
+    const payloadContent = createElement('div', { className: 'tool-stack' }, [
       payloadOutput,
-      expiryInfo,
-      payloadCopyBtn
+      expiryInfo
     ])
-
-    const signatureSection = createElement('div', { className: 'result-box' }, [
-      signatureLabel,
-      signatureOutput
-    ])
+    const payloadSection = createSection('Payload', payloadContent, [payloadCopyBtn])
+    const signatureSection = createSection('Signature', signatureOutput, [signatureCopyBtn])
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
     const btnGroup = createElement('div', { className: 'btn-group' }, [decodeBtn, sampleBtn, clearBtn])

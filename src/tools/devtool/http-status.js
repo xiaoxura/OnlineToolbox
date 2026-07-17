@@ -1,4 +1,4 @@
-import { createElement, createSection } from '../../utils/dom.js'
+import { createElement, createFilterGroup, createSection } from '../../utils/dom.js'
 
 const STATUS_CODES = [
   // 1xx
@@ -69,10 +69,12 @@ function getCategoryClass(code) {
 }
 
 function renderCodeItem(item) {
-  return createElement('div', { className: 'stat-item' }, [
-    createElement('span', { className: 'stat-value', textContent: String(item.code) }),
-    createElement('span', { className: 'stat-label', textContent: item.name }),
-    createElement('span', { className: 'stat-label', textContent: item.desc })
+  return createElement('div', { className: 'status-code-item' }, [
+    createElement('span', { className: 'status-code-number', textContent: String(item.code) }),
+    createElement('div', { className: 'status-code-copy' }, [
+      createElement('strong', { textContent: item.name }),
+      createElement('span', { textContent: item.desc })
+    ])
   ])
 }
 
@@ -100,21 +102,10 @@ export default {
 
     const listEl = createElement('div', { className: 'result-box' })
 
-    // Category tabs
-    const tabContainer = createElement('div', { className: 'tab-group' })
-    CATEGORIES.forEach((cat, idx) => {
-      const btn = createElement('button', {
-        className: 'tab-btn' + (idx === 0 ? ' active' : ''),
-        textContent: cat.label,
-        onClick: () => {
-          tabContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
-          btn.classList.add('active')
-          activePrefix = cat.prefix
-          renderList()
-        }
-      })
-      tabContainer.appendChild(btn)
-    })
+    const filterGroup = createFilterGroup(CATEGORIES.map(cat => ({ label: cat.label, value: cat.prefix })), value => {
+      activePrefix = value
+      renderList()
+    }, { label: 'HTTP 状态码分类' })
 
     function renderList() {
       const query = searchInput.value.trim().toLowerCase()
@@ -143,7 +134,7 @@ export default {
     renderList()
 
     const searchSection = createSection('搜索', searchRow)
-    const tabSection = createSection('分类', tabContainer)
+    const tabSection = createSection('分类', filterGroup)
     const listSection = createSection('状态码列表', listEl)
 
     container.appendChild(searchSection)

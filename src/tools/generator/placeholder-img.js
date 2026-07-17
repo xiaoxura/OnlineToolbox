@@ -77,8 +77,8 @@ export default {
 
     const optionsRow = createElement('div', { className: 'form-row' }, [textGroup, fontSizeGroup])
 
-    const canvas = createElement('canvas', { id: 'ph-canvas' })
-    const previewBox = createElement('div', { className: 'result-box' }, [canvas])
+    const canvas = createElement('canvas', { id: 'ph-canvas', className: 'placeholder-canvas' })
+    const previewBox = createElement('div', { className: 'result-box placeholder-preview' }, [canvas])
 
     const svgOutput = createElement('textarea', {
       className: 'textarea',

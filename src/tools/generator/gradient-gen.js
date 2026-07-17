@@ -1,4 +1,4 @@
-import { createElement, createSection, createTabGroup, createCopyButton } from '../../utils/dom.js'
+import { createElement, createSection, createSegmentedGroup, createCopyButton } from '../../utils/dom.js'
 
 export default {
   id: 'gradient-gen',
@@ -13,34 +13,38 @@ export default {
       { color: '#0000ff', position: 100 }
     ]
 
+    const angleInput = createElement('input', {
+      className: 'input',
+      type: 'number',
+      id: 'gg-angle',
+      value: '90',
+      min: '0',
+      max: '360',
+      onInput: updatePreview
+    })
     const angleGroup = createElement('div', { className: 'form-group' }, [
       createElement('label', { className: 'label', for: 'gg-angle' }, ['角度 (0-360)']),
-      createElement('input', {
-        className: 'input',
-        type: 'number',
-        id: 'gg-angle',
-        value: '90',
-        min: '0',
-        max: '360'
-      })
+      angleInput
     ])
 
+    const shapeSelect = createElement('select', { className: 'select', id: 'gg-shape', onChange: updatePreview }, [
+      createElement('option', { value: 'circle' }, ['圆形 (circle)']),
+      createElement('option', { value: 'ellipse', selected: 'true' }, ['椭圆 (ellipse)'])
+    ])
     const shapeGroup = createElement('div', { className: 'form-group' }, [
       createElement('label', { className: 'label', for: 'gg-shape' }, ['形状']),
-      createElement('select', { className: 'select', id: 'gg-shape' }, [
-        createElement('option', { value: 'circle' }, ['圆形 (circle)']),
-        createElement('option', { value: 'ellipse', selected: 'true' }, ['椭圆 (ellipse)'])
-      ])
+      shapeSelect
     ])
 
     const linearOptions = createElement('div', { className: 'form-group' }, [angleGroup])
     const radialOptions = createElement('div', { className: 'form-group' }, [shapeGroup])
     radialOptions.setAttribute('hidden', 'true')
 
-    const stopsContainer = createElement('div', { className: 'form-group' })
+    const stopsContainer = createElement('div', { className: 'form-group gradient-stops' })
 
     const addStopBtn = createElement('button', {
       className: 'btn btn-secondary',
+      type: 'button',
       textContent: '+ 添加色标',
       onClick: () => {
         colorStops.push({ color: '#00ff00', position: 50 })
@@ -49,7 +53,7 @@ export default {
       }
     })
 
-    const previewArea = createElement('div', { className: 'result-box' })
+    const previewArea = createElement('div', { className: 'result-box visual-preview' })
 
     const cssOutput = createElement('textarea', {
       className: 'textarea',
@@ -85,8 +89,12 @@ export default {
         })
 
         const removeBtn = createElement('button', {
-          className: 'btn btn-secondary',
-          textContent: '删除',
+          className: 'btn-icon gradient-stop-remove',
+          type: 'button',
+          title: '删除色标',
+          'aria-label': `删除第 ${index + 1} 个色标`,
+          textContent: '×',
+          disabled: colorStops.length <= 2,
           onClick: () => {
             if (colorStops.length > 2) {
               colorStops.splice(index, 1)
@@ -96,7 +104,7 @@ export default {
           }
         })
 
-        const stopRow = createElement('div', { className: 'form-row' }, [
+        const stopRow = createElement('div', { className: 'gradient-stop-row' }, [
           createElement('div', { className: 'form-group' }, [
             createElement('label', { className: 'label' }, ['颜色']),
             colorInput
@@ -105,10 +113,7 @@ export default {
             createElement('label', { className: 'label' }, ['位置 (%)']),
             posInput
           ]),
-          createElement('div', { className: 'form-group' }, [
-            createElement('label', { className: 'label' }, [' ']),
-            removeBtn
-          ])
+          removeBtn
         ])
 
         stopsContainer.appendChild(stopRow)
@@ -120,10 +125,10 @@ export default {
       const stopsStr = sortedStops.map(s => `${s.color} ${s.position}%`).join(', ')
 
       if (currentMode === 'linear') {
-        const angle = parseInt(document.getElementById('gg-angle').value) || 90
+        const angle = parseInt(angleInput.value) || 90
         return `background: linear-gradient(${angle}deg, ${stopsStr});`
       } else {
-        const shape = document.getElementById('gg-shape').value
+        const shape = shapeSelect.value
         return `background: radial-gradient(${shape}, ${stopsStr});`
       }
     }
@@ -134,7 +139,7 @@ export default {
       cssOutput.value = css
     }
 
-    const tabGroup = createTabGroup([
+    const tabGroup = createSegmentedGroup([
       { label: '线性渐变', value: 'linear' },
       { label: '径向渐变', value: 'radial' }
     ], (value) => {

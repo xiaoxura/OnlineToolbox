@@ -1,5 +1,4 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 import * as Diff from 'diff'
 
 export default {
@@ -36,7 +35,7 @@ export default {
     const outputEl = createElement('div', { className: 'diff-output' })
 
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick() {
         leftInput.value = `function hello(name) {

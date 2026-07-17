@@ -1,5 +1,4 @@
 import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
   id: 'json',

@@ -1,5 +1,4 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
 
 function inferSchema(value, keyName) {
   if (value === null) {
@@ -112,8 +111,6 @@ export default {
       }
     })
 
-    const btnRow = createElement('div', { className: 'btn-group' }, [generateBtn, clearBtn])
-
     const errorEl = createElement('div', { className: 'error-text' })
 
     const outputEl = createElement('textarea', {
@@ -142,7 +139,7 @@ export default {
       }
     }
 
-    const inputSection = createSection('输入 JSON', inputEl, [btnRow])
+    const inputSection = createSection('输入 JSON', inputEl, [generateBtn, clearBtn])
     const outputSection = createSection('生成的 Schema', outputEl, [copyBtn])
 
     container.appendChild(inputSection)

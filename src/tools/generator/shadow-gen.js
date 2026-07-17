@@ -81,13 +81,13 @@ export default {
       id: 'sg-inset',
       onChange: updatePreview
     })
-    const insetLabel = createElement('label', {
-      className: 'checkbox-label',
-      for: 'sg-inset'
-    }, ['内阴影 (inset)'])
+    const insetLabel = createElement('label', { className: 'option-item option-control-group' }, [
+      insetCheck,
+      createElement('span', { textContent: '内阴影 (inset)' })
+    ])
 
     const optionsRow = createElement('div', { className: 'form-row' }, [colorGroup, opacityGroup])
-    const insetRow = createElement('div', { className: 'form-group' }, [insetCheck, insetLabel])
+    const insetRow = insetLabel
 
     const previewBox = createElement('div', { className: 'result-box' })
     const previewInner = createElement('div', { className: 'stat-item' }, ['阴影预览'])

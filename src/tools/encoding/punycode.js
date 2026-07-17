@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
   id: 'punycode',
@@ -159,7 +158,6 @@ export default {
       onInput: () => convertBtn.click()
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -169,7 +167,7 @@ export default {
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { value: 'text-to-punycode', label: '文本→Punycode' },
       { value: 'punycode-to-text', label: 'Punycode→文本' }
     ], (key) => {
@@ -211,7 +209,7 @@ export default {
     }, ['转换'])
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         const samples = {
@@ -225,7 +223,7 @@ export default {
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
     const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn, sampleBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(tabs)
     container.appendChild(inputGroup)

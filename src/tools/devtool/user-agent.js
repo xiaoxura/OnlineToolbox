@@ -97,7 +97,7 @@ export default {
     })
 
     const currentBtn = createElement('button', {
-      className: 'btn',
+      className: 'btn btn-secondary',
       textContent: '使用当前浏览器',
       onClick: () => {
         uaInput.value = navigator.userAgent
@@ -107,15 +107,12 @@ export default {
 
     const btnRow = createElement('div', { className: 'btn-group' }, [parseBtn, currentBtn])
 
-    const inputRow = createElement('div', { className: 'form-row' }, [
+    const inputRow = createElement('div', { className: 'form-row form-action-row' }, [
       createElement('div', { className: 'form-group' }, [
         createElement('label', { className: 'label', textContent: 'User-Agent 字符串' }),
         uaInput
       ]),
-      createElement('div', { className: 'form-group' }, [
-        createElement('label', { className: 'label', textContent: ' ' }),
-        btnRow
-      ])
+      btnRow
     ])
 
     const errorEl = createElement('div', { className: 'error-text' })

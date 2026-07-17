@@ -1,4 +1,4 @@
-import { createElement, createSection } from '../../utils/dom.js'
+import { createElement, createSection, createTableScroll } from '../../utils/dom.js'
 
 export default {
   id: 'regex',
@@ -48,7 +48,7 @@ export default {
     })
 
     const matchesTable = createElement('div', {
-      className: 'result-box'
+      className: 'section-result'
     })
 
     function getFlags() {
@@ -130,7 +130,7 @@ export default {
       // Match groups table
       if (matches.some(m => m.groups.length > 0)) {
         const table = createElement('table', {
-          className: 'result-table'
+          className: 'result-table result-table-wide'
         })
 
         const thead = document.createElement('thead')
@@ -171,7 +171,7 @@ export default {
           tbody.appendChild(tr)
         })
         table.appendChild(tbody)
-        matchesTable.appendChild(table)
+        matchesTable.appendChild(createTableScroll(table, '正则表达式捕获组详情'))
       }
     }
 

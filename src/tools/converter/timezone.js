@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 
 const TIMEZONES = [
   { value: 'UTC', label: 'UTC' },
@@ -21,8 +20,6 @@ export default {
   icon: 'timestamp',
 
   render(container) {
-    const section = createSection('时区转换')
-
     const inputGroup = createElement('div', { className: 'form-group' })
     const dtLabel = createElement('label', { className: 'label', textContent: '日期时间' })
     const dtInput = createElement('input', {
@@ -69,15 +66,12 @@ export default {
     })
     btnGroup.appendChild(convertBtn)
 
-    const resultBox = createElement('div', { className: 'result-box' })
+    let resultText = ''
+    const resultContent = createElement('div', { className: 'section-result' })
+    const resultSection = createSection('转换结果', resultContent, [createCopyButton(() => resultText)])
     const errorText = createElement('div', { className: 'error-text', style: 'display:none' })
 
-    section.appendChild(inputGroup)
-    section.appendChild(row)
-    section.appendChild(btnGroup)
-    section.appendChild(errorText)
-    section.appendChild(resultBox)
-    container.appendChild(section)
+    container.append(inputGroup, row, btnGroup, errorText, resultSection)
 
     function formatInTimezone(date, tz) {
       return new Intl.DateTimeFormat('zh-CN', {
@@ -104,7 +98,8 @@ export default {
 
     function convert() {
       errorText.style.display = 'none'
-      resultBox.innerHTML = ''
+      resultContent.innerHTML = ''
+      resultText = ''
 
       const dtVal = dtInput.value
       if (!dtVal) {
@@ -151,7 +146,7 @@ export default {
         tgtItem.appendChild(tgtValue)
         statsRow.appendChild(tgtItem)
 
-        resultBox.appendChild(statsRow)
+        resultContent.appendChild(statsRow)
 
         const offsetRow = createElement('div', { className: 'stats-row' })
         const offsetItem = createElement('div', { className: 'stat-item' })
@@ -166,18 +161,8 @@ export default {
         offsetItem.appendChild(offsetLabel)
         offsetItem.appendChild(offsetValue)
         offsetRow.appendChild(offsetItem)
-        resultBox.appendChild(offsetRow)
-
-        const copyBtn = createElement('button', {
-          className: 'btn btn-secondary',
-          textContent: '复制转换结果'
-        })
-        copyBtn.addEventListener('click', () => {
-          copyToClipboard(tgtFormatted)
-          copyBtn.textContent = '已复制'
-          setTimeout(() => { copyBtn.textContent = '复制转换结果' }, 1500)
-        })
-        resultBox.appendChild(copyBtn)
+        resultContent.appendChild(offsetRow)
+        resultText = tgtFormatted
       } catch {
         errorText.textContent = '时区转换失败，请检查输入'
         errorText.style.display = 'block'

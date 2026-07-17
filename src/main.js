@@ -2,7 +2,7 @@ import './styles/base.css'
 import './styles/layout.css'
 import './styles/tool.css'
 
-import { $, createElement, enhanceFormAccessibility } from './utils/dom.js'
+import { $, cleanupFormAccessibility, createElement, enhanceFormAccessibility } from './utils/dom.js'
 import { initRouter, registerRoute, navigate } from './router.js'
 import { categories, tools, getToolsByCategoryAndSearch, getToolById, loadToolById } from './tools/registry.js'
 import icons from './icons.js'
@@ -17,6 +17,7 @@ let currentCategory = 'all'
 let searchQuery = ''
 let homeScrollY = 0
 let renderRequestId = 0
+let returnFocusToolId = null
 let favorites = readStoredList(STORAGE.favorites)
 let recentTools = readStoredList(STORAGE.recent)
 
@@ -48,16 +49,17 @@ function setupTheme() {
     button.setAttribute('aria-label', isDark ? '切换到浅色主题' : '切换到深色主题')
     button.setAttribute('title', isDark ? '切换到浅色主题' : '切换到深色主题')
     button.setAttribute('aria-pressed', String(isDark))
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#0c1220' : '#4355d9')
   }
 
   button.addEventListener('click', () => {
     const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
     document.documentElement.dataset.theme = nextTheme
-    localStorage.setItem('theme', nextTheme)
+    try { localStorage.setItem('theme', nextTheme) } catch { /* Storage may be unavailable. */ }
     updateButton()
   })
   media.addEventListener?.('change', event => {
-    if (localStorage.getItem('theme')) return
+    try { if (localStorage.getItem('theme')) return } catch { /* Follow system theme when storage is unavailable. */ }
     document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
     updateButton()
   })
@@ -168,6 +170,7 @@ function renderToolSection(title, toolIds, className = '') {
 function renderGrid() {
   const main = $('#mainContent')
   const filtered = getToolsByCategoryAndSearch(currentCategory, searchQuery)
+  cleanupFormAccessibility(main)
   main.innerHTML = ''
 
   if (!searchQuery && currentCategory === 'all') {
@@ -226,33 +229,56 @@ async function renderToolPage(toolId) {
   $('.search-box').hidden = true
   const tool = getToolById(toolId)
   if (!tool) { navigate('/'); return }
+  returnFocusToolId = toolId
   recordRecent(toolId)
 
   const main = $('#mainContent')
   const page = createElement('div', { className: 'tool-page' })
-  const header = createElement('div', { className: 'tool-header' }, [
-    createElement('button', { className: 'back-btn', type: 'button', innerHTML: `${icons.back}<span>返回</span>`, onClick: () => navigate('/') }),
-    createElement('h1', { className: 'tool-title', textContent: tool.name }),
-    createElement('span', { className: 'tool-title-desc', textContent: tool.description })
+  const titleId = `tool-title-${tool.id}`
+  const categoryName = categories.find(category => category.id === tool.category)?.name || '在线工具'
+  const title = createElement('h1', { id: titleId, className: 'tool-title', textContent: tool.name, tabindex: '-1' })
+  const header = createElement('header', { className: 'tool-header' }, [
+    createElement('button', {
+      className: 'back-btn',
+      type: 'button',
+      title: '返回工具列表',
+      'aria-label': '返回工具列表',
+      innerHTML: icons.back,
+      onClick: () => navigate('/')
+    }),
+    createElement('div', { className: 'tool-header-icon', innerHTML: icons[tool.icon] || icons.wrench, 'aria-hidden': 'true' }),
+    createElement('div', { className: 'tool-heading' }, [
+      createElement('span', { className: 'tool-eyebrow', textContent: categoryName }),
+      title,
+      createElement('span', { className: 'tool-title-desc', textContent: tool.description })
+    ])
   ])
-  const body = createElement('div', { className: 'tool-body' })
+  const body = createElement('div', { className: 'tool-body', role: 'region', 'aria-labelledby': titleId, 'aria-busy': 'true' })
   page.append(header, body)
+  cleanupFormAccessibility(main)
   main.innerHTML = ''
   main.appendChild(page)
   setPageMetadata(`${tool.name} - 在线工具箱`, tool.description)
+  window.scrollTo(0, 0)
+  requestAnimationFrame(() => title.focus({ preventScroll: true }))
 
   const requestId = ++renderRequestId
-  body.appendChild(createElement('div', { className: 'tool-loading', role: 'status', textContent: '正在加载工具…' }))
+  body.appendChild(createElement('div', { className: 'tool-loading', role: 'status' }, [
+    createElement('span', { className: 'loading-spinner', 'aria-hidden': 'true' }),
+    createElement('span', { textContent: '正在加载工具…' })
+  ]))
   try {
     const implementation = await loadToolById(toolId)
     if (requestId !== renderRequestId) return
     body.innerHTML = ''
     implementation.render(body)
     enhanceFormAccessibility(body)
+    body.setAttribute('aria-busy', 'false')
   } catch (error) {
     if (requestId !== renderRequestId) return
     console.error(`Failed to load tool: ${toolId}`, error)
     body.innerHTML = ''
+    body.setAttribute('aria-busy', 'false')
     body.appendChild(createElement('div', { className: 'load-error', role: 'alert' }, [
       createElement('strong', { textContent: '工具加载失败' }),
       createElement('p', { textContent: navigator.onLine === false ? '当前设备似乎处于离线状态，请联网后重试。' : '可能是网络波动或资源暂时不可用。' }),
@@ -276,7 +302,12 @@ function renderHome() {
     button.setAttribute('aria-pressed', String(isActive))
   })
   renderGrid()
-  requestAnimationFrame(() => window.scrollTo(0, homeScrollY))
+  requestAnimationFrame(() => {
+    window.scrollTo(0, homeScrollY)
+    if (!returnFocusToolId) return
+    document.querySelector(`.tool-card[href="#/${returnFocusToolId}"]`)?.focus({ preventScroll: true })
+    returnFocusToolId = null
+  })
 }
 
 function init() {

@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import CryptoJS from 'crypto-js'
 
 export default {
@@ -56,27 +55,26 @@ export default {
 
     // Mode tabs
     const modeLabel = createElement('label', { className: 'label' }, ['加密模式'])
-    const modeTabs = createTabGroup([
+    const modeTabs = createSegmentedGroup([
       { label: 'CBC', value: 'CBC' },
       { label: 'ECB', value: 'ECB' },
       { label: 'CTR', value: 'CTR' }
     ], (value) => {
       currentMode = value
       updateIvVisibility()
-    })
+    }, { label: '加密模式' })
 
     // Padding tabs
     const paddingLabel = createElement('label', { className: 'label' }, ['填充方式'])
-    const paddingTabs = createTabGroup([
+    const paddingTabs = createSegmentedGroup([
       { label: 'Pkcs7', value: 'Pkcs7' },
       { label: 'ZeroPadding', value: 'ZeroPadding' },
       { label: 'NoPadding', value: 'NoPadding' }
     ], (value) => {
       currentPadding = value
-    })
+    }, { label: '填充方式' })
 
     // Output
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -150,7 +148,7 @@ export default {
     }, ['解密'])
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         inputTextarea.value = '这是一段需要加密的测试文本 Hello World!'
@@ -159,7 +157,7 @@ export default {
     })
 
     const btnGroup = createElement('div', { className: 'btn-group' }, [encryptBtn, decryptBtn, sampleBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(inputLabel)
     container.appendChild(inputTextarea)

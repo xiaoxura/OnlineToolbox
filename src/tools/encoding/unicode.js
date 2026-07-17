@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
   id: 'unicode',
@@ -30,7 +29,6 @@ export default {
       }
     })
 
-    const outputLabel = createElement('label', { className: 'label' }, ['输出结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -38,7 +36,7 @@ export default {
       readOnly: true
     })
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { value: 'text-to-unicode', label: '文本→Unicode' },
       { value: 'unicode-to-text', label: 'Unicode→文本' }
     ], (key) => {
@@ -93,7 +91,7 @@ export default {
     const copyBtn = createCopyButton(() => outputTextarea.value)
 
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         if (mode === 'text-to-unicode') {
@@ -106,7 +104,7 @@ export default {
     })
 
     const clearBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '清空',
       onClick: () => {
         inputTextarea.value = ''
@@ -116,7 +114,7 @@ export default {
 
     const inputGroup = createElement('div', { className: 'form-group' }, [inputLabel, inputTextarea])
     const btnGroup = createElement('div', { className: 'btn-group' }, [convertBtn, sampleBtn, clearBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('输出结果', outputTextarea, [copyBtn])
 
     container.appendChild(tabs)
     container.appendChild(inputGroup)

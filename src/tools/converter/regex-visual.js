@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection, createTableScroll } from '../../utils/dom.js'
 
 const REGEX_COMPONENTS = [
   { pattern: /\(\?:/, desc: '非捕获分组' },
@@ -39,8 +38,6 @@ export default {
   icon: 'regex',
 
   render(container) {
-    const section = createSection('正则表达式可视化')
-
     const inputGroup = createElement('div', { className: 'form-group' })
     const patternLabel = createElement('label', { className: 'label', textContent: '正则表达式' })
     const patternRow = createElement('div', { className: 'form-row' })
@@ -73,21 +70,19 @@ export default {
       textContent: '测试匹配'
     })
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据'
     })
     btnGroup.appendChild(testBtn)
     btnGroup.appendChild(exampleBtn)
 
-    const resultBox = createElement('div', { className: 'result-box' })
+    const resultContainer = createElement('div', { className: 'tool-stack' })
     const errorText = createElement('div', { className: 'error-text', style: 'display:none' })
+    const copyRegexBtn = createCopyButton(() => `/${patternInput.value.trim()}/${flagsInput.value.trim()}`)
+    copyRegexBtn.title = '复制正则表达式'
+    copyRegexBtn.setAttribute('aria-label', '复制正则表达式')
 
-    section.appendChild(inputGroup)
-    section.appendChild(testGroup)
-    section.appendChild(btnGroup)
-    section.appendChild(errorText)
-    section.appendChild(resultBox)
-    container.appendChild(section)
+    container.append(inputGroup, testGroup, btnGroup, errorText, resultContainer)
 
     function escapeHtml(str) {
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -120,7 +115,7 @@ export default {
 
     function runTest() {
       errorText.style.display = 'none'
-      resultBox.innerHTML = ''
+      resultContainer.innerHTML = ''
 
       const pattern = patternInput.value.trim()
       const flags = flagsInput.value.trim()
@@ -158,13 +153,7 @@ export default {
       }
 
       // Highlighted result
-      const highlightSection = createElement('div', { className: 'tool-section' })
-      const highlightLabel = createElement('label', {
-        className: 'label',
-        textContent: `匹配结果 (共 ${matches.length} 个匹配)`
-      })
-      highlightSection.appendChild(highlightLabel)
-
+      let highlightContent
       if (matches.length > 0 && testStr) {
         const highlightBox = createElement('div', { className: 'result-box' })
         let html = ''
@@ -173,31 +162,27 @@ export default {
 
         sortedMatches.forEach(m => {
           html += escapeHtml(testStr.slice(lastIndex, m.index))
-          html += `<span class="stat-value" style="background:#4CAF50;color:#fff;padding:0 2px;border-radius:2px">${escapeHtml(m.full)}</span>`
+          html += `<mark class="regex-match">${escapeHtml(m.full)}</mark>`
           lastIndex = m.index + m.full.length
         })
         html += escapeHtml(testStr.slice(lastIndex))
         highlightBox.innerHTML = html
-        highlightSection.appendChild(highlightBox)
+        highlightContent = highlightBox
       } else {
-        const noMatch = createElement('div', {
+        highlightContent = createElement('div', {
           className: 'stat-item',
           textContent: '无匹配'
         })
-        highlightSection.appendChild(noMatch)
       }
-      resultBox.appendChild(highlightSection)
+      resultContainer.appendChild(createSection(
+        `匹配结果 (共 ${matches.length} 个匹配)`,
+        highlightContent,
+        [copyRegexBtn]
+      ))
 
       // Match groups table
       if (matches.length > 0) {
-        const tableSection = createElement('div', { className: 'tool-section' })
-        const tableLabel = createElement('label', {
-          className: 'label',
-          textContent: '匹配详情'
-        })
-        tableSection.appendChild(tableLabel)
-
-        const table = createElement('table', { className: 'result-box' })
+        const table = createElement('table', { className: 'result-table' })
         const thead = createElement('thead')
         thead.innerHTML = '<tr><th>#</th><th>匹配内容</th><th>位置</th><th>捕获组</th></tr>'
         table.appendChild(thead)
@@ -219,21 +204,17 @@ export default {
         })
 
         table.appendChild(tbody)
-        tableSection.appendChild(table)
-        resultBox.appendChild(tableSection)
+        resultContainer.appendChild(createSection(
+          '匹配详情',
+          createTableScroll(table, '正则表达式匹配详情')
+        ))
       }
 
       // Regex explanation
-      const explainSection = createElement('div', { className: 'tool-section' })
-      const explainLabel = createElement('label', {
-        className: 'label',
-        textContent: '正则表达式分解'
-      })
-      explainSection.appendChild(explainLabel)
-
+      let explainContent
       const explanations = explainRegex(pattern)
       if (explanations.length > 0) {
-        const explainTable = createElement('table', { className: 'result-box' })
+        const explainTable = createElement('table', { className: 'result-table' })
         const eth = createElement('thead')
         eth.innerHTML = '<tr><th>符号</th><th>含义</th></tr>'
         explainTable.appendChild(eth)
@@ -258,27 +239,14 @@ export default {
         })
 
         explainTable.appendChild(etb)
-        explainSection.appendChild(explainTable)
+        explainContent = createTableScroll(explainTable, '正则表达式分解')
       } else {
-        const noExplain = createElement('div', {
+        explainContent = createElement('div', {
           className: 'stat-item',
           textContent: '无法分解此正则表达式'
         })
-        explainSection.appendChild(noExplain)
       }
-      resultBox.appendChild(explainSection)
-
-      // Copy button
-      const copyBtn = createElement('button', {
-        className: 'btn btn-secondary',
-        textContent: '复制正则'
-      })
-      copyBtn.addEventListener('click', () => {
-        copyToClipboard(`/${pattern}/${flags}`)
-        copyBtn.textContent = '已复制'
-        setTimeout(() => { copyBtn.textContent = '复制正则' }, 1500)
-      })
-      resultBox.appendChild(copyBtn)
+      resultContainer.appendChild(createSection('正则表达式分解', explainContent))
     }
 
     testBtn.addEventListener('click', runTest)

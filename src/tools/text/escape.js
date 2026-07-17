@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup, createCopyButton } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createSection, createSegmentedGroup, createCopyButton } from '../../utils/dom.js'
 
 export default {
   id: 'escape',
@@ -129,7 +128,7 @@ export default {
     }
 
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick() {
         input.value = `Hello <World> & "Friends"!\n包含特殊字符: '单引号' & "双引号" <标签>\n路径: C:\\Users\\test\\file.txt\nURL: https://example.com/search?q=hello world&lang=zh\n换行符:\\t制表符\\n换行符\\r回车符`
@@ -170,7 +169,7 @@ export default {
     actionsRow.appendChild(unescapeBtn)
     actionsRow.appendChild(copyBtn)
 
-    const tabGroup = createTabGroup(tabs, (value) => {
+    const tabGroup = createSegmentedGroup(tabs, (value) => {
       currentMode = value
       output.value = ''
       output.placeholder = '转义结果...'

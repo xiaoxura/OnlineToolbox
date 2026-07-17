@@ -1,4 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
+import { createElement, createCopyButton, createTableScroll } from '../../utils/dom.js'
 
 function ipToInt(ip) {
   const parts = ip.trim().split('.')
@@ -36,8 +36,14 @@ export default {
         const labels = { address: 'IP 地址', mask: '子网掩码', network: '网络地址', broadcast: '广播地址', first: '首个可用地址', last: '最后可用地址', total: '地址总数', usable: '可用地址数' }
         const table = createElement('table', { className: 'result-table' })
         const body = createElement('tbody')
-        for (const [key, label] of Object.entries(labels)) body.appendChild(createElement('tr', {}, [createElement('th', { textContent: label }), createElement('td', {}, [createElement('span', { textContent: String(data[key]) }), createCopyButton(String(data[key]))])]))
-        table.appendChild(body); result.appendChild(table)
+        for (const [key, label] of Object.entries(labels)) body.appendChild(createElement('tr', {}, [
+          createElement('th', { textContent: label }),
+          createElement('td', {}, [createElement('div', { className: 'table-cell-actions' }, [
+            createElement('span', { textContent: String(data[key]) }),
+            createCopyButton(String(data[key]))
+          ])])
+        ]))
+        table.appendChild(body); result.appendChild(createTableScroll(table, 'CIDR 计算结果'))
       } catch (e) { error.textContent = e.message }
     }
     input.addEventListener('keydown', event => { if (event.key === 'Enter') run() })

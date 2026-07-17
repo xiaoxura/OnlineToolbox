@@ -33,7 +33,8 @@ export default {
       alt: '预览'
     })
 
-    const sizeInfo = createElement('div', { className: 'inline-result' })
+    const sizeInfo = createElement('div', { className: 'stats-row image-stats', hidden: true })
+    const previewPlaceholder = createElement('div', { className: 'preview-placeholder', textContent: '选择图片后在此预览' })
 
     function formatSize(bytes) {
       if (bytes < 1024) return bytes + ' B'
@@ -55,8 +56,10 @@ export default {
 
         imgPreview.src = dataUrl
         imgPreview.classList.remove('hidden')
+        previewPlaceholder.hidden = true
 
         sizeInfo.innerHTML = ''
+        sizeInfo.hidden = false
         const stats = [
           { label: '文件名', value: file.name },
           { label: '文件大小', value: formatSize(file.size) },
@@ -84,8 +87,10 @@ export default {
       }
     })
 
-    const dropArea = createElement('div', {
+    const dropArea = createElement('button', {
       className: 'drop-area',
+      type: 'button',
+      'aria-label': '选择图片，或将图片拖放到此处',
       onClick: () => fileInput.click(),
       onDragover: (e) => {
         e.preventDefault()
@@ -101,10 +106,18 @@ export default {
         if (file) processFile(file)
       }
     }, [
-      createElement('div', { className: 'drop-text', textContent: '拖拽图片到此处，或点击选择文件' })
+      createElement('span', {
+        className: 'drop-icon',
+        'aria-hidden': 'true',
+        innerHTML: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>'
+      }),
+      createElement('span', { className: 'drop-content' }, [
+        createElement('strong', { textContent: '选择一张图片' }),
+        createElement('span', { className: 'drop-text', textContent: '也可以将图片拖放到此处' })
+      ])
     ])
 
-    const previewSection = createSection('图片预览', createElement('div', { className: 'img-preview-wrap' }, [imgPreview]))
+    const previewSection = createSection('图片预览', createElement('div', { className: 'img-preview-wrap' }, [previewPlaceholder, imgPreview]))
 
     const fullCopyBtn = createCopyButton(() => fullOutput.value)
     const rawCopyBtn = createCopyButton(() => rawOutput.value)

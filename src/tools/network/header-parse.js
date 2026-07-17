@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection, createTableScroll } from '../../utils/dom.js'
 
 const IMPORTANT_HEADERS = [
   'Content-Type',
@@ -24,8 +23,6 @@ export default {
   icon: 'search',
 
   render(container) {
-    const section = createSection('HTTP Headers 解析')
-
     const inputGroup = createElement('div', { className: 'form-group' })
     const inputLabel = createElement('label', {
       className: 'label',
@@ -51,14 +48,10 @@ Content-Length: 1234`
     btnGroup.appendChild(parseBtn)
     btnGroup.appendChild(clearBtn)
 
-    const resultBox = createElement('div', { className: 'result-box' })
+    const resultContainer = createElement('div', { className: 'tool-stack' })
     const errorText = createElement('div', { className: 'error-text', style: 'display:none' })
 
-    section.appendChild(inputGroup)
-    section.appendChild(btnGroup)
-    section.appendChild(errorText)
-    section.appendChild(resultBox)
-    container.appendChild(section)
+    container.append(inputGroup, btnGroup, errorText, resultContainer)
 
     function isImportantHeader(name) {
       return IMPORTANT_HEADERS.some(h => h.toLowerCase() === name.toLowerCase())
@@ -66,7 +59,7 @@ Content-Length: 1234`
 
     function parseHeaders(raw) {
       errorText.style.display = 'none'
-      resultBox.innerHTML = ''
+      resultContainer.innerHTML = ''
 
       if (!raw.trim()) {
         errorText.textContent = '请输入 HTTP Headers'
@@ -99,24 +92,10 @@ Content-Length: 1234`
       }
 
       if (statusLine) {
-        const statusSection = createElement('div', { className: 'tool-section' })
-        const statusLabel = createElement('label', { className: 'label', textContent: '状态行' })
         const statusRow = createElement('div', { className: 'stat-item' })
         const statusValue = createElement('span', { className: 'stat-value', textContent: statusLine })
-        const copyBtn = createElement('button', {
-          className: 'btn btn-secondary',
-          textContent: '复制'
-        })
-        copyBtn.addEventListener('click', () => {
-          copyToClipboard(statusLine)
-          copyBtn.textContent = '已复制'
-          setTimeout(() => { copyBtn.textContent = '复制' }, 1500)
-        })
         statusRow.appendChild(statusValue)
-        statusRow.appendChild(copyBtn)
-        statusSection.appendChild(statusLabel)
-        statusSection.appendChild(statusRow)
-        resultBox.appendChild(statusSection)
+        resultContainer.appendChild(createSection('状态行', statusRow, [createCopyButton(() => statusLine)]))
       }
 
       if (headers.length > 0) {
@@ -135,13 +114,9 @@ Content-Length: 1234`
         impItem.appendChild(impLabel)
         impItem.appendChild(impValue)
         statsRow.appendChild(impItem)
-        resultBox.appendChild(statsRow)
+        resultContainer.appendChild(createSection('解析摘要', statsRow))
 
-        const tableSection = createElement('div', { className: 'tool-section' })
-        const tableLabel = createElement('label', { className: 'label', textContent: 'Header 列表' })
-        tableSection.appendChild(tableLabel)
-
-        const table = createElement('table', { className: 'result-box' })
+        const table = createElement('table', { className: 'result-table' })
         const thead = createElement('thead')
         thead.innerHTML = '<tr><th>Header 名称</th><th>值</th><th>操作</th></tr>'
         table.appendChild(thead)
@@ -155,15 +130,7 @@ Content-Length: 1234`
           const tdKey = createElement('td', { textContent: key })
           const tdValue = createElement('td', { textContent: value })
           const tdAction = createElement('td')
-          const copyBtn = createElement('button', {
-            className: 'btn btn-secondary',
-            textContent: '复制'
-          })
-          copyBtn.addEventListener('click', () => {
-            copyToClipboard(`${key}: ${value}`)
-            copyBtn.textContent = '已复制'
-            setTimeout(() => { copyBtn.textContent = '复制' }, 1500)
-          })
+          const copyBtn = createCopyButton(() => `${key}: ${value}`)
           tdAction.appendChild(copyBtn)
           tr.appendChild(tdKey)
           tr.appendChild(tdValue)
@@ -172,8 +139,10 @@ Content-Length: 1234`
         })
 
         table.appendChild(tbody)
-        tableSection.appendChild(table)
-        resultBox.appendChild(tableSection)
+        resultContainer.appendChild(createSection(
+          'Header 列表',
+          createTableScroll(table, 'HTTP Header 列表')
+        ))
       } else {
         errorText.textContent = '未解析到任何 Header'
         errorText.style.display = 'block'
@@ -183,7 +152,7 @@ Content-Length: 1234`
     parseBtn.addEventListener('click', () => parseHeaders(textarea.value))
     clearBtn.addEventListener('click', () => {
       textarea.value = ''
-      resultBox.innerHTML = ''
+      resultContainer.innerHTML = ''
       errorText.style.display = 'none'
     })
   }

@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
   id: 'css',
@@ -112,7 +111,7 @@ export default {
       }
     }
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { label: '美化', value: 'beautify' },
       { label: '压缩', value: 'minify' }
     ], (value) => {
@@ -128,7 +127,7 @@ export default {
     const copyBtn = createCopyButton(() => output.value)
 
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据'
     })
 

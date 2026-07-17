@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection, createTabGroup } from '../../utils/dom.js'
 
 const WEEKDAYS = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 
@@ -11,8 +10,6 @@ export default {
   icon: 'timestamp',
 
   render(container) {
-    const section = createSection('日期计算器')
-
     const tabs = createTabGroup([
       {
         label: '日期差计算',
@@ -22,9 +19,8 @@ export default {
         label: '日期加减',
         content: renderAddTab
       }
-    ])
-    section.appendChild(tabs.element)
-    container.appendChild(section)
+    ], () => {}, { label: '日期计算模式' })
+    container.appendChild(tabs.element)
 
     function daysBetween(d1, d2) {
       const utc1 = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate())
@@ -51,6 +47,7 @@ export default {
     }
 
     function renderDiffTab(container) {
+      container.classList.add('tool-stack')
       const row = createElement('div', { className: 'form-row' })
 
       const startGroup = createElement('div', { className: 'form-group' })
@@ -86,17 +83,18 @@ export default {
       btnGroup.appendChild(calcBtn)
       btnGroup.appendChild(todayBtn)
 
-      const resultBox = createElement('div', { className: 'result-box' })
+      let resultText = ''
+      const resultContent = createElement('div', { className: 'section-result' })
+      const copyBtn = createCopyButton(() => resultText)
+      const resultSection = createSection('计算结果', resultContent, [copyBtn])
       const errorText = createElement('div', { className: 'error-text', style: 'display:none' })
 
-      container.appendChild(row)
-      container.appendChild(btnGroup)
-      container.appendChild(errorText)
-      container.appendChild(resultBox)
+      container.append(row, btnGroup, errorText, resultSection)
 
       function calculate() {
         errorText.style.display = 'none'
-        resultBox.innerHTML = ''
+        resultContent.innerHTML = ''
+        resultText = ''
 
         if (!startInput.value || !endInput.value) {
           errorText.textContent = '请选择开始和结束日期'
@@ -138,7 +136,7 @@ export default {
         endItem.appendChild(endLabelEl)
         endItem.appendChild(endVal)
         infoRow.appendChild(endItem)
-        resultBox.appendChild(infoRow)
+        resultContent.appendChild(infoRow)
 
         const statsRow = createElement('div', { className: 'stats-row' })
 
@@ -166,7 +164,8 @@ export default {
         weekItem.appendChild(weekValue)
         statsRow.appendChild(weekItem)
 
-        resultBox.appendChild(statsRow)
+        resultContent.appendChild(statsRow)
+        resultText = `${formatDate(d1)} 至 ${formatDate(d2)}：相差 ${diff} 天，工作日 ${weekdays} 天，${weeks} 周 ${diff % 7} 天`
       }
 
       calcBtn.addEventListener('click', calculate)
@@ -178,6 +177,7 @@ export default {
     }
 
     function renderAddTab(container) {
+      container.classList.add('tool-stack')
       const inputGroup = createElement('div', { className: 'form-group' })
       const dateLabel = createElement('label', { className: 'label', textContent: '起始日期' })
       const dateInput = createElement('input', {
@@ -218,18 +218,18 @@ export default {
       })
       btnGroup.appendChild(calcBtn)
 
-      const resultBox = createElement('div', { className: 'result-box' })
+      let resultText = ''
+      const resultContent = createElement('div', { className: 'section-result' })
+      const copyBtn = createCopyButton(() => resultText)
+      const resultSection = createSection('计算结果', resultContent, [copyBtn])
       const errorText = createElement('div', { className: 'error-text', style: 'display:none' })
 
-      container.appendChild(inputGroup)
-      container.appendChild(row)
-      container.appendChild(btnGroup)
-      container.appendChild(errorText)
-      container.appendChild(resultBox)
+      container.append(inputGroup, row, btnGroup, errorText, resultSection)
 
       function calculate() {
         errorText.style.display = 'none'
-        resultBox.innerHTML = ''
+        resultContent.innerHTML = ''
+        resultText = ''
 
         if (!dateInput.value) {
           errorText.textContent = '请选择起始日期'
@@ -280,18 +280,8 @@ export default {
         resultItem.appendChild(resultVal)
         statsRow.appendChild(resultItem)
 
-        resultBox.appendChild(statsRow)
-
-        const copyBtn = createElement('button', {
-          className: 'btn btn-secondary',
-          textContent: '复制结果'
-        })
-        copyBtn.addEventListener('click', () => {
-          copyToClipboard(formatDate(result))
-          copyBtn.textContent = '已复制'
-          setTimeout(() => { copyBtn.textContent = '复制结果' }, 1500)
-        })
-        resultBox.appendChild(copyBtn)
+        resultContent.appendChild(statsRow)
+        resultText = formatDate(result)
       }
 
       calcBtn.addEventListener('click', calculate)

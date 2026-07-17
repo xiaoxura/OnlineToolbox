@@ -10,7 +10,7 @@ describe('core tool behavior', () => {
     input.dispatchEvent(new Event('input'))
     expect(output.value).toBe('5L2g5aW9IE9ubGluZVRvb2xib3g=')
     const encoded = output.value
-    container.querySelectorAll('.tab-btn')[1].click()
+    container.querySelectorAll('.segmented-btn')[1].click()
     input.value = encoded
     input.dispatchEvent(new Event('input'))
     expect(output.value).toBe('你好 OnlineToolbox')

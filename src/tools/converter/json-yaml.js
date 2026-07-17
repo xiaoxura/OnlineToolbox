@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import jsYaml from 'js-yaml'
 
 export default {
@@ -29,59 +28,46 @@ export default {
       className: 'error-text'
     })
 
+    let inputFormat = 'json'
+    const formatGroup = createSegmentedGroup([
+      { label: 'JSON', value: 'json' },
+      { label: 'YAML', value: 'yaml' }
+    ], value => {
+      inputFormat = value
+    }, { label: '输入格式' })
+    const setInputFormat = value => {
+      inputFormat = value
+      formatGroup.setValue(value)
+    }
+
     // Sample data buttons
     const jsonSampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: 'JSON 示例',
       onClick: () => {
         inputTextarea.value = JSON.stringify({ name: '示例', version: 1, items: ['a', 'b', 'c'], config: { debug: true, timeout: 30 } }, null, 2)
-        inputFormat = 'json'
-        updateTabState()
+        setInputFormat('json')
       }
     })
 
     const yamlSampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: 'YAML 示例',
       onClick: () => {
         inputTextarea.value = 'name: 示例\nversion: 1\nitems:\n  - a\n  - b\n  - c\nconfig:\n  debug: true\n  timeout: 30'
-        inputFormat = 'yaml'
-        updateTabState()
+        setInputFormat('yaml')
       }
     })
-
-    // Track current input format
-    let inputFormat = 'json'
-
-    // Tab-like indicator for detected format
-    const jsonTabBtn = createElement('button', {
-      className: 'tab-btn',
-      textContent: 'JSON',
-      onClick: () => { inputFormat = 'json'; updateTabState() }
-    })
-    const yamlTabBtn = createElement('button', {
-      className: 'tab-btn',
-      textContent: 'YAML',
-      onClick: () => { inputFormat = 'yaml'; updateTabState() }
-    })
-    const tabGroup = createElement('div', { className: 'tab-group' }, [jsonTabBtn, yamlTabBtn])
-
-    function updateTabState() {
-      jsonTabBtn.classList.toggle('active', inputFormat === 'json')
-      yamlTabBtn.classList.toggle('active', inputFormat === 'yaml')
-    }
-    updateTabState()
 
     // Auto-detect format on input
     inputTextarea.addEventListener('input', () => {
       const val = inputTextarea.value.trim()
       if (!val) return
       if (val.startsWith('{') || val.startsWith('[')) {
-        inputFormat = 'json'
+        setInputFormat('json')
       } else {
-        inputFormat = 'yaml'
+        setInputFormat('yaml')
       }
-      updateTabState()
     })
 
     // Convert buttons
@@ -141,14 +127,13 @@ export default {
 
     // Swap button
     const swapBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '⇄ 交换',
       onClick: () => {
         const temp = inputTextarea.value
         inputTextarea.value = outputTextarea.value
         outputTextarea.value = temp
-        inputFormat = inputFormat === 'json' ? 'yaml' : 'json'
-        updateTabState()
+        setInputFormat(inputFormat === 'json' ? 'yaml' : 'json')
       }
     })
 
@@ -161,7 +146,7 @@ export default {
 
     const sampleRow = createElement('div', { className: 'btn-group' }, [jsonSampleBtn, yamlSampleBtn])
 
-    const inputSection = createSection('输入', createElement('div', {}, [tabGroup, inputTextarea, sampleRow]), [copyInputBtn])
+    const inputSection = createSection('输入', createElement('div', { className: 'tool-stack' }, [formatGroup, inputTextarea, sampleRow]), [copyInputBtn])
     const outputSection = createSection('输出', outputTextarea, [copyOutputBtn])
 
     container.appendChild(inputSection)

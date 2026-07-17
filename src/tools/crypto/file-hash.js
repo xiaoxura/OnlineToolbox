@@ -1,4 +1,4 @@
-import { createElement, createCopyButton } from '../../utils/dom.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export async function digestFile(file, algorithm = 'SHA-256') {
   const buffer = await file.arrayBuffer()
@@ -29,7 +29,7 @@ export default {
         createElement('div', { className: 'form-group' }, [createElement('label', { className: 'label', textContent: '哈希算法' }), algorithm])
       ]),
       createElement('button', { className: 'btn btn-primary', type: 'button', textContent: '计算文件哈希', onClick: calculate }), status,
-      createElement('div', { className: 'result-box' }, [createElement('label', { className: 'label', textContent: '哈希结果' }), output, createCopyButton(() => output.value)])
+      createSection('哈希结果', output, [createCopyButton(() => output.value)])
     )
   }
 }

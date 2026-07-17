@@ -1,5 +1,4 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
@@ -27,41 +26,29 @@ export default {
       rows: 12,
       'aria-label': 'HTML 源码输出'
     })
-    const sourcePanel = createElement('div', { className: 'tool-section' }, [htmlOutput])
+    const sourcePanel = createElement('div', {}, [htmlOutput])
     const previewPanel = createElement('div', {
-      className: 'tool-section result-box',
-      style: { display: 'none' }
+      className: 'markdown-preview',
+      hidden: true
     })
 
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { label: 'HTML 源码', value: 'source' },
       { label: '预览效果', value: 'preview' }
     ], value => {
-      sourcePanel.style.display = value === 'source' ? '' : 'none'
-      previewPanel.style.display = value === 'preview' ? '' : 'none'
-    })
+      sourcePanel.hidden = value !== 'source'
+      previewPanel.hidden = value !== 'preview'
+    }, { label: '输出视图' })
 
-    const copyBtn = createElement('button', {
-      className: 'btn btn-secondary',
-      textContent: '复制 HTML',
-      onClick: () => {
-        if (htmlOutput.value) copyToClipboard(htmlOutput.value)
-      }
-    })
+    const copyBtn = createCopyButton(() => htmlOutput.value)
 
-    const outputGroup = createElement('div', { className: 'form-group' }, [
-      createElement('div', { className: 'label', textContent: 'HTML 输出' }),
+    const outputGroup = createElement('div', { className: 'tool-stack' }, [
       tabs,
       sourcePanel,
-      previewPanel,
-      createElement('div', { className: 'btn-group' }, [copyBtn])
+      previewPanel
     ])
 
-    const section = createSection('Markdown 转 HTML', createElement('div', {}, [
-      inputGroup,
-      outputGroup
-    ]))
-    container.append(section)
+    container.append(inputGroup, createSection('HTML 输出', outputGroup, [copyBtn]))
 
     function doConvert() {
       const markdown = textarea.value

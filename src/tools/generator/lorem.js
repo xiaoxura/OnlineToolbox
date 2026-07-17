@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
   id: 'lorem',
@@ -84,7 +83,7 @@ export default {
     }
 
     // Tabs
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { label: '段落', value: 'paragraph' },
       { label: '句子', value: 'sentence' },
       { label: '单词', value: 'word' }
@@ -104,7 +103,6 @@ export default {
     const countGroup = createElement('div', { className: 'form-group' }, [countLabel, countInput])
 
     // Output
-    const outputLabel = createElement('label', { className: 'label' }, ['生成结果'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '点击"生成"按钮生成 Lorem ipsum 文本...',
@@ -119,8 +117,8 @@ export default {
       onClick: generate
     }, ['生成'])
 
-    const btnGroup = createElement('div', { className: 'btn-group' }, [generateBtn, copyBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea])
+    const btnGroup = createElement('div', { className: 'btn-group' }, [generateBtn])
+    const outputSection = createSection('生成结果', outputTextarea, [copyBtn])
 
     container.appendChild(tabs)
     container.appendChild(countGroup)

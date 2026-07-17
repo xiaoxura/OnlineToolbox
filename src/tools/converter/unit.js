@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 const unitCategories = {
   length: {
@@ -197,7 +196,7 @@ export default {
       value: key
     }))
 
-    const tabGroup = createTabGroup(tabs, (value) => {
+    const tabGroup = createSegmentedGroup(tabs, (value) => {
       if (activePanel) activePanel.style.display = 'none'
       panels[value].style.display = 'block'
       activePanel = panels[value]

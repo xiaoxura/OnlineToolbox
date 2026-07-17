@@ -1,5 +1,4 @@
-import { createElement, createSection } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 
 export default {
   id: 'html-to-jsx',
@@ -9,8 +8,6 @@ export default {
   icon: 'html',
 
   render(container) {
-    const section = createSection('HTML 转 JSX')
-
     // Input area
     const inputGroup = createElement('div', { className: 'form-group' })
     const inputLabel = createElement('label', { className: 'label', textContent: '输入 HTML' })
@@ -28,34 +25,25 @@ export default {
       textContent: '转换'
     })
     const exampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据'
     })
     btnGroup.append(convertBtn, exampleBtn)
 
     // Output area
-    const outputGroup = createElement('div', { className: 'form-group' })
-    const outputLabel = createElement('label', { className: 'label', textContent: 'JSX 输出' })
     const output = createElement('textarea', {
       className: 'textarea',
       readOnly: true,
       rows: 10
     })
 
-    const copyGroup = createElement('div', { className: 'btn-group' })
-    const copyBtn = createElement('button', {
-      className: 'btn btn-secondary',
-      textContent: '复制结果'
-    })
-    copyGroup.append(copyBtn)
-
-    outputGroup.append(outputLabel, output, copyGroup)
+    const copyBtn = createCopyButton(() => output.value)
+    const outputSection = createSection('JSX 输出', output, [copyBtn])
 
     // Error display
     const errorEl = createElement('div', { className: 'error-text' })
 
-    section.append(inputGroup, btnGroup, outputGroup, errorEl)
-    container.append(section)
+    container.append(inputGroup, btnGroup, errorEl, outputSection)
 
     // Self-closing tags
     const selfClosingTags = [
@@ -139,12 +127,6 @@ export default {
         output.value = convertHtmlToJsx(html)
       } catch (e) {
         errorEl.textContent = '转换失败: ' + e.message
-      }
-    })
-
-    copyBtn.addEventListener('click', () => {
-      if (output.value) {
-        copyToClipboard(output.value)
       }
     })
 

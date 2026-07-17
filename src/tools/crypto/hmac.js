@@ -1,5 +1,4 @@
-import { createElement, createCopyButton, createTabGroup } from '../../utils/dom.js'
-import { copyToClipboard } from '../../utils/clipboard.js'
+import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import CryptoJS from 'crypto-js'
 
 export default {
@@ -48,7 +47,7 @@ export default {
     })
 
     // Algorithm tabs
-    const tabs = createTabGroup([
+    const tabs = createSegmentedGroup([
       { label: 'MD5', value: 'md5' },
       { label: 'SHA1', value: 'sha1' },
       { label: 'SHA256', value: 'sha256' },
@@ -59,7 +58,6 @@ export default {
     })
 
     // Output
-    const outputLabel = createElement('label', { className: 'label' }, ['HMAC 签名'])
     const outputTextarea = createElement('textarea', {
       className: 'textarea',
       placeholder: '结果将显示在这里...',
@@ -69,7 +67,7 @@ export default {
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
     const sampleBtn = createElement('button', {
-      className: 'btn btn-secondary btn-sm',
+      className: 'btn btn-secondary',
       textContent: '示例数据',
       onClick: () => {
         messageTextarea.value = 'Hello, World! 这是一条测试消息'
@@ -79,7 +77,7 @@ export default {
     })
 
     const btnGroup = createElement('div', { className: 'btn-group' }, [sampleBtn])
-    const outputSection = createElement('div', { className: 'result-box' }, [outputLabel, outputTextarea, copyBtn])
+    const outputSection = createSection('HMAC 签名', outputTextarea, [copyBtn])
 
     container.appendChild(messageLabel)
     container.appendChild(messageTextarea)
