@@ -2,9 +2,9 @@ import './styles/base.css'
 import './styles/layout.css'
 import './styles/tool.css'
 
-import { $, cleanupFormAccessibility, createElement, enhanceFormAccessibility } from './utils/dom.js'
+import { $, cleanupFormAccessibility, createElement, enhanceFormAccessibility, applyTwoColumnLayout, enhanceResultSections } from './utils/dom.js'
 import { initRouter, registerRoute, navigate } from './router.js'
-import { categories, tools, getToolsByCategoryAndSearch, getToolById, loadToolById } from './tools/registry.js'
+import { categories, tools, getToolsByCategory, getToolsByCategoryAndSearch, getToolById, loadToolById } from './tools/registry.js'
 import icons from './icons.js'
 
 const STORAGE = {
@@ -120,13 +120,42 @@ function favoriteIcon(isFavorite) {
   return `<svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="${isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
 }
 
-function createToolCard(tool) {
-  const isFavorite = favorites.includes(tool.id)
+// Pure state toggle: updates the favorites list + storage only, no re-render.
+// Returns the new favorite state for the toggled tool.
+function setFavorite(toolId) {
+  favorites = favorites.includes(toolId) ? favorites.filter(id => id !== toolId) : [toolId, ...favorites]
+  storeList(STORAGE.favorites, favorites)
+  return favorites.includes(toolId)
+}
+
+// Shared favorite star button. `onToggle(isFavorite)` decides what happens after
+// the state flips (home grid re-renders; tool page updates in place).
+function createFavoriteButton(tool, onToggle) {
+  const sync = (button, isFavorite) => {
+    button.classList.toggle('active', isFavorite)
+    button.title = isFavorite ? '取消收藏' : '收藏工具'
+    button.setAttribute('aria-label', `${isFavorite ? '取消收藏' : '收藏'}${tool.name}`)
+    button.setAttribute('aria-pressed', String(isFavorite))
+    button.innerHTML = favoriteIcon(isFavorite)
+  }
+  const button = createElement('button', {
+    className: 'favorite-btn',
+    type: 'button',
+    onClick: () => {
+      const isFavorite = setFavorite(tool.id)
+      sync(button, isFavorite)   // always reflect the new state on this button…
+      onToggle(isFavorite)        // …then let the caller do more (e.g. re-render home)
+    }
+  })
+  sync(button, favorites.includes(tool.id))
+  return button
+}
+
+function createToolCard(tool, { recordHomeScroll = false } = {}) {
   const link = createElement('a', {
     className: 'tool-card',
     href: `#/${tool.id}`,
-    'aria-label': `${tool.name}：${tool.description}`,
-    onClick: () => { homeScrollY = window.scrollY }
+    'aria-label': `${tool.name}：${tool.description}`
   }, [
     createElement('div', { className: 'tool-icon-wrap' }, [
       createElement('div', { className: 'tool-icon', innerHTML: icons[tool.icon] || icons.wrench })
@@ -134,22 +163,11 @@ function createToolCard(tool) {
     createElement('div', { className: 'tool-name', textContent: tool.name }),
     createElement('div', { className: 'tool-desc', textContent: tool.description })
   ])
-  const favoriteButton = createElement('button', {
-    className: `favorite-btn${isFavorite ? ' active' : ''}`,
-    type: 'button',
-    title: isFavorite ? '取消收藏' : '收藏工具',
-    'aria-label': `${isFavorite ? '取消收藏' : '收藏'}${tool.name}`,
-    'aria-pressed': String(isFavorite),
-    innerHTML: favoriteIcon(isFavorite),
-    onClick: () => toggleFavorite(tool.id)
-  })
+  if (recordHomeScroll) {
+    link.addEventListener('click', () => { homeScrollY = window.scrollY })
+  }
+  const favoriteButton = createFavoriteButton(tool, () => renderGrid())
   return createElement('div', { className: 'tool-card-wrap' }, [link, favoriteButton])
-}
-
-function toggleFavorite(toolId) {
-  favorites = favorites.includes(toolId) ? favorites.filter(id => id !== toolId) : [toolId, ...favorites]
-  storeList(STORAGE.favorites, favorites)
-  renderGrid()
 }
 
 function renderToolSection(title, toolIds, className = '') {
@@ -162,9 +180,22 @@ function renderToolSection(title, toolIds, className = '') {
     ])
   ])
   const grid = createElement('div', { className: 'tool-grid compact' })
-  sectionTools.forEach(tool => grid.appendChild(createToolCard(tool)))
+  sectionTools.forEach(tool => grid.appendChild(createToolCard(tool, { recordHomeScroll: true })))
   section.appendChild(grid)
   return section
+}
+
+// "相关工具" footer on a tool page: other tools in the same category.
+// Cards here must NOT record home scroll (we're on a tool page, not home).
+function createRelatedTools(tool, max = 6) {
+  const related = getToolsByCategory(tool.category).filter(item => item.id !== tool.id).slice(0, max)
+  if (!related.length) return null
+  const grid = createElement('div', { className: 'tool-grid compact related-tools-grid' })
+  related.forEach(item => grid.appendChild(createToolCard(item)))
+  return createElement('section', { className: 'related-tools', 'aria-label': '相关工具' }, [
+    createElement('h2', { className: 'related-tools-title', textContent: '相关工具' }),
+    grid
+  ])
 }
 
 function renderGrid() {
@@ -207,7 +238,7 @@ function renderGrid() {
     allSection.appendChild(empty)
   } else {
     const grid = createElement('div', { className: 'tool-grid' })
-    filtered.forEach(tool => grid.appendChild(createToolCard(tool)))
+    filtered.forEach(tool => grid.appendChild(createToolCard(tool, { recordHomeScroll: true })))
     allSection.appendChild(grid)
   }
   main.appendChild(allSection)
@@ -237,6 +268,25 @@ async function renderToolPage(toolId) {
   const titleId = `tool-title-${tool.id}`
   const categoryName = categories.find(category => category.id === tool.category)?.name || '在线工具'
   const title = createElement('h1', { id: titleId, className: 'tool-title', textContent: tool.name, tabindex: '-1' })
+
+  // Breadcrumb: 首页 / 分类(可点,回到该分类) / 当前工具名
+  const breadcrumb = createElement('nav', { className: 'breadcrumb', 'aria-label': '面包屑' }, [
+    createElement('a', { className: 'breadcrumb-link', href: '#/', textContent: '首页' }),
+    createElement('span', { className: 'breadcrumb-sep', textContent: '/', 'aria-hidden': 'true' }),
+    createElement('button', {
+      className: 'breadcrumb-link breadcrumb-category',
+      type: 'button',
+      textContent: categoryName,
+      title: `查看${categoryName}分类`,
+      onClick: () => { currentCategory = tool.category; navigate('/') }
+    }),
+    createElement('span', { className: 'breadcrumb-sep', textContent: '/', 'aria-hidden': 'true' }),
+    createElement('span', { className: 'breadcrumb-current', textContent: tool.name, 'aria-current': 'page' })
+  ])
+
+  // Favorite button in the header updates in place (no home re-render).
+  const headerFavorite = createFavoriteButton(tool, () => {})
+
   const header = createElement('header', { className: 'tool-header' }, [
     createElement('button', {
       className: 'back-btn',
@@ -248,10 +298,11 @@ async function renderToolPage(toolId) {
     }),
     createElement('div', { className: 'tool-header-icon', innerHTML: icons[tool.icon] || icons.wrench, 'aria-hidden': 'true' }),
     createElement('div', { className: 'tool-heading' }, [
-      createElement('span', { className: 'tool-eyebrow', textContent: categoryName }),
+      breadcrumb,
       title,
       createElement('span', { className: 'tool-title-desc', textContent: tool.description })
-    ])
+    ]),
+    headerFavorite
   ])
   const body = createElement('div', { className: 'tool-body', role: 'region', 'aria-labelledby': titleId, 'aria-busy': 'true' })
   page.append(header, body)
@@ -272,8 +323,16 @@ async function renderToolPage(toolId) {
     if (requestId !== renderRequestId) return
     body.innerHTML = ''
     implementation.render(body)
+    applyTwoColumnLayout(body)
     enhanceFormAccessibility(body)
+    enhanceResultSections(body, { toolName: tool.id })
     body.setAttribute('aria-busy', 'false')
+
+    const related = createRelatedTools(tool)
+    if (related) {
+      page.querySelector('.related-tools')?.remove()
+      page.appendChild(related)
+    }
   } catch (error) {
     if (requestId !== renderRequestId) return
     console.error(`Failed to load tool: ${toolId}`, error)

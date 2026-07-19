@@ -106,7 +106,7 @@ fieldset {
   position: fixed;
   top: 8px;
   left: 8px;
-  z-index: 1000;
+  z-index: var(--z-skiplink);
   padding: 8px 12px;
   color: var(--color-inverse-text);
   background: var(--color-inverse-bg);

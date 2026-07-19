@@ -85,7 +85,14 @@
   --header-height: 64px;
   --nav-height: 52px;
   --max-width: 1400px;
-  --max-tool-width: 1120px;
+  --max-tool-width: 1280px;
+
+  /* Z-index layers (ordered low → high) */
+  --z-card: 2;
+  --z-header: 100;
+  --z-overlay: 500;
+  --z-skiplink: 1000;
+  --z-toast: 9999;
 }
 
 :root[data-theme='dark'] {

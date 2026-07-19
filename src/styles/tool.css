@@ -181,6 +181,79 @@
   overflow-wrap: anywhere;
 }
 
+/* Breadcrumb in the tool header */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  min-width: 0;
+}
+
+.breadcrumb-link {
+  color: var(--color-primary);
+  font: inherit;
+  padding: 2px 0;
+  border-radius: var(--radius-sm);
+  transition: color 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.breadcrumb-current {
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The header's favorite star reuses the card's .favorite-btn visuals but sits
+   inline (the card version is absolutely positioned over its card). */
+.tool-header > .favorite-btn {
+  position: static;
+  opacity: 1;
+  flex-shrink: 0;
+  align-self: flex-start;
+  color: var(--color-text-muted);
+}
+
+.tool-header > .favorite-btn:hover,
+.tool-header > .favorite-btn.active {
+  color: var(--color-warning);
+}
+
+/* Related tools footer on a tool page. It lives inside .tool-page, so it
+   follows the page's own width/padding — only needs separation from the tool. */
+.related-tools {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.related-tools-title {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+}
+
+.related-tools-grid {
+  padding: 0;
+  max-width: none;
+}
+
 /* Tool Body */
 .tool-body {
   display: flex;
@@ -586,6 +659,35 @@
   user-select: all;
 }
 
+/* Result toolbar states (injected by enhanceResultSections) */
+.result-box.nowrap {
+  white-space: pre;
+  word-break: normal;
+  overflow-x: auto;
+}
+
+.result-box.collapsed {
+  max-height: 160px;
+  overflow: hidden;
+  position: relative;
+}
+
+.result-box.collapsed::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--color-bg));
+}
+
+.btn-icon.active {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
 /* Tabs, segmented controls, and filters */
 .tab-group,
 .segmented-group,
@@ -711,7 +813,7 @@
   border-radius: var(--radius-lg);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  z-index: 9999;
+  z-index: var(--z-toast);
   opacity: 0;
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -853,6 +955,96 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-sm);
+}
+
+/* IO split layout (input ↔ output). Single column by default; the two-column
+   split only engages on wide screens. */
+.tool-io-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+  min-width: 0;
+  align-items: start;
+}
+
+.tool-io-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.tool-io-col > * {
+  min-width: 0;
+}
+
+/* Swap control between the two columns */
+.tool-io-swap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  order: 2;
+}
+
+.io-swap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.io-swap-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.io-swap-btn:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: scale(1.06);
+}
+
+/* Stacked (narrow) layout: the swap sits between input and output, flipped. */
+.tool-io-grid.has-swap .tool-io-output {
+  order: 3;
+}
+
+.tool-io-grid.has-swap .tool-io-swap {
+  margin: calc(var(--space-sm) * -1) 0;
+}
+
+.tool-io-grid.has-swap .io-swap-btn svg {
+  transform: rotate(90deg);
+}
+
+@media (min-width: 1024px) {
+  .tool-io-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .tool-io-grid.has-swap {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: var(--space-md);
+    align-items: center;
+  }
+
+  .tool-io-grid.has-swap .tool-io-swap {
+    order: 0;
+    margin: 0;
+  }
+
+  .tool-io-grid.has-swap .io-swap-btn svg {
+    transform: none;
+  }
 }
 
 /* Stats row */
