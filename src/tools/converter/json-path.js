@@ -67,12 +67,19 @@ export default {
 
     // Result display
     const resultBox = createElement('div', { className: 'result-box' })
+    const resultStatus = createElement('div', {
+      className: 'sr-only',
+      role: 'status',
+      'aria-live': 'polite',
+      'aria-atomic': 'true'
+    })
 
     // Error display
     const errorEl = createElement('div', { className: 'error-text' })
 
     // Current parsed data
     let currentData = null
+    let treeRegionId = 0
 
     function renderTreeMessage(message, isError = false) {
       treeContainer.replaceChildren(createElement('div', {
@@ -108,13 +115,15 @@ export default {
           return wrapper
         }
 
-        // Collapsed header
-        const header = createElement('div', { className: 'json-tree-node', role: 'button', tabindex: '0' })
+        // Collapsible header. Selection and expansion remain separate native buttons.
+        const childrenId = `json-tree-children-${++treeRegionId}`
+        const header = createElement('div', { className: 'json-tree-node' })
         const toggle = createElement('button', {
           className: 'json-toggle',
           type: 'button',
-          'aria-label': '折叠或展开数组',
+          'aria-label': `${path}：折叠或展开数组`,
           'aria-expanded': 'true',
+          'aria-controls': childrenId,
           textContent: '▼',
         })
         const keySpan = createElement('span', { className: 'json-bracket', textContent: openBracket })
@@ -123,14 +132,18 @@ export default {
           textContent: ` ${data.length} items...`
         })
         const closeSpan = createElement('span', { className: 'json-bracket', textContent: closeBracket })
+        const selectButton = createElement('button', {
+          className: 'json-node-select',
+          type: 'button',
+          title: `选择路径 ${path}`,
+          'aria-label': `选择 JSONPath ${path}`
+        }, [keySpan, preview, closeSpan])
 
         header.appendChild(toggle)
-        header.appendChild(keySpan)
-        header.appendChild(preview)
-        header.appendChild(closeSpan)
+        header.appendChild(selectButton)
 
         // Children container
-        const children = createElement('div', { className: 'json-tree-children' })
+        const children = createElement('div', { id: childrenId, className: 'json-tree-children' })
 
         data.forEach((item, index) => {
           const itemPath = path + '[' + index + ']'
@@ -161,16 +174,7 @@ export default {
           toggle.setAttribute('aria-expanded', String(!collapsed))
         })
 
-        // Click header to select path
-        header.addEventListener('click', (e) => {
-          if (e.target === toggle) return
-          selectPath(path, data)
-        })
-        header.addEventListener('keydown', (e) => {
-          if (e.target !== header || !['Enter', ' '].includes(e.key)) return
-          e.preventDefault()
-          selectPath(path, data)
-        })
+        selectButton.addEventListener('click', () => selectPath(path, data))
 
         wrapper.appendChild(header)
         wrapper.appendChild(children)
@@ -185,12 +189,14 @@ export default {
         return wrapper
       }
 
-      const header = createElement('div', { className: 'json-tree-node', role: 'button', tabindex: '0' })
+      const childrenId = `json-tree-children-${++treeRegionId}`
+      const header = createElement('div', { className: 'json-tree-node' })
       const toggle = createElement('button', {
         className: 'json-toggle',
         type: 'button',
-        'aria-label': '折叠或展开对象',
+        'aria-label': `${path}：折叠或展开对象`,
         'aria-expanded': 'true',
+        'aria-controls': childrenId,
         textContent: '▼',
       })
       const openBrace = createElement('span', { className: 'json-bracket', textContent: '{' })
@@ -199,13 +205,17 @@ export default {
         textContent: ` ${keys.length} keys...`
       })
       const closeBrace = createElement('span', { className: 'json-bracket', textContent: '}' })
+      const selectButton = createElement('button', {
+        className: 'json-node-select',
+        type: 'button',
+        title: `选择路径 ${path}`,
+        'aria-label': `选择 JSONPath ${path}`
+      }, [openBrace, preview, closeBrace])
 
       header.appendChild(toggle)
-      header.appendChild(openBrace)
-      header.appendChild(preview)
-      header.appendChild(closeBrace)
+      header.appendChild(selectButton)
 
-      const children = createElement('div', { className: 'json-tree-children' })
+      const children = createElement('div', { id: childrenId, className: 'json-tree-children' })
 
       keys.forEach(key => {
         const childPath = path + '.' + key
@@ -241,15 +251,7 @@ export default {
         toggle.setAttribute('aria-expanded', String(!collapsed))
       })
 
-      header.addEventListener('click', (e) => {
-        if (e.target === toggle) return
-        selectPath(path, data)
-      })
-      header.addEventListener('keydown', (e) => {
-        if (e.target !== header || !['Enter', ' '].includes(e.key)) return
-        e.preventDefault()
-        selectPath(path, data)
-      })
+      selectButton.addEventListener('click', () => selectPath(path, data))
 
       wrapper.appendChild(header)
       wrapper.appendChild(children)
@@ -257,15 +259,15 @@ export default {
     }
 
     function createTreeNode(path, value, className) {
-      const node = createElement('div', { className: 'json-tree-node', role: 'button', tabindex: '0' })
+      const node = createElement('button', {
+        className: 'json-tree-node json-node-select',
+        type: 'button',
+        title: `选择路径 ${path}`,
+        'aria-label': `选择 JSONPath ${path}`
+      })
       const valSpan = createElement('span', { className: className, textContent: value })
       node.appendChild(valSpan)
       node.addEventListener('click', () => selectPath(path, null))
-      node.addEventListener('keydown', (event) => {
-        if (!['Enter', ' '].includes(event.key)) return
-        event.preventDefault()
-        selectPath(path, null)
-      })
       return node
     }
 
@@ -380,6 +382,7 @@ export default {
     function runQuery() {
       errorEl.textContent = ''
       resultBox.innerHTML = ''
+      resultStatus.textContent = ''
       const input = inputTextarea.value.trim()
       const path = pathInput.value.trim()
 
@@ -401,6 +404,7 @@ export default {
             className: 'inline-result',
             textContent: '未找到匹配结果'
           }))
+          resultStatus.textContent = '查询完成，未找到匹配结果'
           return
         }
 
@@ -411,6 +415,7 @@ export default {
           ])
           resultBox.appendChild(row)
         }
+        resultStatus.textContent = `查询完成，找到 ${matches.length} 个结果`
       } catch (e) {
         errorEl.textContent = '错误: ' + e.message
       }
@@ -428,6 +433,7 @@ export default {
     container.appendChild(treeSection)
     container.appendChild(selectedPathDisplay)
     container.appendChild(resultSection)
+    container.appendChild(resultStatus)
 
     // Initialize
     renderTreeMessage('请粘贴 JSON 数据，或点击「示例数据」')

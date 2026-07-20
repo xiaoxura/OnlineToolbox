@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="在线工具箱 - 100 个在浏览器本地运行的编解码、数据转换、文本处理与开发者工具" />
-  <meta name="theme-color" content="#f7f8fa" />
+  <meta name="theme-color" content="#f4f5f8" />
   <meta name="color-scheme" content="light dark" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="在线工具箱" />
@@ -27,19 +27,27 @@
     <header class="site-header">
       <div class="header-inner">
         <a href="#/" class="logo" aria-label="在线工具箱首页">
-          <svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.86 3.86z"/>
-          </svg>
-          <span>在线工具箱</span>
-        </a>
-        <div class="header-right">
-          <div class="search-box">
-            <svg aria-hidden="true" focusable="false" class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          <span class="logo-mark" aria-hidden="true">
+            <svg focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
             </svg>
-            <label class="sr-only" for="searchInput">搜索工具</label>
-            <input type="search" id="searchInput" placeholder="搜索工具..." autocomplete="off" spellcheck="false" />
-          </div>
+          </span>
+          <span class="logo-copy">
+            <strong>在线工具箱</strong>
+            <small>开发者工作台</small>
+          </span>
+        </a>
+        <div class="search-box">
+          <svg aria-hidden="true" focusable="false" class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <label class="sr-only" for="searchInput">搜索工具</label>
+          <input type="search" id="searchInput" placeholder="搜索工具..." autocomplete="off" spellcheck="false" />
+          <button id="searchClear" class="search-clear" type="button" aria-label="清除搜索" title="清除搜索" hidden>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></svg>
+          </button>
+        </div>
+        <div class="header-actions">
           <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换主题" title="切换主题">
             <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
             <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
@@ -52,8 +60,16 @@
         </div>
       </div>
     </header>
-    <nav class="category-nav" id="categoryNav" aria-label="工具分类"></nav>
-    <main id="mainContent" tabindex="-1"></main>
+    <div class="app-shell">
+      <nav class="category-nav" id="categoryNav" aria-label="工具分类"></nav>
+      <div class="content-column">
+        <main id="mainContent" tabindex="-1"></main>
+        <footer class="site-footer">
+          <span>本地优先 · 无需登录</span>
+          <a href="https://github.com/xiaoxura/OnlineToolbox" target="_blank" rel="noopener noreferrer">MIT 开源项目</a>
+        </footer>
+      </div>
+    </div>
     <div id="liveRegion" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   </div>
   <script type="module" src="/src/main.js"></script>

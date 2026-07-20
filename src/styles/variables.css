@@ -2,27 +2,30 @@
   color-scheme: light;
 
   /* Core surfaces */
-  --color-bg: #f4f6fb;
-  --color-bg-secondary: #edf1f7;
+  --color-bg: #f4f5f8;
+  --color-bg-secondary: #eceef3;
   --color-surface: #ffffff;
-  --color-surface-raised: #ffffff;
-  --color-section-header: #f7f8fc;
-  --color-border: #dfe4ed;
-  --color-border-hover: #c8d0dd;
+  --color-surface-raised: #fbfcfe;
+  --color-section-header: #f7f8fb;
+  --color-border: #dcdfe7;
+  --color-border-hover: #b9c0cc;
 
   /* Text and brand */
-  --color-text: #18202f;
-  --color-text-secondary: #536071;
-  --color-text-muted: #687386;
-  --color-primary: #4355d9;
-  --color-primary-hover: #3446c4;
-  --color-primary-light: #eef1ff;
-  --color-primary-border: #cbd3ff;
-  --color-focus-ring: rgba(67, 85, 217, 0.25);
+  --color-text: #171923;
+  --color-text-secondary: #505767;
+  --color-text-muted: #667085;
+  --color-primary: #4f46d9;
+  --color-primary-hover: #3d35bd;
+  --color-primary-light: #efefff;
+  --color-primary-border: #cbc9ff;
+  --color-focus-ring: rgba(79, 70, 217, 0.48);
+  --color-accent: #0f766e;
+  --color-accent-soft: #e8f7f4;
+  --color-favorite: #a16207;
 
   /* Action colors stay contrast-safe in both themes */
-  --color-action-primary: #4355d9;
-  --color-action-primary-hover: #3446c4;
+  --color-action-primary: #4f46d9;
+  --color-action-primary-hover: #3d35bd;
   --color-action-success: #237a42;
   --color-action-success-hover: #1b6536;
   --color-action-danger: #c12d3f;
@@ -67,9 +70,9 @@
   --control-padding-inline: 14px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(24, 32, 47, 0.06);
-  --shadow-md: 0 8px 24px rgba(24, 32, 47, 0.08);
-  --shadow-lg: 0 18px 48px rgba(24, 32, 47, 0.12);
+  --shadow-sm: 0 1px 2px rgba(23, 25, 35, 0.06);
+  --shadow-md: 0 10px 28px rgba(23, 25, 35, 0.09);
+  --shadow-lg: 0 24px 56px rgba(23, 25, 35, 0.13);
 
   /* Typography */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
@@ -82,10 +85,11 @@
   --font-size-2xl: 26px;
 
   /* Layout */
-  --header-height: 64px;
-  --nav-height: 52px;
-  --max-width: 1400px;
-  --max-tool-width: 1280px;
+  --header-height: 72px;
+  --nav-height: 48px;
+  --sidebar-width: 246px;
+  --max-width: 1560px;
+  --max-tool-width: 1240px;
 
   /* Z-index layers (ordered low → high) */
   --z-card: 2;
@@ -97,23 +101,26 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-bg: #0c1220;
-  --color-bg-secondary: #1a2434;
-  --color-surface: #141d2c;
-  --color-surface-raised: #192334;
-  --color-section-header: #111927;
-  --color-border: #2e3a4d;
-  --color-border-hover: #435168;
-  --color-text: #f3f6fb;
-  --color-text-secondary: #c7cfdb;
-  --color-text-muted: #9ba7b8;
-  --color-primary: #aeb9ff;
-  --color-primary-hover: #c8ceff;
-  --color-primary-light: rgba(109, 124, 255, 0.16);
-  --color-primary-border: rgba(154, 167, 255, 0.38);
-  --color-focus-ring: rgba(174, 185, 255, 0.34);
-  --color-action-primary: #5262cc;
-  --color-action-primary-hover: #4453b7;
+  --color-bg: #111216;
+  --color-bg-secondary: #202228;
+  --color-surface: #1a1c22;
+  --color-surface-raised: #20232a;
+  --color-section-header: #17191e;
+  --color-border: #31343d;
+  --color-border-hover: #505561;
+  --color-text: #f5f6f8;
+  --color-text-secondary: #c3c6ce;
+  --color-text-muted: #9ba0ab;
+  --color-primary: #aaa5ff;
+  --color-primary-hover: #c0bdff;
+  --color-primary-light: rgba(118, 108, 235, 0.18);
+  --color-primary-border: rgba(170, 165, 255, 0.38);
+  --color-focus-ring: rgba(170, 165, 255, 0.58);
+  --color-accent: #5eead4;
+  --color-accent-soft: rgba(45, 212, 191, 0.13);
+  --color-favorite: #facc15;
+  --color-action-primary: #6259d2;
+  --color-action-primary-hover: #756ce2;
   --color-action-success: #237a4b;
   --color-action-success-hover: #1d683f;
   --color-action-danger: #b43b4d;
@@ -134,6 +141,6 @@
   --color-inverse-bg: #eef2f7;
   --color-inverse-text: #111827;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.34);
-  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.28);
-  --shadow-lg: 0 20px 56px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 24px 58px rgba(0, 0, 0, 0.42);
 }

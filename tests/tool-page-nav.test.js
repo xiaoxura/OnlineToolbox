@@ -6,6 +6,7 @@ beforeAll(async () => {
   document.body.innerHTML = `
     <button id="themeToggle"></button>
     <div class="search-box"><input id="searchInput"></div>
+    <button id="searchClear" hidden></button>
     <nav id="categoryNav"></nav>
     <main id="mainContent"></main>
   `
@@ -22,6 +23,9 @@ async function gotoTool(hash) {
 
 describe('tool page context navigation', () => {
   it('renders a breadcrumb with a clickable category that returns to that category', async () => {
+    const search = document.querySelector('#searchInput')
+    search.value = 'JWT'
+    search.dispatchEvent(new Event('input', { bubbles: true }))
     await gotoTool('#/base64')
     const crumb = document.querySelector('.breadcrumb')
     expect(crumb).not.toBeNull()
@@ -32,6 +36,7 @@ describe('tool page context navigation', () => {
     categoryBtn.click()
     await vi.waitFor(() => expect(document.querySelector('.all-tools-section')).not.toBeNull())
     // Lands on home with the encoding tab active.
+    expect(search.value).toBe('')
     expect(document.querySelector('[data-category="encoding"]').getAttribute('aria-pressed')).toBe('true')
   })
 

@@ -6,6 +6,7 @@ beforeAll(async () => {
   document.body.innerHTML = `
     <button id="themeToggle"></button>
     <div class="search-box"><input id="searchInput"></div>
+    <button id="searchClear" hidden></button>
     <nav id="categoryNav"></nav>
     <main id="mainContent"></main>
   `
@@ -58,6 +59,9 @@ describe('application routing', () => {
     favoritesView.focus()
     favoritesView.click()
     expect(document.activeElement?.dataset.view).toBe('favorites')
+    document.querySelector('[data-category="math"]').click()
+    expect(document.querySelector('.empty-state p')?.textContent).toBe('当前筛选下没有匹配工具')
+    document.querySelector('.empty-state .btn').click()
     const allView = document.querySelector('[data-view="all"]')
     allView.focus()
     allView.click()
@@ -68,7 +72,18 @@ describe('application routing', () => {
     search.value = 'JWT'
     search.dispatchEvent(new Event('input', { bubbles: true }))
     expect(document.querySelectorAll('.all-tools-section .tool-card')).toHaveLength(1)
-    expect(document.querySelector('[data-category="all"]').getAttribute('aria-pressed')).toBe('true')
+    expect(document.querySelector('[data-category="encoding"]').getAttribute('aria-pressed')).toBe('true')
+    expect(document.querySelector('#searchClear').hidden).toBe(false)
+    search.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    expect(search.value).toBe('')
+    expect(document.querySelector('[data-category="encoding"]').getAttribute('aria-pressed')).toBe('true')
+    search.value = 'JWT'
+    search.dispatchEvent(new Event('input', { bubbles: true }))
+    document.querySelector('#searchClear').click()
+    expect(search.value).toBe('')
+    expect(document.querySelector('#searchClear').hidden).toBe(true)
+    search.value = 'JWT'
+    search.dispatchEvent(new Event('input', { bubbles: true }))
 
     window.location.hash = '#/jwt'
     window.dispatchEvent(new HashChangeEvent('hashchange'))
@@ -81,11 +96,12 @@ describe('application routing', () => {
     window.location.hash = '#/'
     window.dispatchEvent(new HashChangeEvent('hashchange'))
     await vi.waitFor(() => expect(document.querySelector('#searchInput').value).toBe('JWT'))
-    expect(document.querySelector('[data-category="all"]').getAttribute('aria-pressed')).toBe('true')
+    expect(document.querySelector('[data-category="encoding"]').getAttribute('aria-pressed')).toBe('true')
     await vi.waitFor(() => expect(document.activeElement?.getAttribute('href')).toBe('#/jwt'))
 
     search.value = ''
     search.dispatchEvent(new Event('input', { bubbles: true }))
+    document.querySelector('[data-category="all"]').click()
     const recentFavorite = document.querySelector('.recent-section [data-tool-id="jwt"]')
     recentFavorite.focus()
     recentFavorite.click()

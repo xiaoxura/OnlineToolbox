@@ -1,5 +1,4 @@
 import './styles/base.css'
-import './styles/layout.css'
 import './styles/tool.css'
 import './styles/refresh.css'
 
@@ -65,7 +64,7 @@ function setupTheme() {
     button.setAttribute('aria-label', isDark ? '切换到浅色主题' : '切换到深色主题')
     button.setAttribute('title', isDark ? '切换到浅色主题' : '切换到深色主题')
     button.setAttribute('aria-pressed', String(isDark))
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#111318' : '#f7f8fa')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#111216' : '#f4f5f8')
   }
 
   button.addEventListener('click', () => {
@@ -82,17 +81,35 @@ function setupTheme() {
   updateButton()
 }
 
+function syncSearchControls() {
+  const input = $('#searchInput')
+  const clearButton = $('#searchClear')
+  const searchBox = input?.closest('.search-box')
+  const hasValue = Boolean(input?.value)
+  if (clearButton) clearButton.hidden = !hasValue
+  searchBox?.classList.toggle('has-value', hasValue)
+}
+
 function setupHeader() {
   const searchInput = $('#searchInput')
   searchInput.placeholder = `搜索 ${tools.length} 个工具...`
   searchInput.addEventListener('input', event => {
     searchQuery = event.target.value.trim()
-    currentView = 'all'
-    currentCategory = 'all'
-    syncCategoryTabs()
     const isHome = window.location.hash === '#/' || window.location.hash === ''
+    if (!isHome) {
+      currentView = 'all'
+      currentCategory = 'all'
+      syncCategoryTabs()
+    }
+    syncSearchControls()
     if (isHome) renderGrid()
     else navigate('/')
+  })
+  $('#searchClear')?.addEventListener('click', clearSearch)
+  searchInput.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !searchInput.value) return
+    event.preventDefault()
+    clearSearch()
   })
 
   document.addEventListener('keydown', event => {
@@ -108,10 +125,17 @@ function setupHeader() {
       searchInput.select()
     })
   })
+  syncSearchControls()
 }
 
 function setupCategoryNav() {
   const nav = $('#categoryNav')
+  nav.innerHTML = ''
+  nav.appendChild(createElement('div', { className: 'category-nav-heading' }, [
+    createElement('span', { textContent: '浏览' }),
+    createElement('strong', { textContent: '工具分类' }),
+    createElement('small', { textContent: `${categories.length - 1} 个分类 · ${tools.length} 个工具` })
+  ]))
   const inner = createElement('div', { className: 'category-nav-inner' })
   categories.forEach(category => {
     const count = category.id === 'all' ? tools.length : tools.filter(tool => tool.category === category.id).length
@@ -123,7 +147,6 @@ function setupCategoryNav() {
       title: category.description,
       onClick: () => {
         currentCategory = category.id
-        currentView = 'all'
         inner.querySelectorAll('.category-tab').forEach(item => {
           item.classList.toggle('active', item === button)
           item.setAttribute('aria-pressed', String(item === button))
@@ -133,7 +156,10 @@ function setupCategoryNav() {
       }
     }, [
       createElement('span', { className: 'category-dot', 'aria-hidden': 'true' }),
-      createElement('span', { textContent: category.name }),
+      createElement('span', { className: 'category-tab-copy' }, [
+        createElement('strong', { textContent: category.name }),
+        createElement('small', { textContent: category.description })
+      ]),
       createElement('span', { className: 'category-count', textContent: String(count), 'aria-hidden': 'true' })
     ])
     inner.appendChild(button)
@@ -250,8 +276,6 @@ function createViewButton(id, label, count) {
     'aria-pressed': String(currentView === id),
     onClick: () => {
       currentView = id
-      currentCategory = 'all'
-      syncCategoryTabs()
       renderGrid({ viewId: id })
     }
   }, [createElement('span', { textContent: label }), createElement('strong', { textContent: String(count) })])
@@ -260,7 +284,7 @@ function createViewButton(id, label, count) {
 function createHomeOverview() {
   return createElement('section', { className: 'home-overview', 'aria-labelledby': 'workspaceTitle' }, [
     createElement('div', { className: 'overview-copy' }, [
-      createElement('span', { className: 'overview-kicker', textContent: 'DEVELOPER WORKSPACE' }),
+      createElement('span', { className: 'overview-kicker', textContent: '当前工作区' }),
       createElement('h1', { id: 'workspaceTitle', textContent: '工具工作台' }),
       createElement('div', { className: 'overview-stats' }, [
         createElement('span', {}, [createElement('strong', { textContent: String(tools.length) }), ' 个工具']),
@@ -268,10 +292,19 @@ function createHomeOverview() {
         createElement('span', { className: 'local-status' }, [createElement('i', { 'aria-hidden': 'true' }), ' 本地优先'])
       ])
     ]),
-    createElement('div', { className: 'view-tabs', role: 'group', 'aria-label': '工具视图' }, [
-      createViewButton('all', '全部', tools.length),
-      createViewButton('favorites', '收藏', favorites.length),
-      createViewButton('recent', '最近', recentTools.length)
+    createElement('div', { className: 'overview-controls' }, [
+      createElement('div', { className: 'privacy-banner', role: 'note' }, [
+        createElement('span', { className: 'privacy-icon', innerHTML: icons.sha, 'aria-hidden': 'true' }),
+        createElement('div', {}, [
+          createElement('strong', { textContent: '数据留在当前设备' }),
+          createElement('span', { textContent: '联网工具会单独标注' })
+        ])
+      ]),
+      createElement('div', { className: 'view-tabs', role: 'group', 'aria-label': '工具视图' }, [
+        createViewButton('all', '全部', tools.length),
+        createViewButton('favorites', '收藏', favorites.length),
+        createViewButton('recent', '最近', recentTools.length)
+      ])
     ])
   ])
 }
@@ -297,29 +330,46 @@ function currentHeading() {
   return categories.find(category => category.id === currentCategory)?.name || '全部工具'
 }
 
+function currentDescription() {
+  const category = categories.find(item => item.id === currentCategory)
+  if (searchQuery) {
+    const scope = currentCategory === 'all' ? '全部分类' : category?.name
+    return `正在${scope ? `${scope}中` : ''}匹配名称、描述与关键词`
+  }
+  if (currentView === 'favorites') return '保存在当前浏览器中的常用工具'
+  if (currentView === 'recent') return '最近打开过的工具，按使用顺序排列'
+  return category?.description || '浏览全部可用工具'
+}
+
+function hasActiveFilters() {
+  return Boolean(searchQuery || currentCategory !== 'all' || currentView !== 'all')
+}
+
+function resetFilters() {
+  searchQuery = ''
+  currentCategory = 'all'
+  currentView = 'all'
+  $('#searchInput').value = ''
+  syncSearchControls()
+  syncCategoryTabs()
+  renderGrid({ viewId: 'all' })
+}
+
 function renderGrid(focusTarget = {}) {
   const main = $('#mainContent')
   const filtered = visibleTools()
+  document.body.dataset.page = 'home'
+  main.className = 'home-main'
   cleanupFormAccessibility(main)
   main.innerHTML = ''
   main.appendChild(createHomeOverview())
 
   if (!searchQuery && currentCategory === 'all' && currentView === 'all') {
-    const intro = createElement('div', { className: 'home-intro' }, [
-      createElement('div', { className: 'privacy-banner', role: 'note' }, [
-        createElement('span', { className: 'privacy-icon', innerHTML: icons.sha, 'aria-hidden': 'true' }),
-        createElement('div', {}, [
-          createElement('strong', { textContent: '输入默认留在当前设备' }),
-          createElement('span', { textContent: '联网工具会在执行前明确标注。' })
-        ])
-      ])
-    ])
-    main.appendChild(intro)
     const favoriteSection = renderToolSection('我的收藏', favorites, { className: 'favorites-section' })
     const recentIds = recentTools.filter(id => !favorites.includes(id))
     const recentSection = recentTools.length ? renderToolSection('最近使用', recentIds, {
       className: 'recent-section',
-      countText: `${recentTools.length} 条记录`,
+      countText: `${recentIds.length} 个工具`,
       emptyText: '最近使用的工具均已收藏',
       onClear: () => {
         recentTools = []
@@ -328,31 +378,60 @@ function renderGrid(focusTarget = {}) {
         announce('最近使用记录已清空')
       }
     }) : null
-    if (favoriteSection) main.appendChild(favoriteSection)
-    if (recentSection) main.appendChild(recentSection)
-    const featuredSection = renderToolSection('常用工具', FEATURED_TOOLS, { className: 'featured-section' })
+    const personalSections = [favoriteSection, recentSection].filter(Boolean)
+    if (personalSections.length) {
+      main.appendChild(createElement('div', { className: 'personal-sections' }, personalSections))
+    }
+    const personalizedIds = new Set([...favorites, ...recentTools])
+    const featuredIds = FEATURED_TOOLS.filter(id => !personalizedIds.has(id))
+    const featuredSection = renderToolSection('快速访问', featuredIds, { className: 'featured-section' })
     if (featuredSection) main.appendChild(featuredSection)
   }
 
   const allSection = createElement('section', { className: 'home-tool-section all-tools-section' })
-  allSection.appendChild(createElement('div', { className: 'home-section-header' }, [
-    createElement('div', {}, [
-      createElement('h2', { textContent: currentHeading() }),
-      createElement('span', { textContent: `${filtered.length} 个工具` })
+  const sectionHeader = createElement('div', { className: 'home-section-header' }, [
+    createElement('div', { className: 'section-heading-copy' }, [
+      createElement('div', { className: 'section-heading-line' }, [
+        createElement('h2', { textContent: currentHeading() }),
+        createElement('span', { textContent: `${filtered.length} 个工具` })
+      ]),
+      createElement('p', { textContent: currentDescription() })
     ])
-  ]))
+  ])
+  if (hasActiveFilters()) {
+    sectionHeader.appendChild(createElement('button', {
+      className: 'section-reset',
+      type: 'button',
+      textContent: '重置筛选',
+      onClick: resetFilters
+    }))
+  }
+  allSection.appendChild(sectionHeader)
 
   if (!filtered.length) {
-    const message = currentView === 'favorites' ? '还没有收藏工具' : currentView === 'recent' ? '还没有最近使用记录' : `未找到“${searchQuery}”相关工具`
+    const favoritesEmpty = currentView === 'favorites' && favorites.length === 0
+    const recentEmpty = currentView === 'recent' && recentTools.length === 0
+    const collectionEmpty = favoritesEmpty || recentEmpty
+    const onlySearchActive = Boolean(searchQuery && currentCategory === 'all' && currentView === 'all')
+    const message = favoritesEmpty
+      ? '还没有收藏工具'
+      : recentEmpty
+        ? '还没有最近使用记录'
+        : searchQuery
+          ? `当前筛选下未找到“${searchQuery}”`
+          : '当前筛选下没有匹配工具'
+    const hint = collectionEmpty
+      ? '保存的工具会显示在这里。'
+      : '当前分类、视图或关键词没有交集。'
     allSection.appendChild(createElement('div', { className: 'empty-state' }, [
       createElement('div', { className: 'empty-search-icon', innerHTML: icons.search, 'aria-hidden': 'true' }),
       createElement('p', { textContent: message }),
-      createElement('span', { textContent: searchQuery ? '可以尝试 JSON、时间戳、Base64 或正则等关键词。' : '从全部工具中选择一个开始使用。' }),
+      createElement('span', { textContent: hint }),
       createElement('button', {
         className: 'btn btn-secondary',
         type: 'button',
-        textContent: searchQuery ? '清除搜索' : '查看全部工具',
-        onClick: searchQuery ? clearSearch : () => { currentView = 'all'; renderGrid() }
+        textContent: onlySearchActive ? '清除搜索' : collectionEmpty ? '浏览全部工具' : '重置筛选',
+        onClick: onlySearchActive ? clearSearch : resetFilters
       })
     ]))
   } else {
@@ -375,6 +454,7 @@ function renderGrid(focusTarget = {}) {
 function clearSearch() {
   searchQuery = ''
   $('#searchInput').value = ''
+  syncSearchControls()
   $('#searchInput').focus()
   renderGrid()
 }
@@ -391,6 +471,8 @@ async function renderToolPage(toolId) {
   recordRecent(toolId)
 
   const main = $('#mainContent')
+  document.body.dataset.page = 'tool'
+  main.className = 'tool-main'
   const page = createElement('div', { className: 'tool-page', 'data-category': tool.category })
   const titleId = `tool-title-${tool.id}`
   const categoryName = categories.find(category => category.id === tool.category)?.name || '在线工具'
@@ -403,9 +485,17 @@ async function renderToolPage(toolId) {
       type: 'button',
       textContent: categoryName,
       title: `查看${categoryName}分类`,
-      onClick: () => { currentCategory = tool.category; currentView = 'all'; syncCategoryTabs(); navigate('/') }
+      onClick: () => {
+        searchQuery = ''
+        currentCategory = tool.category
+        currentView = 'all'
+        $('#searchInput').value = ''
+        syncSearchControls()
+        syncCategoryTabs()
+        navigate('/')
+      }
     }),
-    createElement('span', { className: 'breadcrumb-sep', textContent: '/', 'aria-hidden': 'true' }),
+    createElement('span', { className: 'breadcrumb-sep breadcrumb-sep-current', textContent: '/', 'aria-hidden': 'true' }),
     createElement('span', { className: 'breadcrumb-current', textContent: tool.name, 'aria-current': 'page' })
   ])
   const headerFavorite = createFavoriteButton(tool, () => {})
@@ -421,7 +511,6 @@ async function renderToolPage(toolId) {
     createElement('div', { className: 'tool-header-icon', innerHTML: icons[tool.icon] || icons.wrench, 'aria-hidden': 'true' }),
     createElement('div', { className: 'tool-heading' }, [
       breadcrumb,
-      createElement('span', { className: 'tool-eyebrow', textContent: categoryName }),
       title,
       createElement('span', { className: 'tool-title-desc', textContent: tool.description })
     ]),
@@ -476,9 +565,11 @@ function renderHome() {
   const focusedCard = document.activeElement?.closest?.('.tool-card')
   const focusToolId = returnFocusToolId || focusedCard?.getAttribute('href')?.replace(/^#\//, '')
   renderRequestId += 1
+  document.body.dataset.page = 'home'
   $('.search-box').hidden = false
   $('#categoryNav').style.display = ''
   $('#searchInput').value = searchQuery
+  syncSearchControls()
   setPageMetadata('在线工具箱', `在线工具箱 - ${tools.length} 个在浏览器本地运行的开发者工具`)
   document.querySelectorAll('.category-tab').forEach(button => {
     const isActive = button.dataset.category === currentCategory
