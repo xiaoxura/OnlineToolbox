@@ -1,17 +1,17 @@
 // Lightweight tool metadata registry. Tool implementations are loaded on demand.
 
 export const categories = [
-  { id: 'all', name: '全部' },
-  { id: 'encoding', name: '编码/解码' },
-  { id: 'crypto', name: '哈希/加密' },
-  { id: 'text', name: '文本工具' },
-  { id: 'generator', name: '生成器' },
-  { id: 'converter', name: '转换器' },
-  { id: 'formatter', name: '格式化' },
-  { id: 'devtool', name: '开发者' },
-  { id: 'image', name: '图片工具' },
-  { id: 'network', name: '网络工具' },
-  { id: 'math', name: '数学计算' },
+  { id: 'all', name: '全部', description: '按任务查找工具' },
+  { id: 'encoding', name: '编码/解码', description: '文本、字节与令牌' },
+  { id: 'crypto', name: '哈希/加密', description: '摘要、签名与加密' },
+  { id: 'text', name: '文本工具', description: '清理、比较与批处理' },
+  { id: 'generator', name: '生成器', description: '随机值与视觉素材' },
+  { id: 'converter', name: '转换器', description: '数据格式与单位' },
+  { id: 'formatter', name: '格式化', description: '让代码更易读' },
+  { id: 'devtool', name: '开发者', description: '规范、参考与校验' },
+  { id: 'image', name: '图片工具', description: '压缩、编码与 SVG' },
+  { id: 'network', name: '网络工具', description: 'URL、请求与网段' },
+  { id: 'math', name: '数学计算', description: '表达式与高精度数字' },
 ]
 
 export const tools = [
@@ -24,6 +24,7 @@ export const tools = [
   { id: "base58", name: "Base58 编解码", description: "使用 Bitcoin 字母表进行 Base58 编码与解码", category: "encoding", icon: "base32", load: () => import("./encoding/base58.js") },
   { id: "base32", name: "Base32 编解码", description: "Base32 编码与解码（RFC 4648 字母表: A-Z2-7）", category: "encoding", icon: "base32", load: () => import("./encoding/base32.js") },
   { id: "punycode", name: "Punycode 编解码", description: "Punycode 编解码，用于国际化域名(IDN)转换", category: "encoding", icon: "punycode", load: () => import("./encoding/punycode.js") },
+  { id: "data-url", name: "Data URL 生成", description: "将本地文件转换为可嵌入 HTML 或 CSS 的 Data URL", category: "encoding", icon: "img-to-base64", keywords: ["data uri", "文件编码", "base64文件"], load: () => import("./encoding/data-url.js") },
   { id: "md5", name: "MD5 哈希", description: "计算文本的 MD5 哈希值", category: "crypto", icon: "md5", load: () => import("./crypto/md5.js") },
   { id: "sha", name: "SHA 哈希", description: "计算 SHA-1/SHA-256/SHA-512 哈希值", category: "crypto", icon: "sha", load: () => import("./crypto/sha.js") },
   { id: "aes", name: "AES 加解密", description: "AES 对称加密和解密", category: "crypto", icon: "aes", load: () => import("./crypto/aes.js") },
@@ -41,6 +42,10 @@ export const tools = [
   { id: "markdown", name: "Markdown 预览", description: "实时预览 Markdown 文本", category: "text", icon: "html", load: () => import("./text/markdown.js") },
   { id: "set-operations", name: "文本集合运算", description: "计算两组文本行的交集、并集、差集和对称差集", category: "text", icon: "text-diff", load: () => import("./text/set-operations.js") },
   { id: "text-encrypt", name: "文本加密", description: "使用 AES 加密和解密文本", category: "text", icon: "aes", load: () => import("./text/text-encrypt.js") },
+  { id: "slugify", name: "Slug 生成器", description: "将标题或文本转换为 URL 友好的 slug", category: "text", icon: "url-encode", keywords: ["slug", "url路径", "permalink"], load: () => import("./text/slugify.js") },
+  { id: "line-endings", name: "换行符转换", description: "在 LF、CRLF 和 CR 换行格式之间转换文本", category: "text", icon: "text-sort", keywords: ["换行", "crlf", "lf", "eol"], load: () => import("./text/line-endings.js") },
+  { id: "text-wrap", name: "文本自动换行", description: "按指定列宽自动换行并保留段落结构", category: "text", icon: "lorem", keywords: ["wrap", "列宽", "折行"], load: () => import("./text/text-wrap.js") },
+  { id: "markdown-table", name: "Markdown 表格生成", description: "将 CSV、TSV 或竖线分隔数据转换为 Markdown 表格", category: "text", icon: "json-csv", keywords: ["table", "表格", "csv to markdown"], load: () => import("./text/markdown-table.js") },
   { id: "uuid", name: "UUID 生成", description: "生成 UUID v4 随机唯一标识符", category: "generator", icon: "uuid", load: () => import("./generator/uuid.js") },
   { id: "password", name: "随机密码生成", description: "生成安全的随机密码", category: "generator", icon: "password", load: () => import("./generator/password.js") },
   { id: "random", name: "随机数生成", description: "生成随机数和随机字符串", category: "generator", icon: "random", load: () => import("./generator/random.js") },
@@ -50,6 +55,7 @@ export const tools = [
   { id: "gradient-gen", name: "CSS 渐变生成器", description: "生成线性渐变和径向渐变的 CSS 代码", category: "generator", icon: "color", load: () => import("./generator/gradient-gen.js") },
   { id: "shadow-gen", name: "CSS 阴影生成器", description: "可视化调整并生成 box-shadow CSS 代码", category: "generator", icon: "json", load: () => import("./generator/shadow-gen.js") },
   { id: "palette-gen", name: "调色板生成", description: "基于色彩理论生成互补色、三色组、类似色等配色方案", category: "generator", icon: "color", load: () => import("./generator/palette-gen.js") },
+  { id: "ulid", name: "ULID 生成", description: "生成按时间排序、适合分布式系统的 ULID 标识符", category: "generator", icon: "uuid", keywords: ["sortable id", "分布式 id"], load: () => import("./generator/ulid.js") },
   { id: "timestamp", name: "时间戳转换", description: "Unix 时间戳与日期时间相互转换", category: "converter", icon: "timestamp", load: () => import("./converter/timestamp.js") },
   { id: "radix", name: "进制转换", description: "2/8/10/16 进制数相互转换", category: "converter", icon: "radix", load: () => import("./converter/radix.js") },
   { id: "color", name: "颜色转换", description: "HEX/RGB/HSL 颜色格式相互转换", category: "converter", icon: "color", load: () => import("./converter/color.js") },
@@ -68,6 +74,10 @@ export const tools = [
   { id: "json-typescript", name: "JSON 转 TypeScript", description: "根据 JSON 自动生成 TypeScript interface 或 type", category: "converter", icon: "json", load: () => import("./converter/json-typescript.js") },
   { id: "amount-cn", name: "中文大写金额", description: "将数字金额转换为中文大写", category: "converter", icon: "radix", load: () => import("./converter/amount-cn.js") },
   { id: "regex-visual", name: "正则表达式可视化", description: "测试和解释正则表达式", category: "converter", icon: "regex", load: () => import("./converter/regex-visual.js") },
+  { id: "json-lines", name: "JSONL ↔ JSON 转换", description: "在 JSON Lines 与 JSON 数组之间双向转换和校验", category: "converter", icon: "json", keywords: ["jsonl", "ndjson", "newline json"], load: () => import("./converter/json-lines.js") },
+  { id: "json-pointer", name: "JSON Pointer 查询", description: "使用 RFC 6901 JSON Pointer 精确读取 JSON 节点", category: "converter", icon: "json-path", keywords: ["rfc6901", "json path", "节点路径"], load: () => import("./converter/json-pointer.js") },
+  { id: "duration-converter", name: "时间长度转换", description: "批量换算毫秒、秒、分钟、小时、天和周", category: "converter", icon: "timestamp", keywords: ["duration", "milliseconds", "ms"], load: () => import("./converter/duration-converter.js") },
+  { id: "number-format", name: "数字格式化", description: "按地区格式化数字、货币和百分比", category: "converter", icon: "radix", keywords: ["number format", "currency", "locale"], load: () => import("./converter/number-format.js") },
   { id: "json", name: "JSON 格式化", description: "JSON 美化、压缩和校验", category: "formatter", icon: "json", load: () => import("./formatter/json.js") },
   { id: "css", name: "CSS 格式化", description: "CSS 代码美化和压缩", category: "formatter", icon: "css", load: () => import("./formatter/css.js") },
   { id: "html", name: "HTML 格式化", description: "HTML 代码美化和压缩", category: "formatter", icon: "html", load: () => import("./formatter/html.js") },
@@ -88,6 +98,9 @@ export const tools = [
   { id: "chmod-calculator", name: "chmod 权限计算器", description: "可视化计算 Linux 文件权限和 chmod 命令", category: "devtool", icon: "search", load: () => import("./devtool/chmod-calculator.js") },
   { id: "sql-in", name: "SQL IN 参数生成", description: "将多行数据转换为 SQL IN 或 NOT IN 条件", category: "devtool", icon: "sql", load: () => import("./devtool/sql-in.js") },
   { id: "format-check", name: "格式校验工具", description: "校验手机号、邮箱、身份证、URL、IP地址、MAC地址、日期等格式", category: "devtool", icon: "regex", load: () => import("./devtool/format-check.js") },
+  { id: "color-contrast", name: "WCAG 颜色对比度", description: "计算前景色与背景色对比度，检查 WCAG AA/AAA 标准", category: "devtool", icon: "color", keywords: ["wcag", "contrast", "无障碍", "a11y"], load: () => import("./devtool/color-contrast.js") },
+  { id: "semver", name: "SemVer 版本比较", description: "校验、比较和升级语义化版本号", category: "devtool", icon: "json", keywords: ["semantic version", "版本号", "npm"], load: () => import("./devtool/semver.js") },
+  { id: "mime-types", name: "MIME 类型查询", description: "按文件扩展名快速查找常用 MIME Content-Type", category: "devtool", icon: "search", keywords: ["content type", "扩展名", "http header"], load: () => import("./devtool/mime-types.js") },
   { id: "image-compress", name: "图片压缩与格式转换", description: "在本地压缩图片、调整尺寸并转换为 JPEG、PNG 或 WebP", category: "image", icon: "base64", load: () => import("./image/image-compress.js") },
   { id: "img-to-base64", name: "图片转 Base64", description: "将图片转换为 Base64 编码字符串", category: "image", icon: "base64", load: () => import("./image/img-to-base64.js") },
   { id: "svg-compress", name: "SVG 压缩", description: "压缩 SVG 代码，移除冗余内容", category: "image", icon: "html", load: () => import("./image/svg-compress.js") },
@@ -99,6 +112,7 @@ export const tools = [
   { id: "curl-generator", name: "CURL 命令生成器", description: "根据请求方法、Headers 和 Body 生成 CURL 命令", category: "network", icon: "url-encode", load: () => import("./network/curl-generator.js") },
   { id: "url-params", name: "URL 参数编辑器", description: "可视化解析、添加、删除和重新生成 URL 查询参数", category: "network", icon: "url-encode", load: () => import("./network/url-params.js") },
   { id: "cookie-viewer", name: "Cookie 查看器", description: "查看当前页面的 Cookie 信息", category: "network", icon: "search", load: () => import("./network/cookie-viewer.js") },
+  { id: "query-string", name: "Query String 转换", description: "在 JSON 对象与 URL 查询字符串之间双向转换", category: "network", icon: "url-encode", keywords: ["query params", "url query", "search params"], load: () => import("./network/query-string.js") },
   { id: "calculator", name: "科学计算器", description: "支持科学函数、键盘输入和计算历史的科学计算器", category: "math", icon: "unit", load: () => import("./math/calculator.js") },
   { id: "big-number", name: "大数计算器", description: "大数进制转换和高精度四则运算，支持任意长度整数", category: "math", icon: "radix", load: () => import("./math/big-number.js") },
 ]
@@ -116,13 +130,28 @@ const searchAliases = {
 
 function matchesSearch(tool, query) {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
-  const searchable = [tool.name, tool.description, tool.id, tool.category, ...(searchAliases[tool.id] || [])].join(' ').toLowerCase()
+  const searchable = [tool.name, tool.description, tool.id, tool.category, ...(tool.keywords || []), ...(searchAliases[tool.id] || [])].join(' ').toLowerCase()
   return terms.every(term => searchable.includes(term))
+}
+
+function scoreTool(tool, query) {
+  const normalized = query.toLowerCase()
+  const name = tool.name.toLowerCase()
+  const id = tool.id.toLowerCase()
+  const keyword = [...(tool.keywords || []), ...(searchAliases[tool.id] || [])].join(' ').toLowerCase()
+  let score = 0
+  if (id === normalized) score += 100
+  if (name === normalized) score += 90
+  if (name.startsWith(normalized)) score += 55
+  if (id.startsWith(normalized)) score += 45
+  if (keyword.includes(normalized)) score += 25
+  if (tool.description.toLowerCase().includes(normalized)) score += 10
+  return score
 }
 
 export function searchTools(query) {
   if (!query) return tools
-  return tools.filter(tool => matchesSearch(tool, query))
+  return tools.filter(tool => matchesSearch(tool, query)).sort((a, b) => scoreTool(b, query) - scoreTool(a, query))
 }
 
 export function getToolsByCategory(categoryId) {
@@ -133,7 +162,7 @@ export function getToolsByCategory(categoryId) {
 export function getToolsByCategoryAndSearch(categoryId, query) {
   const categoryTools = categoryId === 'all' ? tools : getToolsByCategory(categoryId)
   if (!query) return categoryTools
-  return categoryTools.filter(tool => matchesSearch(tool, query))
+  return categoryTools.filter(tool => matchesSearch(tool, query)).sort((a, b) => scoreTool(b, query) - scoreTool(a, query))
 }
 
 export function getToolById(id) {

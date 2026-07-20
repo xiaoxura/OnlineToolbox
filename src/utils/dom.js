@@ -345,6 +345,10 @@ export function cleanupFormAccessibility(root = document) {
 }
 
 export function enhanceFormAccessibility(root = document) {
+  root.querySelectorAll('input, textarea, select').forEach(control => {
+    if (!control.id) control.id = `tool-field-${++generatedId}`
+  })
+
   root.querySelectorAll('.tool-section').forEach(section => {
     const body = section.querySelector(':scope > .tool-section-body')
     const header = section.querySelector(':scope > .tool-section-header')
@@ -384,13 +388,12 @@ export function enhanceFormAccessibility(root = document) {
   root.querySelectorAll('.form-group').forEach(group => {
     const labels = [...group.querySelectorAll('label')].filter(label => !label.control)
     const controls = [...group.querySelectorAll('input, textarea, select')].filter(control => {
-      return !control.closest('label') && !control.getAttribute('aria-label') && !control.getAttribute('aria-labelledby')
+      return !control.closest('label')
     })
 
     labels.forEach((label, index) => {
       const control = controls[index]
       if (!control) return
-      if (!control.id) control.id = `tool-field-${++generatedId}`
       label.htmlFor = control.id
     })
   })
@@ -608,4 +611,3 @@ export function enhanceResultSections(container, { toolName = 'result' } = {}) {
     section.dataset.resultEnhanced = 'true'
   })
 }
-

@@ -22,6 +22,19 @@ describe('shared tool page UI', () => {
     expect(section.querySelector(':scope > .tool-section-body')?.contains(control)).toBe(true)
   })
 
+  it('gives aria-labelled fields stable ids for browser autofill', () => {
+    const root = document.createElement('main')
+    const field = createElement('textarea', { 'aria-label': '内容' })
+    const label = createElement('label', { textContent: '格式' })
+    const select = createElement('select', { 'aria-label': '输入格式' })
+    root.append(field, createElement('div', { className: 'form-group' }, [label, select]))
+
+    enhanceFormAccessibility(root)
+
+    expect(field.id).toMatch(/^tool-field-/)
+    expect(label.htmlFor).toBe(select.id)
+  })
+
   it('normalizes and wraps result tables without changing table semantics', () => {
     const root = document.createElement('main')
     const table = createElement('table', { className: 'result-box' })

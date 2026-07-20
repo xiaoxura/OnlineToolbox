@@ -1,7 +1,7 @@
 {
   "name": "onlinetoolbox",
   "version": "1.0.0",
-  "description": "在线工具箱 - 86 个常用编解码、文本处理、格式化、生成器等开发者工具",
+  "description": "在线工具箱 - 100 个常用编解码、文本处理、格式化、生成器等开发者工具",
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -28,7 +28,9 @@
     "dompurify": "^3.4.11",
     "js-yaml": "^4.2.0",
     "marked": "^18.0.5",
-    "qrcode": "^1.5.4"
+    "papaparse": "^5.5.4",
+    "qrcode": "^1.5.4",
+    "ulid": "^3.0.2"
   },
   "homepage": "https://xiaoxura.github.io/OnlineToolbox/"
 }

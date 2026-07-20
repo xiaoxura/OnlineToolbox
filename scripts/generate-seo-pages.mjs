@@ -35,7 +35,7 @@ function toolPage(tool) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(tool.description)}。所有处理均在浏览器中完成。">
-  <meta name="theme-color" content="#4263eb">
+  <meta name="theme-color" content="#f7f8fa">
   <link rel="canonical" href="${escapeHtml(canonical)}">
   <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
   <meta property="og:type" content="website">
@@ -45,13 +45,13 @@ function toolPage(tool) {
   <meta name="twitter:card" content="summary">
   <script type="application/ld+json">${schema}</script>
   <style>
-    :root{color-scheme:light dark;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f8f9fa;color:#212529}
-    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}
-    main{width:min(640px,100%);background:#fff;border:1px solid #d0d5dd;border-radius:16px;padding:32px;box-sizing:border-box;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-    .category{color:#4263eb;font-weight:600;font-size:14px}h1{margin:8px 0 12px;font-size:32px}p{color:#667085;line-height:1.7}
-    a{display:inline-flex;margin-top:12px;padding:11px 20px;border-radius:8px;background:#4263eb;color:#fff;text-decoration:none;font-weight:700}
-    a:focus-visible{outline:3px solid rgba(66,99,235,.4);outline-offset:3px}
-    @media(prefers-color-scheme:dark){:root{background:#111827;color:#f3f4f6}main{background:#18212f;border-color:#374151}p{color:#cbd5e1}}
+    :root{color-scheme:light dark;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f6f8;color:#161a20}
+    body{margin:0;min-height:100vh;display:grid;place-items:start center;padding:12vh 24px 48px;box-sizing:border-box}
+    main{width:min(680px,100%);border-top:3px solid #315cbb;padding:28px 0;box-sizing:border-box}
+    .category{color:#315cbb;font-weight:650;font-size:13px}h1{margin:8px 0 12px;font-size:30px;letter-spacing:0}p{color:#596574;line-height:1.7}
+    a{display:inline-flex;margin-top:12px;padding:10px 18px;border-radius:6px;background:#315cbb;color:#fff;text-decoration:none;font-weight:700}
+    a:focus-visible{outline:3px solid rgba(49,92,187,.35);outline-offset:3px}
+    @media(prefers-color-scheme:dark){:root{background:#111318;color:#edf0f4}.category{color:#9ab9ff}p{color:#b2bbc7}a{background:#4771c7}}
   </style>
 </head>
 <body>

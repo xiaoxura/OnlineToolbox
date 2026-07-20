@@ -1,10 +1,10 @@
 # 🛠️ 在线工具箱
 
-一个纯静态、轻量级的在线开发者工具箱，提供 86 个常用编解码、文本处理、格式化、生成器、转换器等实用工具。无需账号或后端服务，绝大多数数据只在浏览器本地处理。
+一个纯静态、轻量级的在线开发者工具箱，提供 100 个常用编解码、文本处理、格式化、生成器、转换器等实用工具。无需账号或后端服务，绝大多数数据只在浏览器本地处理。
 
 ## ✨ 特性
 
-- **86 个实用工具** — 覆盖编码解码、哈希加密、文本处理、生成器、格式化、转换器、开发者参考、图片处理、网络工具、数学计算等 10 大分类
+- **100 个实用工具** — 覆盖编码解码、哈希加密、文本处理、生成器、格式化、转换器、开发者参考、图片处理、网络工具、数学计算等 10 大分类
 - **工具按需加载** — 首页只加载工具元数据，进入工具后再下载对应实现及依赖，降低首屏 JS 体积
 - **纯静态部署** — 构建产物可部署到 EdgeOne Pages、GitHub Pages、Vercel、Netlify 等静态托管平台
 - **本地优先与隐私提示** — 绝大多数功能完全在本地运行；IP 查询仅在用户主动点击后请求第三方服务
@@ -16,32 +16,32 @@
 
 ## 🧰 工具列表
 
-### 编码/解码（9 个）
-Base64 编解码 · URL 编解码 · HTML 实体编解码 · Unicode 编解码 · Hex 编解码 · JWT 解析 · Base32 编解码 · Base58 编解码 · Punycode 编解码
+### 编码/解码（10 个）
+Base64 编解码 · URL 编解码 · HTML 实体编解码 · Unicode 编解码 · Hex 编解码 · JWT 解析 · Base32 编解码 · Base58 编解码 · Punycode 编解码 · Data URL 生成
 
 ### 哈希/加密（6 个）
 MD5 哈希 · SHA 哈希（SHA-1/256/512） · AES 加解密 · DES/3DES 加解密 · HMAC 生成 · 文件哈希计算
 
-### 文本工具（11 个）
-字符统计 · 文本对比 · 大小写转换 · 文本去重 · 文本排序 · 正则表达式测试 · 文本替换 · 转义工具 · Markdown 预览 · 文本加密 · 文本集合运算
+### 文本工具（15 个）
+字符统计 · 文本对比 · 大小写转换 · 文本去重 · 文本排序 · 正则表达式测试 · 文本替换 · 转义工具 · Markdown 预览 · 文本加密 · 文本集合运算 · Slug 生成 · 换行符转换 · 文本自动换行 · Markdown 表格生成
 
-### 生成器（9 个）
-UUID 生成 · 随机密码生成 · 随机数生成 · Lorem ipsum 生成 · 二维码生成 · 占位图生成 · CSS 渐变生成器 · CSS 阴影生成器 · 调色板生成
+### 生成器（10 个）
+UUID 生成 · ULID 生成 · 随机密码生成 · 随机数生成 · Lorem ipsum 生成 · 二维码生成 · 占位图生成 · CSS 渐变生成器 · CSS 阴影生成器 · 调色板生成
 
-### 转换器（18 个）
-时间戳转换 · 进制转换 · 颜色转换 · 单位转换 · JSON↔YAML · JSON↔XML · JSON 转 CSV · CSV 转 JSON · JSONPath 查询 · Markdown 转 HTML · HTML 转 JSX · CSS 转 JS 对象 · JSON 对比 · 时区转换 · 日期计算器 · 中文大写金额 · 正则表达式可视化 · JSON 转 TypeScript
+### 转换器（22 个）
+时间戳转换 · 时间长度转换 · 进制转换 · 数字格式化 · 颜色转换 · 单位转换 · JSON↔YAML · JSON↔XML · JSONL↔JSON · JSON Pointer 查询 · JSON 转 CSV · CSV 转 JSON · JSONPath 查询 · Markdown 转 HTML · HTML 转 JSX · CSS 转 JS 对象 · JSON 对比 · 时区转换 · 日期计算器 · 中文大写金额 · 正则表达式可视化 · JSON 转 TypeScript
 
 ### 格式化（5 个）
 JSON 格式化 · CSS 格式化 · HTML 格式化 · SQL 格式化 · XML 格式化
 
-### 开发者工具（15 个）
-Cron 表达式解析 · HTTP 状态码查询 · User-Agent 解析 · 正则表达式速查表 · CSS 单位转换 · JSON Schema 生成 · Mock 数据生成 · Git 命令速查 · Linux 命令速查 · 身份证号校验 · 银行卡号校验 · 统一社会信用代码校验 · 格式校验工具 · chmod 权限计算器 · SQL IN 参数生成
+### 开发者工具（18 个）
+Cron 表达式解析 · HTTP 状态码查询 · User-Agent 解析 · 正则表达式速查表 · CSS 单位转换 · JSON Schema 生成 · Mock 数据生成 · Git 命令速查 · Linux 命令速查 · 身份证号校验 · 银行卡号校验 · 统一社会信用代码校验 · 格式校验工具 · chmod 权限计算器 · SQL IN 参数生成 · WCAG 颜色对比度 · SemVer 版本比较 · MIME 类型查询
 
 ### 图片工具（3 个）
 图片转 Base64 · SVG 压缩 · 图片压缩与格式转换
 
-### 网络工具（8 个）
-IP 地址信息查询 · 端口说明查询 · URL 解析器 · HTTP Headers 解析 · Cookie 查看器 · IPv4/CIDR 计算器 · CURL 命令生成器 · URL 参数编辑器
+### 网络工具（9 个）
+IP 地址信息查询 · 端口说明查询 · URL 解析器 · HTTP Headers 解析 · Cookie 查看器 · IPv4/CIDR 计算器 · CURL 命令生成器 · URL 参数编辑器 · Query String 转换
 
 ### 数学计算（2 个）
 科学计算器 · 大数计算器
@@ -70,7 +70,7 @@ npm run build
 
 构建产物输出到 `dist/`。除 Vite 应用资源外，构建脚本还会生成：
 
-- `dist/tools/{tool-id}/index.html`：86 个工具的独立 SEO 落地页
+- `dist/tools/{tool-id}/index.html`：100 个工具的独立 SEO 落地页
 - `dist/sitemap.xml`：首页及全部工具页的网站地图
 - `dist/robots.txt`：爬虫规则和网站地图地址
 
@@ -92,7 +92,7 @@ npm run test:watch  # Vitest 监听模式
 npm run check       # 依次执行 lint、测试和生产构建
 ```
 
-测试覆盖工具注册表、全部 86 个工具的渲染冒烟测试、表单可访问名称、核心工具行为、Markdown XSS 防护、路由懒加载和主题偏好持久化。
+测试覆盖工具注册表、全部 100 个工具的渲染冒烟测试、表单可访问名称、核心工具行为、Markdown XSS 防护、路由懒加载和主题偏好持久化。
 
 ## 🔒 隐私与联网说明
 
@@ -178,7 +178,7 @@ OnlineToolbox/
 1. 在对应的 `src/tools/` 分类目录下创建 `.js` 文件并默认导出工具对象。
 2. 在 `src/tools/registry.js` 添加工具的轻量元数据，以及指向实现文件的动态 `import()`。
 3. 如需新图标，在 `src/icons.js` 添加 SVG 图标；也可以复用现有图标。
-4. 运行 `npm run check`，确认静态检查、86+ 工具测试和生产构建均通过。
+4. 运行 `npm run check`，确认静态检查、全部工具测试和生产构建均通过。
 
 注册表示例：
 

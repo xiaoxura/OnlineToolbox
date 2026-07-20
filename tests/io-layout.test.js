@@ -12,7 +12,9 @@ const EXPECT_SPLIT = new Set([
   'punycode', 'md5', 'sha', 'aes', 'des', 'hmac', 'char-count', 'case-convert',
   'text-dedup', 'text-sort', 'regex', 'text-replace', 'escape', 'text-encrypt',
   'json-yaml', 'json-xml', 'json-csv', 'csv-json', 'html-to-jsx', 'json', 'css',
-  'html', 'sql', 'xml', 'user-agent', 'json-schema', 'format-check', 'svg-compress'
+  'html', 'sql', 'xml', 'user-agent', 'json-schema', 'format-check', 'svg-compress',
+  'slugify', 'line-endings', 'text-wrap', 'markdown-table', 'json-lines', 'json-pointer',
+  'duration-converter', 'number-format', 'query-string'
 ])
 
 describe('two-column IO layout', () => {

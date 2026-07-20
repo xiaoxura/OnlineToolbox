@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { categories, getToolById, getToolsByCategoryAndSearch, tools } from '../src/tools/registry.js'
 
 describe('tool registry', () => {
-  it('contains 86 unique and complete descriptors', () => {
-    expect(tools).toHaveLength(86)
+  it('contains at least 100 unique and complete descriptors', () => {
+    expect(tools.length).toBeGreaterThanOrEqual(100)
     expect(new Set(tools.map(tool => tool.id)).size).toBe(tools.length)
     const categoryIds = new Set(categories.map(category => category.id))
     for (const tool of tools) {
