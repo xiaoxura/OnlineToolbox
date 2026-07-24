@@ -478,7 +478,7 @@
 
 .personal-sections {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   gap: 28px;
 }
 
@@ -568,10 +568,6 @@
 .tool-grid.compact {
   padding-bottom: 6px;
   grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
-}
-
-.personal-sections .tool-grid.compact {
-  grid-template-columns: 1fr;
 }
 
 .tool-card-wrap {
