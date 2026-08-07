@@ -1,6 +1,6 @@
 import './styles/base.css'
+import './styles/app.css'
 import './styles/tool.css'
-import './styles/refresh.css'
 
 import { $, cleanupFormAccessibility, createElement, enhanceFormAccessibility, applyTwoColumnLayout, enhanceResultSections } from './utils/dom.js'
 import { initRouter, registerRoute, navigate } from './router.js'
@@ -64,7 +64,7 @@ function setupTheme() {
     button.setAttribute('aria-label', isDark ? '切换到浅色主题' : '切换到深色主题')
     button.setAttribute('title', isDark ? '切换到浅色主题' : '切换到深色主题')
     button.setAttribute('aria-pressed', String(isDark))
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#111216' : '#f4f5f8')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#0e0f12' : '#f7f8fa')
   }
 
   button.addEventListener('click', () => {
@@ -131,11 +131,6 @@ function setupHeader() {
 function setupCategoryNav() {
   const nav = $('#categoryNav')
   nav.innerHTML = ''
-  nav.appendChild(createElement('div', { className: 'category-nav-heading' }, [
-    createElement('span', { textContent: '浏览' }),
-    createElement('strong', { textContent: '工具分类' }),
-    createElement('small', { textContent: `${categories.length - 1} 个分类 · ${tools.length} 个工具` })
-  ]))
   const inner = createElement('div', { className: 'category-nav-inner' })
   categories.forEach(category => {
     const count = category.id === 'all' ? tools.length : tools.filter(tool => tool.category === category.id).length
@@ -156,10 +151,7 @@ function setupCategoryNav() {
       }
     }, [
       createElement('span', { className: 'category-dot', 'aria-hidden': 'true' }),
-      createElement('span', { className: 'category-tab-copy' }, [
-        createElement('strong', { textContent: category.name }),
-        createElement('small', { textContent: category.description })
-      ]),
+      createElement('span', { className: 'category-tab-name', textContent: category.name }),
       createElement('span', { className: 'category-count', textContent: String(count), 'aria-hidden': 'true' })
     ])
     inner.appendChild(button)
@@ -201,7 +193,6 @@ function createFavoriteButton(tool, onToggle) {
 }
 
 function createToolCard(tool, { recordHomeScroll = false, refreshHome = false } = {}) {
-  const category = categories.find(item => item.id === tool.category)
   const link = createElement('a', {
     className: 'tool-card',
     href: `#/${tool.id}`,
@@ -211,13 +202,9 @@ function createToolCard(tool, { recordHomeScroll = false, refreshHome = false } 
       createElement('div', { className: 'tool-icon', innerHTML: icons[tool.icon] || icons.wrench })
     ]),
     createElement('div', { className: 'tool-card-copy' }, [
-      createElement('div', { className: 'tool-card-title-row' }, [
-        createElement('div', { className: 'tool-name', textContent: tool.name }),
-        createElement('span', { className: 'tool-category-label', textContent: category?.name || '工具' })
-      ]),
+      createElement('div', { className: 'tool-name', textContent: tool.name }),
       createElement('div', { className: 'tool-desc', textContent: tool.description })
-    ]),
-    createElement('span', { className: 'tool-card-arrow', innerHTML: icons.back, 'aria-hidden': 'true' })
+    ])
   ])
   if (recordHomeScroll) link.addEventListener('click', () => { homeScrollY = window.scrollY })
   const favoriteButton = createFavoriteButton(tool, () => {
@@ -282,29 +269,16 @@ function createViewButton(id, label, count) {
 }
 
 function createHomeOverview() {
-  return createElement('section', { className: 'home-overview', 'aria-labelledby': 'workspaceTitle' }, [
-    createElement('div', { className: 'overview-copy' }, [
-      createElement('span', { className: 'overview-kicker', textContent: '当前工作区' }),
-      createElement('h1', { id: 'workspaceTitle', textContent: '工具工作台' }),
-      createElement('div', { className: 'overview-stats' }, [
-        createElement('span', {}, [createElement('strong', { textContent: String(tools.length) }), ' 个工具']),
-        createElement('span', {}, [createElement('strong', { textContent: String(categories.length - 1) }), ' 个分类']),
-        createElement('span', { className: 'local-status' }, [createElement('i', { 'aria-hidden': 'true' }), ' 本地优先'])
-      ])
+  return createElement('section', { className: 'home-toolbar' }, [
+    createElement('h1', { className: 'sr-only', textContent: '在线工具箱' }),
+    createElement('div', { className: 'view-tabs', role: 'group', 'aria-label': '工具视图' }, [
+      createViewButton('all', '全部', tools.length),
+      createViewButton('favorites', '收藏', favorites.length),
+      createViewButton('recent', '最近', recentTools.length)
     ]),
-    createElement('div', { className: 'overview-controls' }, [
-      createElement('div', { className: 'privacy-banner', role: 'note' }, [
-        createElement('span', { className: 'privacy-icon', innerHTML: icons.sha, 'aria-hidden': 'true' }),
-        createElement('div', {}, [
-          createElement('strong', { textContent: '数据留在当前设备' }),
-          createElement('span', { textContent: '联网工具会单独标注' })
-        ])
-      ]),
-      createElement('div', { className: 'view-tabs', role: 'group', 'aria-label': '工具视图' }, [
-        createViewButton('all', '全部', tools.length),
-        createViewButton('favorites', '收藏', favorites.length),
-        createViewButton('recent', '最近', recentTools.length)
-      ])
+    createElement('span', { className: 'privacy-badge', role: 'note' }, [
+      createElement('span', { className: 'privacy-icon', innerHTML: icons.sha, 'aria-hidden': 'true' }),
+      createElement('span', { textContent: '数据留在当前设备' })
     ])
   ])
 }
