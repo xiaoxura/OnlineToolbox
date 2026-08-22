@@ -11,7 +11,7 @@ const EXPECT_SPLIT = new Set([
   'base64', 'url-encode', 'html-entity', 'unicode', 'hex', 'base58', 'base32',
   'punycode', 'md5', 'sha', 'aes', 'des', 'hmac', 'char-count', 'case-convert',
   'text-dedup', 'text-sort', 'regex', 'text-replace', 'escape', 'text-encrypt',
-  'json-yaml', 'json-xml', 'json-csv', 'csv-json', 'html-to-jsx', 'json', 'css',
+  'json-yaml', 'toml-json', 'json-xml', 'json-csv', 'csv-json', 'html-to-jsx', 'json', 'css',
   'html', 'sql', 'xml', 'user-agent', 'json-schema', 'format-check', 'svg-compress',
   'slugify', 'line-endings', 'text-wrap', 'markdown-table', 'json-lines', 'json-pointer',
   'duration-converter', 'number-format', 'query-string'

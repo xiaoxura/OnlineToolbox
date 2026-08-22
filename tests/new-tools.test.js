@@ -10,6 +10,9 @@ import mimeTypes from '../src/tools/devtool/mime-types.js'
 import lineEndings from '../src/tools/text/line-endings.js'
 import markdownTable from '../src/tools/text/markdown-table.js'
 import textWrap from '../src/tools/text/text-wrap.js'
+import tomlJson, { parseToml, stringifyToml } from '../src/tools/converter/toml-json.js'
+import jsonPatch from '../src/tools/converter/json-patch.js'
+import ipv6Calculator, { calculateIPv6, compressIPv6, expandIPv6, parseIPv6 } from '../src/tools/network/ipv6-calculator.js'
 
 let root
 
@@ -33,6 +36,41 @@ function outputTextarea() {
 
 function runPrimaryAction() {
   root.querySelector('.btn-primary').click()
+}
+
+function decodeJsonPointer(pointer) {
+  if (pointer === '') return []
+  return pointer.slice(1).split('/').map(token => token.replaceAll('~1', '/').replaceAll('~0', '~'))
+}
+
+function applyJsonPatch(documentValue, operations) {
+  let result = JSON.parse(JSON.stringify(documentValue))
+  for (const operation of operations) {
+    const tokens = decodeJsonPointer(operation.path)
+    if (!tokens.length) {
+      if (operation.op === 'remove') result = undefined
+      else result = JSON.parse(JSON.stringify(operation.value))
+      continue
+    }
+
+    const parent = tokens.slice(0, -1).reduce((value, token) => value[token], result)
+    const token = tokens.at(-1)
+    if (Array.isArray(parent)) {
+      if (operation.op === 'add') {
+        if (token === '-') parent.push(JSON.parse(JSON.stringify(operation.value)))
+        else parent.splice(Number(token), 0, JSON.parse(JSON.stringify(operation.value)))
+      } else if (operation.op === 'remove') {
+        parent.splice(Number(token), 1)
+      } else {
+        parent[Number(token)] = JSON.parse(JSON.stringify(operation.value))
+      }
+    } else if (operation.op === 'remove') {
+      delete parent[token]
+    } else {
+      parent[token] = JSON.parse(JSON.stringify(operation.value))
+    }
+  }
+  return result
 }
 
 describe('new utility tools', () => {
@@ -239,5 +277,178 @@ describe('new utility tools', () => {
     const rows = [...root.querySelectorAll('tbody tr')]
     expect(rows).toHaveLength(1)
     expect(rows[0].textContent).toContain('image/webp')
+  })
+
+  it('converts TOML tables and array tables in both UI directions', () => {
+    tomlJson.render(root)
+    const toml = [
+      'title = "Example"',
+      '',
+      '[owner]',
+      'name = "Alice"',
+      '',
+      '[[servers]]',
+      'name = "alpha"',
+      'ports = [8000, 8001]',
+      '',
+      '[[servers]]',
+      'name = "beta"'
+    ].join('\n')
+    editableTextarea().value = toml
+    runPrimaryAction()
+    expect(JSON.parse(outputTextarea().value)).toEqual({
+      title: 'Example',
+      owner: { name: 'Alice' },
+      servers: [
+        { name: 'alpha', ports: [8000, 8001] },
+        { name: 'beta' }
+      ]
+    })
+
+    root.querySelector('.segmented-btn[data-value="json-to-toml"]').click()
+    const expected = {
+      title: 'Example',
+      owner: { name: 'Alice' },
+      servers: [
+        { name: 'alpha', ports: [8000, 8001] },
+        { name: 'beta' }
+      ]
+    }
+    editableTextarea().value = JSON.stringify(expected)
+    runPrimaryAction()
+    expect(parseToml(outputTextarea().value)).toEqual(expected)
+    expect(stringifyToml(expected)).toBe(outputTextarea().value)
+  })
+
+  it('clears TOML output when malformed input would otherwise be partially converted', () => {
+    tomlJson.render(root)
+    editableTextarea().value = 'title = "valid"\ntitle = "duplicate"'
+    runPrimaryAction()
+    expect(outputTextarea().value).toBe('')
+    expect(root.querySelector('.error-text').textContent).not.toBe('')
+  })
+
+  it('keeps TOML dates and inline tables JSON-safe', () => {
+    const value = parseToml([
+      'created = 1979-05-27',
+      'point = { x = 1, label = "origin" }',
+      'mixed = [1, "two", true]'
+    ].join('\n'))
+    expect(value).toEqual({
+      created: '1979-05-27',
+      point: { x: 1, label: 'origin' },
+      mixed: [1, 'two', true]
+    })
+    expect(JSON.stringify(value)).toContain('1979-05-27')
+  })
+
+  it('rejects unsafe TOML integers and clears the UI output', () => {
+    expect(() => parseToml('value = 9007199254740992')).toThrow()
+
+    tomlJson.render(root)
+    editableTextarea().value = 'value = 9007199254740992'
+    runPrimaryAction()
+    expect(outputTextarea().value).toBe('')
+    expect(root.querySelector('.error-text').textContent).not.toBe('')
+  })
+
+  it('rejects values that JSON cannot represent as TOML', () => {
+    expect(() => stringifyToml({ value: null })).toThrow()
+    expect(() => stringifyToml({ value: undefined })).toThrow()
+    expect(() => stringifyToml({ value: Number.NaN })).toThrow()
+    expect(() => stringifyToml({ value: new Date() })).toThrow()
+    expect(() => stringifyToml({ value: 1n })).toThrow()
+    expect(() => stringifyToml({ value: 9007199254740992 })).toThrow()
+    expect(() => stringifyToml({ nested: { values: [1, 9007199254740992] } })).toThrow()
+  })
+
+  it('rejects TOML date/time precision that JSON Date would truncate', () => {
+    expect(() => parseToml('created = 1979-05-27T07:32:00.123456Z')).toThrow(/毫秒精度/)
+    expect(() => parseToml('created = 07:32:00.123456')).toThrow(/毫秒精度/)
+    expect(() => parseToml('created = "1979-05-27T07:32:00.123456Z"')).not.toThrow()
+  })
+
+  it('generates an applicable JSON Patch for nested arrays and escaped pointers', () => {
+    jsonPatch.render(root)
+    const [sourceInput, targetInput] = root.querySelectorAll('textarea:not([readonly])')
+    const source = {
+      config: { retries: 1, 'feature/flag': { enabled: false } },
+      items: [{ name: 'one', tags: ['a'] }, { name: 'two' }],
+      'a~b': 'old',
+      removed: true
+    }
+    const target = {
+      config: { retries: 3, 'feature/flag': { enabled: true } },
+      items: [
+        { name: 'one', tags: ['a', 'b'] },
+        { name: 'two', enabled: true },
+        { name: 'three' }
+      ],
+      'a~b': 'new',
+      added: { value: 42 }
+    }
+    sourceInput.value = JSON.stringify(source)
+    targetInput.value = JSON.stringify(target)
+    runPrimaryAction()
+
+    const patch = JSON.parse(outputTextarea().value)
+    expect(patch).toEqual(expect.arrayContaining([
+      { op: 'replace', path: '/config/retries', value: 3 },
+      { op: 'replace', path: '/config/feature~1flag/enabled', value: true },
+      { op: 'add', path: '/items/0/tags/1', value: 'b' },
+      { op: 'add', path: '/items/2', value: { name: 'three' } },
+      { op: 'replace', path: '/a~0b', value: 'new' },
+      { op: 'remove', path: '/removed' }
+    ]))
+    expect(applyJsonPatch(source, patch)).toEqual(target)
+  })
+
+  it('renders IPv6 normalization and CIDR ranges in the UI', () => {
+    ipv6Calculator.render(root)
+    const input = root.querySelector('input[type="text"]')
+    input.value = '2001:0db8:0000:0000:0000:ff00:0042:8329/64'
+    runPrimaryAction()
+    const rows = [...root.querySelectorAll('tbody tr')]
+    const values = new Map(rows.map(row => [row.querySelector('th').textContent, row.querySelector('td span').textContent]))
+    expect(values.get('压缩表示')).toBe('2001:db8::ff00:42:8329')
+    expect(values.get('展开表示')).toBe('2001:0db8:0000:0000:0000:ff00:0042:8329')
+    expect(values.get('网络地址')).toBe('2001:db8::')
+    expect(values.get('最后地址')).toBe('2001:db8::ffff:ffff:ffff:ffff')
+    expect(values.get('地址总数')).toBe('18446744073709551616')
+  })
+
+  it('handles IPv6 compression, IPv4 tails, /0 and /128 boundaries', () => {
+    expect(compressIPv6('2001:0db8:0000:0000:0000:ff00:0042:8329')).toBe('2001:db8::ff00:42:8329')
+    expect(expandIPv6('2001:db8::ff00:42:8329')).toBe('2001:0db8:0000:0000:0000:ff00:0042:8329')
+
+    const ipv4Tail = calculateIPv6('::ffff:192.0.2.128/120')
+    expect(ipv4Tail).toMatchObject({
+      compressed: '::ffff:c000:280',
+      expanded: '0000:0000:0000:0000:0000:ffff:c000:0280',
+      prefix: 120,
+      network: '::ffff:c000:200',
+      first: '::ffff:c000:200',
+      last: '::ffff:c000:2ff',
+      total: '256'
+    })
+
+    const allAddresses = calculateIPv6('2001:db8::1/0')
+    expect(allAddresses).toMatchObject({ network: '::', first: '::', last: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff', total: '340282366920938463463374607431768211456' })
+
+    const oneAddress = calculateIPv6('2001:db8::1/128')
+    expect(oneAddress).toMatchObject({ network: '2001:db8::1', first: '2001:db8::1', last: '2001:db8::1', total: '1' })
+  })
+
+  it('rejects malformed IPv6 addresses without leaving stale UI results', () => {
+    for (const invalid of ['2001:db8::1::2', '2001:db8:0:0:0:0:0:0:1', '::ffff:192.0.2.999', '::ffff:192.0.2.001', '2001:db8::1/129', 'fe80::1%eth0']) {
+      expect(() => parseIPv6(invalid)).toThrow()
+    }
+
+    ipv6Calculator.render(root)
+    const input = root.querySelector('input[type="text"]')
+    input.value = '2001:db8::1::2'
+    runPrimaryAction()
+    expect(root.querySelector('.error-text').textContent).not.toBe('')
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(0)
   })
 })
