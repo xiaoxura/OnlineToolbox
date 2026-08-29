@@ -1,55 +1,34 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as OTPAuth from 'otpauth'
-import QRCode from 'qrcode'
 import { enhanceFormAccessibility } from '../src/utils/dom.js'
 import totp, {
   generateTotp,
   getSecondsRemaining,
-  parseTotpInput,
-  validateTotp
+  parseTotpInput
 } from '../src/tools/crypto/totp.js'
 
-const RFC_SECRETS = {
-  SHA1: '12345678901234567890',
-  SHA256: '12345678901234567890123456789012',
-  SHA512: '1234567890123456789012345678901234567890123456789012345678901234'
-}
+// RFC 6238 test secret: ASCII "12345678901234567890" encoded as Base32.
+const RFC_SHA1_SECRET = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'
+const RFC_SHA256_SECRET = OTPAuth.Secret.fromUTF8('12345678901234567890123456789012').base32
+const RFC_SHA512_SECRET = OTPAuth.Secret.fromUTF8('1234567890123456789012345678901234567890123456789012345678901234').base32
+const ALTERNATE_SECRET = 'JBSWY3DPEHPK3PXP'
+const SHORT_SECRET = 'GEZDGNBVGY'
+const PERIOD_START = 1_700_000_010_000
 
-const RFC_VECTORS = {
-  SHA1: {
-    59: '94287082',
-    1111111109: '07081804',
-    1111111111: '14050471',
-    1234567890: '89005924',
-    2000000000: '69279037',
-    20000000000: '65353130'
-  },
-  SHA256: {
-    59: '46119246',
-    1111111109: '68084774',
-    1111111111: '67062674',
-    1234567890: '91819424',
-    2000000000: '90698825',
-    20000000000: '77737706'
-  },
-  SHA512: {
-    59: '90693936',
-    1111111109: '25091201',
-    1111111111: '99943326',
-    1234567890: '93441116',
-    2000000000: '38618901',
-    20000000000: '47863826'
-  }
+const RFC_SHA1_VECTORS = {
+  59: '94287082',
+  1111111109: '07081804',
+  1111111111: '14050471',
+  1234567890: '89005924',
+  2000000000: '69279037',
+  20000000000: '65353130'
 }
-
-const secretFromAscii = value => OTPAuth.Secret.fromUTF8(value).base32
-const inputEvent = () => new Event('input', { bubbles: true })
 
 let root
 
 beforeEach(() => {
   vi.useFakeTimers()
-  vi.setSystemTime(1_700_000_015_000)
+  vi.setSystemTime(PERIOD_START + 5_000)
   root = document.createElement('main')
   document.body.replaceChildren(root)
   vi.clearAllMocks()
@@ -63,344 +42,252 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-function controlLabel(control) {
-  return [
-    ...(control.labels || [])
-  ].map(label => label.textContent || '').join(' ')
-    .concat(` ${control.getAttribute('aria-label') || ''} ${control.getAttribute('placeholder') || ''}`)
+function setInputValue(input, value) {
+  input.value = value
+  input.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
-function controlMatching(pattern) {
-  return [...root.querySelectorAll('input, textarea, select')]
-    .find(control => pattern.test(controlLabel(control)))
+function renderTool() {
+  totp.render(root)
+  enhanceFormAccessibility(root)
 }
 
-function fieldValues() {
-  return [...root.querySelectorAll('input, textarea, select')].map(control => control.value)
+function secretInput() {
+  return root.querySelector('#totp-secret') || root.querySelector('input[type="text"]')
 }
 
-function selectedChoiceValues() {
-  return [...root.querySelectorAll('[role="radio"][aria-checked="true"]')]
-    .map(button => button.getAttribute('data-value'))
+function codeElement() {
+  return root.querySelector('.totp-code') || root.querySelector('[aria-label="当前验证码"]')
 }
 
-function renderedText() {
-  return [...root.querySelectorAll('[role="status"], .inline-result, .error-text, output, .result-box')]
-    .map(element => element.textContent || element.value || '')
-    .join(' ')
+function countdownElement() {
+  return root.querySelector('.totp-countdown') || root.querySelector('[aria-label*="剩余"]')
 }
 
-function hasRenderedToken(token) {
-  return [...root.querySelectorAll('*')].some(element => {
-    if (element.matches('input, textarea, select')) return element.value === token
-    return element.childElementCount === 0 && element.textContent.trim() === token
-  })
+function submitForm() {
+  const form = root.querySelector('form')
+  expect(form).not.toBeNull()
+  form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
 }
 
-function setControlValue(control, value) {
-  control.value = value
-  control.dispatchEvent(inputEvent())
-}
-
-function findInvalidToken(config, timestamp) {
-  const period = config.period ?? 30
-  const digits = config.digits ?? 6
-  const blocked = new Set([-1, 0, 1].map(delta => (
-    generateTotp(config, timestamp + delta * period * 1000)
-  )))
-  const limit = 10 ** digits
-
-  for (let value = 0; value < limit; value += 1) {
-    const candidate = String(value).padStart(digits, '0')
-    if (!blocked.has(candidate)) return candidate
-  }
-
-  throw new Error('无法生成确定的无效验证码')
+function renderedCode() {
+  return codeElement()?.textContent.trim() || ''
 }
 
 describe('TOTP primitives', () => {
-  it('matches the RFC 6238 SHA1, SHA256 and SHA512 8-digit vectors', () => {
-    for (const [algorithm, expectedBySecond] of Object.entries(RFC_VECTORS)) {
-      const config = {
-        secret: secretFromAscii(RFC_SECRETS[algorithm]),
-        algorithm,
-        digits: 8,
-        period: 30
-      }
-
-      for (const [seconds, expected] of Object.entries(expectedBySecond)) {
-        expect(generateTotp(config, Number(seconds) * 1000))
-          .toBe(expected)
-      }
-    }
-  })
-
-  it('parses Base32 secrets regardless of case, spacing, hyphens or padding', () => {
-    const canonical = secretFromAscii(RFC_SECRETS.SHA256)
-    const expected = generateTotp({ secret: canonical }, 59_000)
-    const variants = [
-      canonical.toLowerCase(),
-      `${canonical.slice(0, 4)} ${canonical.slice(4)}`,
-      `${canonical.slice(0, 4)}-${canonical.slice(4)}`,
-      `${canonical}====`
-    ]
-
-    for (const variant of variants) {
-      const parsed = parseTotpInput(variant)
-      expect(generateTotp(parsed, 59_000)).toBe(expected)
-    }
-  })
-
-  it('rejects empty and malformed Base32 input', () => {
-    for (const invalid of ['', '   ', null, undefined, 'JBSWY3DPEHPK3PX!']) {
-      expect(() => parseTotpInput(invalid)).toThrow()
-    }
-  })
-
-  it('parses TOTP URI metadata and rejects unsupported URI configurations', () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA256)
-    const uri = `otpauth://totp/Acme:alice%40example.com?secret=${secret}&issuer=Acme&algorithm=SHA256&digits=8&period=60`
-    const parsed = parseTotpInput(uri)
-
-    expect(parsed).toMatchObject({
-      issuer: 'Acme',
-      account: 'alice@example.com',
-      algorithm: 'SHA256',
-      digits: 8,
-      period: 60
-    })
-    expect(generateTotp(parsed, 59_000)).toBe(generateTotp({ secret, algorithm: 'SHA256', digits: 8, period: 60 }, 59_000))
-
-    const unsupported = [
-      'otpauth://hotp/Acme:alice?secret=JBSWY3DPEHPK3PXP&counter=0',
-      'otpauth://totp/Acme:alice?secret=JBSWY3DPEHPK3PXP&algorithm=MD5',
-      'otpauth://totp/Acme:alice?secret=JBSWY3DPEHPK3PXP&digits=7',
-      'otpauth://totp/Acme:alice?secret=JBSWY3DPEHPK3PXP&period=0',
-      'otpauth://totp/Acme:alice?secret=JBSWY3DPEHPK3PXP&period=301'
-    ]
-
-    for (const invalid of unsupported) {
-      expect(() => parseTotpInput(invalid)).toThrow()
-    }
-  })
-
-  it('applies direct Base32 validation to URI secrets', () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA256)
-    const createUri = value => `otpauth://totp/Acme:alice?secret=${encodeURIComponent(value)}`
-    const validPadded = `${secret}====`
-
-    expect(parseTotpInput(createUri(validPadded)).secret).toBe(secret)
-
-    for (const invalid of ['A', 'ABC', `${secret}=`, `${secret}===`, `${secret}!`, `${secret}+`]) {
-      expect(() => parseTotpInput(createUri(invalid))).toThrow()
-    }
-  })
-
-  it('preserves URI metadata encoding and rejects ambiguous secret parameters', () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA1)
-    const parsed = parseTotpInput(`otpauth://totp/Acme%20Inc:alice?SECRET=${secret}&issuer=Acme%20Inc`)
-
-    expect(parsed).toMatchObject({ secret, issuer: 'Acme Inc', account: 'alice' })
-    expect(() => parseTotpInput(`otpauth://totp/Acme:alice?se%63ret=${secret}`)).toThrow()
-    expect(() => parseTotpInput(`otpauth://totp/Acme:alice?secret=${secret}+`)).toThrow()
-    expect(() => parseTotpInput(`otpauth://totp/Acme:alice?secret=${secret}&SECRET=${secret}`)).toThrow()
-    expect(() => parseTotpInput(`otpauth://totp/Acme:alice?secret=${secret}#fragment&secret=MZXW6YTBOI======`)).toThrow()
-  })
-
-  it('validates current and adjacent-period tokens, returning null for malformed tokens', () => {
+  it('matches the RFC 6238 SHA1 8-digit vectors at representative timestamps', () => {
     const config = {
-      secret: secretFromAscii(RFC_SECRETS.SHA1),
+      secret: RFC_SHA1_SECRET,
       algorithm: 'SHA1',
-      digits: 6,
+      digits: 8,
       period: 30
     }
-    const timestamp = 1_700_000_015_000
 
-    expect(validateTotp(config, generateTotp(config, timestamp), timestamp, 1)).toBe(0)
-    expect(validateTotp(config, generateTotp(config, timestamp - 30_000), timestamp, 1)).toBe(-1)
-    expect(validateTotp(config, generateTotp(config, timestamp + 30_000), timestamp, 1)).toBe(1)
-    expect(validateTotp(config, '12x456', timestamp, 1)).toBeNull()
+    for (const [seconds, expected] of Object.entries(RFC_SHA1_VECTORS)) {
+      expect(generateTotp(config, Number(seconds) * 1000)).toBe(expected)
+    }
   })
 
-  it('reports the seconds remaining at period boundaries', () => {
+  it('matches the RFC 6238 SHA256 and SHA512 8-digit vectors at 59 seconds', () => {
+    const vectors = [
+      { algorithm: 'SHA256', secret: RFC_SHA256_SECRET, expected: '46119246' },
+      { algorithm: 'SHA512', secret: RFC_SHA512_SECRET, expected: '90693936' }
+    ]
+
+    for (const { algorithm, secret, expected } of vectors) {
+      expect(generateTotp({ secret, algorithm, digits: 8, period: 30 }, 59_000)).toBe(expected)
+    }
+  })
+
+  it('accepts OTPAuth.Secret instances in direct generation configs', () => {
+    const secret = OTPAuth.Secret.fromUTF8('12345678901234567890')
+
+    expect(generateTotp({ secret, digits: 8 }, 59_000)).toBe(RFC_SHA1_VECTORS[59])
+  })
+
+  it('normalizes Base32 case, spaces, hyphens and legal padding', () => {
+    const variants = [
+      SHORT_SECRET.toLowerCase(),
+      `${SHORT_SECRET.slice(0, 4)} ${SHORT_SECRET.slice(4)}`,
+      `${SHORT_SECRET.slice(0, 4)}-${SHORT_SECRET.slice(4)}`,
+      `${SHORT_SECRET}======`
+    ]
+
+    for (const input of variants) {
+      expect(parseTotpInput(input)).toEqual({
+        secret: SHORT_SECRET,
+        algorithm: 'SHA1',
+        digits: 6,
+        period: 30
+      })
+    }
+  })
+
+  it('rejects empty input, otpauth URIs, invalid characters and invalid length or padding', () => {
+    const invalidInputs = [
+      '',
+      '   ',
+      null,
+      undefined,
+      'otpauth://totp/Acme:alice?secret=JBSWY3DPEHPK3PXP',
+      'JBSWY3DPEHPK3P!P',
+      'JBSWY3DPEHPK3P0P',
+      'ABC',
+      `${SHORT_SECRET}=`,
+      `${SHORT_SECRET}====`,
+      `${SHORT_SECRET}=======`
+    ]
+
+    for (const input of invalidInputs) {
+      expect(() => parseTotpInput(input)).toThrow()
+    }
+  })
+
+  it('rejects Unicode characters that would expand into Base32 letters when uppercased', () => {
+    const invalidInputs = [
+      'JBSWY3DPEHPK3Pß',
+      'JBSWY3DPEHPK3Pﬀ',
+      'JBSWY3DPEHßPK3PXP',
+      'JBSWY3DPEHﬀPK3PXP'
+    ]
+
+    for (const input of invalidInputs) {
+      expect(() => parseTotpInput(input)).toThrow()
+    }
+  })
+
+  it('reports the seconds remaining at and around period boundaries', () => {
     expect(getSecondsRemaining(0, 30)).toBe(30)
+    expect(getSecondsRemaining(1, 30)).toBe(30)
     expect(getSecondsRemaining(29_000, 30)).toBe(1)
     expect(getSecondsRemaining(29_999, 30)).toBe(1)
     expect(getSecondsRemaining(30_000, 30)).toBe(30)
+    expect(getSecondsRemaining(60_000, 30)).toBe(30)
   })
 })
 
 describe('TOTP tool UI', () => {
   beforeEach(() => {
-    totp.render(root)
-    enhanceFormAccessibility(root)
+    renderTool()
   })
 
-  it('renders an accessible sensitive secret field and toggles its visibility', () => {
-    const secretInput = root.querySelector('input[type="password"]')
-    expect(secretInput).not.toBeNull()
-    expect(secretInput.labels?.length || secretInput.getAttribute('aria-label')).toBeTruthy()
+  it('renders one accessible Base32 text input and the primary submit action', () => {
+    const inputs = [...root.querySelectorAll('input')]
+    const input = secretInput()
+    const button = [...root.querySelectorAll('button')]
+      .find(candidate => candidate.textContent.trim() === '获取验证码')
 
-    const showSecret = root.querySelector('input[type="checkbox"]')
-    expect(showSecret).not.toBeNull()
-    showSecret.click()
-    expect(secretInput.type).toBe('text')
-    showSecret.click()
-    expect(secretInput.type).toBe('password')
+    expect(inputs).toHaveLength(1)
+    expect(input).not.toBeNull()
+    expect(input.type).toBe('text')
+    expect(input.labels?.length || input.getAttribute('aria-label') || input.getAttribute('aria-labelledby'))
+      .toBeTruthy()
+    expect(button).not.toBeNull()
+    expect(root.querySelector('form')).not.toBeNull()
+    expect(root.querySelector('.privacy-notice')).not.toBeNull()
+    expect(root.querySelector('input[type="checkbox"], input[type="number"], input[type="radio"], select, textarea'))
+      .toBeNull()
   })
 
-  it('shows the current token after a secret is entered', async () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA1)
-    const secretInput = root.querySelector('input[type="password"]')
-    setControlValue(secretInput, secret)
+  it('does not generate a token while the secret is only being entered', () => {
+    const input = secretInput()
+    setInputValue(input, RFC_SHA1_SECRET)
 
-    const expected = generateTotp({ secret }, Date.now())
-    await vi.waitFor(() => expect(hasRenderedToken(expected)).toBe(true))
+    expect(renderedCode()).not.toMatch(/^\d{6}$/)
   })
 
-  it('generates a valid Base32 secret from the random-key action', () => {
-    const secretInput = root.querySelector('input[type="password"]')
-    const generateButton = [...root.querySelectorAll('button')]
-      .find(button => /随机|生成.*密钥|密钥.*生成/i.test(`${button.textContent} ${button.getAttribute('aria-label') || ''}`))
-    expect(generateButton).not.toBeNull()
+  it('generates a six-digit token and remaining seconds through form submit', () => {
+    const input = secretInput()
+    setInputValue(input, RFC_SHA1_SECRET)
 
-    generateButton.click()
+    expect(renderedCode()).not.toMatch(/^\d{6}$/)
+    submitForm()
 
-    expect(secretInput.value).toMatch(/^[A-Z2-7]+=*$/)
-    expect(() => OTPAuth.Secret.fromBase32(secretInput.value)).not.toThrow()
+    expect(renderedCode()).toBe(generateTotp({ secret: RFC_SHA1_SECRET }, Date.now()))
+    expect(renderedCode()).toMatch(/^\d{6}$/)
+    expect(countdownElement()).not.toBeNull()
+    expect(countdownElement().textContent).toContain(String(getSecondsRemaining(Date.now(), 30)))
   })
 
-  it('imports a TOTP URI into the visible configuration controls', async () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA256)
-    const uri = `otpauth://totp/Acme:alice%40example.com?secret=${secret}&issuer=Acme&algorithm=SHA256&digits=8&period=60`
-    const uriInput = controlMatching(/otpauth|URI|链接|导入/i)
-    expect(uriInput).not.toBeNull()
+  it('refreshes at the exact Unix 30-second boundary after a successful submit', () => {
+    vi.setSystemTime(PERIOD_START + 29_000)
+    const input = secretInput()
+    setInputValue(input, RFC_SHA1_SECRET)
+    submitForm()
 
-    setControlValue(uriInput, uri)
+    const beforeBoundary = generateTotp({ secret: RFC_SHA1_SECRET }, PERIOD_START + 29_000)
+    const atBoundary = generateTotp({ secret: RFC_SHA1_SECRET }, PERIOD_START + 30_000)
+    expect(renderedCode()).toBe(beforeBoundary)
 
-    await vi.waitFor(() => {
-      expect(fieldValues()).toEqual(expect.arrayContaining(['Acme', 'alice@example.com', '60']))
-      expect(selectedChoiceValues()).toEqual(expect.arrayContaining(['SHA256', '8']))
-    })
-  })
-
-  it('keeps imported URI controls editable and regenerates URI metadata', async () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA256)
-    const uri = `otpauth://totp/Acme:alice%40example.com?secret=${secret}&issuer=Acme&algorithm=SHA256&digits=8&period=60`
-    const uriInput = controlMatching(/otpauth|URI|链接|导入/i)
-    const issuerInput = controlMatching(/issuer|服务|发行/i)
-    const periodInput = controlMatching(/period|周期/i)
-    const uriOutput = root.querySelector('#totp-uri')
-    const sha512Button = root.querySelector('[role="radio"][data-value="SHA512"]')
-
-    setControlValue(uriInput, uri)
-    await vi.waitFor(() => expect(issuerInput.value).toBe('Acme'))
-
-    setControlValue(issuerInput, 'Renamed')
-    sha512Button.click()
-    setControlValue(periodInput, '45')
-
-    await vi.waitFor(() => {
-      expect(issuerInput.value).toBe('Renamed')
-      expect(periodInput.value).toBe('45')
-      expect(selectedChoiceValues()).toContain('SHA512')
-      expect(uriOutput.value).toContain('issuer=Renamed')
-      expect(uriOutput.value).toContain('algorithm=SHA512')
-      expect(uriOutput.value).toContain('period=45')
-    })
-  })
-
-  it('updates the displayed token at the exact Unix period boundary', () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA1)
-    const config = { secret, algorithm: 'SHA1', digits: 6, period: 30 }
-    const secretInput = root.querySelector('input[type="password"]')
-    const before = generateTotp(config, Date.now())
-    const after = generateTotp(config, Date.now() + 15_000)
-
-    setControlValue(secretInput, secret)
-    expect(hasRenderedToken(before)).toBe(true)
-
-    vi.advanceTimersByTime(14_999)
-    expect(hasRenderedToken(before)).toBe(true)
+    vi.advanceTimersByTime(999)
+    expect(renderedCode()).toBe(beforeBoundary)
     vi.advanceTimersByTime(1)
-    expect(hasRenderedToken(after)).toBe(true)
+    expect(renderedCode()).toBe(atBoundary)
+    expect(countdownElement().textContent).toContain('30')
   })
 
-  it('generates the copied token from the current time at click time', () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA1)
-    const config = { secret, algorithm: 'SHA1', digits: 6, period: 30 }
-    const secretInput = root.querySelector('input[type="password"]')
-    const codeSection = [...root.querySelectorAll('.tool-section')]
-      .find(section => section.querySelector('h2')?.textContent.includes('当前验证码'))
-    const copyButton = codeSection.querySelector('.btn-icon')
+  it('cleans up the scheduled refresh when the container is removed', async () => {
+    const input = secretInput()
+    setInputValue(input, RFC_SHA1_SECRET)
+    submitForm()
 
-    setControlValue(secretInput, secret)
-    const oldToken = generateTotp(config, Date.now())
-    let clickTimestamp = Date.now() + config.period * 1000
-    let expected = generateTotp(config, clickTimestamp)
-    while (expected === oldToken) {
-      clickTimestamp += config.period * 1000
-      expected = generateTotp(config, clickTimestamp)
-    }
+    const removedCode = renderedCode()
+    expect(removedCode).toMatch(/^\d{6}$/)
+    expect(vi.getTimerCount()).toBeGreaterThan(0)
+
+    const mutationSettled = new Promise(resolve => {
+      const observer = new MutationObserver(() => {
+        observer.disconnect()
+        resolve()
+      })
+      observer.observe(document.body, { childList: true, subtree: true })
+    })
+    root.remove()
+    await mutationSettled
+
+    expect(vi.getTimerCount()).toBe(0)
+    vi.advanceTimersByTime(60_000)
+    expect(renderedCode()).toBe(removedCode)
+  })
+
+  it('clears the old token when the input changes and requires another submit', () => {
+    const input = secretInput()
+    setInputValue(input, RFC_SHA1_SECRET)
+    submitForm()
+    expect(renderedCode()).toMatch(/^\d{6}$/)
+
+    setInputValue(input, ALTERNATE_SECRET)
+    expect(renderedCode()).not.toMatch(/^\d{6}$/)
+
+    vi.advanceTimersByTime(5_000)
+    expect(renderedCode()).not.toMatch(/^\d{6}$/)
+
+    submitForm()
+    expect(renderedCode()).toBe(generateTotp({ secret: ALTERNATE_SECRET }, Date.now()))
+    expect(renderedCode()).toMatch(/^\d{6}$/)
+  })
+
+  it('copies the token generated for the current time at click time', () => {
+    const input = secretInput()
+    setInputValue(input, RFC_SHA1_SECRET)
+    submitForm()
+
+    const copyButton = root.querySelector('.btn-icon')
+    expect(copyButton).not.toBeNull()
+    expect(copyButton.querySelector('svg')).not.toBeNull()
+    expect(copyButton.getAttribute('aria-label') || copyButton.title).toMatch(/复制|copy/i)
+
+    const clickTimestamp = PERIOD_START + 30_000
     vi.setSystemTime(clickTimestamp)
-
     copyButton.click()
 
-    expect(navigator.clipboard.writeText).toHaveBeenLastCalledWith(expected)
+    expect(navigator.clipboard.writeText)
+      .toHaveBeenLastCalledWith(generateTotp({ secret: RFC_SHA1_SECRET }, clickTimestamp))
   })
 
-  it('resets progress accessibility values when the configuration is cleared', () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA1)
-    const secretInput = root.querySelector('input[type="password"]')
-    const progress = root.querySelector('.totp-progress')
-
-    setControlValue(secretInput, secret)
-    expect(progress.getAttribute('aria-valuetext')).toMatch(/剩余/)
-
-    setControlValue(secretInput, '')
-
-    expect(progress.getAttribute('aria-valuemax')).toBe('30')
-    expect(progress.getAttribute('aria-valuenow')).toBe('0')
-    expect(progress.hasAttribute('aria-valuetext')).toBe(false)
-  })
-
-  it('requests a QR canvas once the secret, issuer and account are complete', async () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA1)
-    const secretInput = root.querySelector('input[type="password"]')
-    const issuerInput = controlMatching(/issuer|服务|发行/i)
-    const accountInput = controlMatching(/account|账户|账号/i)
-    expect(issuerInput).not.toBeNull()
-    expect(accountInput).not.toBeNull()
-    QRCode.toCanvas.mockClear()
-
-    setControlValue(secretInput, secret)
-    setControlValue(issuerInput, 'Acme')
-    setControlValue(accountInput, 'alice@example.com')
-
-    await vi.waitFor(() => expect(QRCode.toCanvas).toHaveBeenCalled())
-    const [canvas, uri] = QRCode.toCanvas.mock.calls.at(-1)
-    expect(canvas).toBeInstanceOf(HTMLCanvasElement)
-    expect(uri).toContain('otpauth://totp/')
-    expect(uri).toContain('issuer=Acme')
-  })
-
-  it('reports valid and invalid tokens from the verification action', () => {
-    const secret = secretFromAscii(RFC_SECRETS.SHA1)
-    const secretInput = root.querySelector('input[type="password"]')
-    const tokenInput = controlMatching(/验证码|一次性|动态密码/i)
-    const verifyButton = [...root.querySelectorAll('button')]
-      .find(button => /校验|验证|检查|validate/i.test(`${button.textContent} ${button.getAttribute('aria-label') || ''}`))
-    expect(tokenInput).not.toBeNull()
-    expect(verifyButton).not.toBeNull()
-
-    setControlValue(secretInput, secret)
-    const token = generateTotp({ secret }, Date.now())
-    setControlValue(tokenInput, token)
-    verifyButton.click()
-    expect(renderedText()).toMatch(/有效|正确|valid/i)
-
-    setControlValue(tokenInput, findInvalidToken({ secret }, Date.now()))
-    verifyButton.click()
-    expect(renderedText()).toMatch(/无效|错误|invalid/i)
+  it('does not expose the removed configuration, URI, QR, validation or progress UI', () => {
+    expect(root.querySelector('.totp-progress, [role="progressbar"]')).toBeNull()
+    expect(root.querySelector('.totp-uri, .totp-qr-area, .totp-qr-canvas, .totp-validation-result')).toBeNull()
+    expect(root.textContent).not.toMatch(/随机密钥|二维码|otpauth|本地校验|校验验证码/i)
   })
 })
