@@ -62,6 +62,7 @@ export const tools = [
   { id: "color", name: "颜色转换", description: "HEX/RGB/HSL 颜色格式相互转换", category: "converter", icon: "color", load: () => import("./converter/color.js") },
   { id: "unit", name: "单位转换", description: "长度、重量、温度等单位转换", category: "converter", icon: "unit", load: () => import("./converter/unit.js") },
   { id: "json-yaml", name: "JSON ↔ YAML 转换", description: "JSON 和 YAML 格式相互转换", category: "converter", icon: "json-yaml", load: () => import("./converter/json-yaml.js") },
+  { id: "codex-credential-converter", name: "CPA ↔ Sub2API 凭证转换", description: "CPA ↔ Sub2API，二者均可导出 auth.json", category: "converter", icon: "json-yaml", keywords: ["cpa", "cliproxyapi", "sub2api", "auth.json", "codex", "oauth"], load: () => import("./converter/codex-credential-converter.js") },
   { id: "toml-json", name: "TOML ↔ JSON 转换", description: "在 TOML 配置与 JSON 对象之间双向转换，支持表和数组表", category: "converter", icon: "json", keywords: ["toml", "toml parser", "配置转换"], load: () => import("./converter/toml-json.js") },
   { id: "json-xml", name: "JSON ↔ XML 转换", description: "JSON 和 XML 格式相互转换", category: "converter", icon: "json-xml", load: () => import("./converter/json-xml.js") },
   { id: "json-csv", name: "JSON 转 CSV", description: "将 JSON 数组转换为 CSV 格式，支持嵌套对象", category: "converter", icon: "json", load: () => import("./converter/json-csv.js") },

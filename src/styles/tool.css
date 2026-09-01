@@ -352,6 +352,153 @@ input[type='range'].input {
   min-width: 0;
 }
 
+/* Codex credential converter: a deliberate single-column workflow. */
+.credential-converter { gap: var(--space-lg); }
+
+.credential-converter .credential-source-status {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.credential-converter .credential-warnings {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 10px 14px 10px 32px;
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-sm);
+}
+
+.credential-converter .credential-warnings:empty { display: none; }
+
+.credential-converter .credential-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.credential-converter .credential-controls .select { width: 100%; }
+
+.credential-converter .credential-details {
+  display: grid;
+  gap: 0;
+}
+
+.credential-converter .credential-detail-row {
+  display: grid;
+  grid-template-columns: minmax(128px, 0.3fr) minmax(0, 1fr) var(--control-height-sm);
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.credential-converter .credential-detail-row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.credential-converter .credential-detail-row:last-child { padding-bottom: 0; }
+
+.credential-converter .credential-detail-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.credential-converter .credential-detail-value {
+  min-width: 0;
+  padding: 5px 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  color: var(--color-text);
+  white-space: nowrap;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  user-select: text;
+}
+
+.credential-converter .credential-detail-row .btn-icon:disabled {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.credential-converter .credential-output {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.credential-converter .credential-output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 8px 12px 8px var(--space-md);
+  background: var(--color-section-header);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.credential-converter .credential-output-header h2 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.credential-converter .credential-output-header .btn-group {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+.credential-converter .credential-output-header .btn {
+  min-height: var(--control-height-sm);
+  padding: 0 10px;
+}
+
+.credential-converter .credential-output-header .btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.credential-converter .credential-output-body { padding: var(--space-md) var(--space-lg); }
+
+.credential-converter .credential-output-text { min-height: 280px; }
+
+@media (max-width: 560px) {
+  .credential-converter .credential-controls { grid-template-columns: minmax(0, 1fr); }
+
+  .credential-converter .credential-detail-row {
+    grid-template-columns: minmax(0, 1fr) var(--control-height-sm);
+  }
+
+  .credential-converter .credential-detail-label { grid-column: 1 / -1; }
+
+  .credential-converter .credential-output-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .credential-converter .credential-output-header .btn-group { flex-wrap: wrap; }
+}
+
 /* Section card — 直接子级 header/body 关系是 JS 契约(见 utils/dom.js) */
 .tool-section {
   min-width: 0;
