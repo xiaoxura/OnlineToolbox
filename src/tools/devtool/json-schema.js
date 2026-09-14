@@ -1,6 +1,6 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
-function inferSchema(value, keyName) {
+function inferSchema(value) {
   if (value === null) {
     return { type: 'null' }
   }

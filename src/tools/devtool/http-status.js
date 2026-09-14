@@ -56,18 +56,6 @@ const CATEGORIES = [
   { label: '5xx 服务端错误', prefix: '5' }
 ]
 
-function getCategoryClass(code) {
-  const digit = String(code)[0]
-  switch (digit) {
-    case '1': return 'stat-label'
-    case '2': return 'stat-label'
-    case '3': return 'stat-label'
-    case '4': return 'stat-label'
-    case '5': return 'stat-label'
-    default: return 'stat-label'
-  }
-}
-
 function renderCodeItem(item) {
   return createElement('div', { className: 'status-code-item' }, [
     createElement('span', { className: 'status-code-number', textContent: String(item.code) }),
@@ -92,13 +80,6 @@ export default {
       type: 'text',
       placeholder: '搜索状态码或描述（如 404、Not Found、缓存）...'
     })
-
-    const searchRow = createElement('div', { className: 'form-row' }, [
-      createElement('div', { className: 'form-group' }, [
-        createElement('label', { className: 'label', textContent: '搜索' }),
-        searchInput
-      ])
-    ])
 
     const listEl = createElement('div', { className: 'result-box' })
 
@@ -133,7 +114,7 @@ export default {
     searchInput.addEventListener('input', renderList)
     renderList()
 
-    const searchSection = createSection('搜索', searchRow)
+    const searchSection = createSection('搜索', searchInput)
     const tabSection = createSection('分类', filterGroup)
     const listSection = createSection('状态码列表', listEl)
 

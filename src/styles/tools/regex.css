@@ -1,0 +1,7 @@
+/* --- 正则匹配高亮 --- */
+.regex-match {
+  padding: 1px 2px;
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+  border-radius: 3px;
+}

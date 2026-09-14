@@ -1,3 +1,4 @@
+import "../../styles/tools/totp.css"
 import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 import * as OTPAuth from 'otpauth'
 

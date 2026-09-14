@@ -1,3 +1,4 @@
+import "../../styles/tools/permission.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 const groups = [['user', '所有者'], ['group', '所属组'], ['other', '其他用户']]

@@ -73,11 +73,13 @@ for (const tool of tools) {
 }
 
 const urls = [siteUrl, ...tools.map(tool => `${siteUrl}tools/${encodeURIComponent(tool.id)}/`)]
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(url => `  <url><loc>${escapeHtml(url)}</loc></url>`).join('\n')}\n</urlset>\n`
+const lastmod = new Date().toISOString().slice(0, 10)
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(url => `  <url><loc>${escapeHtml(url)}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`
 await writeFile(resolve(outputDir, 'sitemap.xml'), sitemap)
 await writeFile(resolve(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${siteUrl}sitemap.xml\n`)
 
 let index = await readFile(resolve(outputDir, 'index.html'), 'utf8')
 index = index.replace('</head>', `  <link rel="canonical" href="${escapeHtml(siteUrl)}">\n  <meta property="og:url" content="${escapeHtml(siteUrl)}">\n</head>`)
+index = index.replaceAll('%TOOL_COUNT%', String(tools.length))
 await writeFile(resolve(outputDir, 'index.html'), index)
 console.log(`Generated ${tools.length} SEO landing pages for ${siteUrl}`)

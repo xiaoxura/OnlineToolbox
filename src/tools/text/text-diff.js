@@ -1,3 +1,4 @@
+import "../../styles/tools/diff.css"
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 import * as Diff from 'diff'
 

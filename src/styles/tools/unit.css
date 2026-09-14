@@ -1,0 +1,47 @@
+/* --- 单位换算 --- */
+.unit-panel { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.unit-selects-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.unit-select-group {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.unit-select-group .label { white-space: nowrap; }
+
+.unit-result {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 56px;
+  padding: 14px 18px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.unit-result-value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-primary);
+  word-break: break-all;
+}
+
+.unit-result-unit { font-size: var(--font-size-sm); color: var(--color-text-secondary); white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .unit-selects-row { flex-direction: column; align-items: stretch; }
+  .unit-select-group { min-width: 0; }
+
+  .unit-selects-row .btn-swap { align-self: center; transform: rotate(90deg); }
+}

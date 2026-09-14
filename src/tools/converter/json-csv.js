@@ -132,6 +132,7 @@ export default {
 // Flatten nested object with dot notation keys
 function flattenObject(obj, prefix = '') {
   const result = {}
+  if (obj === null || typeof obj !== 'object') return result
   for (const [key, value] of Object.entries(obj)) {
     const newKey = prefix ? `${prefix}.${key}` : key
     if (value !== null && typeof value === 'object' && !Array.isArray(value)) {

@@ -1,3 +1,4 @@
+import "../../styles/tools/jwt.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {

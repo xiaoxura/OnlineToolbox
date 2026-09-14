@@ -1,0 +1,23 @@
+/* --- JWT 过期状态 --- */
+.expiry-info {
+  display: none;
+  margin-top: 8px;
+  padding: 8px 12px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+}
+
+.expiry-info.expired {
+  display: block;
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border);
+}
+
+.expiry-info.valid {
+  display: block;
+  color: var(--color-success-text);
+  background: var(--color-success-soft);
+  border: 1px solid var(--color-success-border);
+}

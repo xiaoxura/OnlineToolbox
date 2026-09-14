@@ -1,3 +1,4 @@
+import "../../styles/tools/timestamp.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
@@ -52,8 +53,7 @@ export default {
       const num = Number(val)
       if (isNaN(num)) { tsResult.textContent = '请输入有效数字'; return }
 
-      // Auto-detect: if > 1e12, treat as milliseconds; otherwise seconds
-      const ms = num > 1e12 ? num : num * 1000
+      const ms = detectMilliseconds(num)
       const fmt = formatSelect.value
       tsResult.textContent = formatTimestamp(ms, fmt)
     }
@@ -108,6 +108,15 @@ export default {
     const dateSection = createSection('日期 → 时间戳', dateContent, [dateCopyBtn])
     container.appendChild(dateSection)
   }
+}
+
+// Interpret a numeric value as seconds or milliseconds. A seconds reading that
+// falls outside a plausible calendar range is almost certainly milliseconds.
+function detectMilliseconds(num) {
+  if (!Number.isFinite(num)) return NaN
+  const asSeconds = num * 1000
+  const year = new Date(asSeconds).getFullYear()
+  return (Number.isNaN(year) || year > 3000 || year < 1) ? num : asSeconds
 }
 
 function formatTimestamp(ms, fmt) {

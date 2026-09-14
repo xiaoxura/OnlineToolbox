@@ -89,7 +89,7 @@ export default {
     const optionsRow = createElement('div', { className: 'form-row' }, [colorGroup, opacityGroup])
     const insetRow = insetLabel
 
-    const previewBox = createElement('div', { className: 'result-box' })
+    const previewBox = createElement('div', { className: 'result-box visual-preview' })
     const previewInner = createElement('div', { className: 'stat-item' }, ['阴影预览'])
     previewBox.appendChild(previewInner)
 
@@ -115,7 +115,8 @@ export default {
       const blur = parseInt(document.getElementById('sg-blur').value) || 0
       const spread = parseInt(document.getElementById('sg-spread').value) || 0
       const color = document.getElementById('sg-color').value
-      const opacity = parseInt(document.getElementById('sg-opacity').value) || 50
+      const opacityValue = Number(document.getElementById('sg-opacity').value)
+      const opacity = Number.isNaN(opacityValue) ? 50 : opacityValue
       const inset = document.getElementById('sg-inset').checked
 
       const rgba = hexToRgba(color, opacity)

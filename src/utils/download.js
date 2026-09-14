@@ -1,4 +1,4 @@
-import { showToast } from './dom.js'
+import { showToast } from './toast.js'
 
 // Trigger a browser download for a Blob and release the object URL afterwards.
 export function downloadBlob(filename, blob) {

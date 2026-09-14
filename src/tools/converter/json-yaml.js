@@ -146,12 +146,10 @@ export default {
 
     const sampleRow = createElement('div', { className: 'btn-group' }, [jsonSampleBtn, yamlSampleBtn])
 
-    const inputSection = createSection('输入', createElement('div', { className: 'tool-stack' }, [formatGroup, inputTextarea, sampleRow]), [copyInputBtn])
+    const inputSection = createSection('输入', createElement('div', { className: 'tool-stack' }, [formatGroup, inputTextarea, sampleRow, btnRow, errorEl]), [copyInputBtn])
     const outputSection = createSection('输出', outputTextarea, [copyOutputBtn])
 
     container.appendChild(inputSection)
-    container.appendChild(btnRow)
-    container.appendChild(errorEl)
     container.appendChild(outputSection)
   }
 }

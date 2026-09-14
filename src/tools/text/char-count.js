@@ -26,8 +26,8 @@ export default {
 
     function getByteLength(str) {
       let bytes = 0
-      for (let i = 0; i < str.length; i++) {
-        const code = str.charCodeAt(i)
+      for (const ch of str) {
+        const code = ch.codePointAt(0)
         if (code <= 0x7f) {
           bytes += 1
         } else if (code <= 0x7ff) {

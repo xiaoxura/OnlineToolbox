@@ -1,3 +1,5 @@
+import "../../styles/tools/drop-area.css"
+import "../../styles/tools/image-preview.css"
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {

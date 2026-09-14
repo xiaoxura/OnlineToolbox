@@ -17,7 +17,9 @@ export default {
     }
 
     const REG_AUTHORITY = {
-      '1': '民政', '2': '机构编制', '3': '工商', '9': '其他'
+      '1': '机构编制', '2': '外交', '3': '司法行政', '4': '文化', '5': '民政',
+      '6': '旅游', '7': '宗教', '8': '工会', '9': '工商',
+      'A': '中央军委改革和编制办公室', 'N': '农业', 'Y': '其他'
     }
 
     function validateCreditCode(code) {
@@ -31,7 +33,7 @@ export default {
       }
 
       const firstChar = upperCode[0]
-      if (!'1239'.includes(firstChar)) {
+      if (!REG_AUTHORITY[firstChar]) {
         return { valid: false, error: '第一位登记管理部门代码无效' }
       }
 

@@ -1,3 +1,4 @@
+import "../../styles/tools/color-contrast.css"
 import { createElement, createSection } from '../../utils/dom.js'
 
 function parseHex(value) {
@@ -63,7 +64,7 @@ export default {
     foreground.picker.addEventListener('input', update)
     background.picker.addEventListener('input', update)
     container.append(
-      createElement('div', { className: 'color-contrast-grid' }, [foreground.element, background.element]),
+      createSection('颜色', createElement('div', { className: 'color-contrast-grid' }, [foreground.element, background.element])),
       createSection('对比预览', preview),
       createSection('WCAG 结果', result)
     )

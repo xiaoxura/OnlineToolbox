@@ -19,6 +19,7 @@ let currentView = 'all'
 let searchQuery = ''
 let homeScrollY = 0
 let renderRequestId = 0
+let searchRenderTimer = null
 let returnFocusToolId = null
 let favorites = readStoredList(STORAGE.favorites)
 let recentTools = readStoredList(STORAGE.recent)
@@ -81,6 +82,19 @@ function setupTheme() {
   updateButton()
 }
 
+function cancelSearchRender() {
+  clearTimeout(searchRenderTimer)
+  searchRenderTimer = null
+}
+
+function scheduleSearchRender() {
+  clearTimeout(searchRenderTimer)
+  searchRenderTimer = setTimeout(() => {
+    searchRenderTimer = null
+    if (document.body.dataset.page === 'home') renderGrid()
+  }, 150)
+}
+
 function syncSearchControls() {
   const input = $('#searchInput')
   const clearButton = $('#searchClear')
@@ -96,14 +110,15 @@ function setupHeader() {
   searchInput.addEventListener('input', event => {
     searchQuery = event.target.value.trim()
     const isHome = window.location.hash === '#/' || window.location.hash === ''
+    syncSearchControls()
     if (!isHome) {
       currentView = 'all'
       currentCategory = 'all'
       syncCategoryTabs()
+      navigate('/')
+      return
     }
-    syncSearchControls()
-    if (isHome) renderGrid()
-    else navigate('/')
+    scheduleSearchRender()
   })
   $('#searchClear')?.addEventListener('click', clearSearch)
   searchInput.addEventListener('keydown', event => {
@@ -439,6 +454,7 @@ function recordRecent(toolId) {
 }
 
 async function renderToolPage(toolId) {
+  cancelSearchRender()
   const tool = getToolById(toolId)
   if (!tool) { navigate('/'); return }
   returnFocusToolId = toolId
@@ -536,6 +552,7 @@ async function renderToolPage(toolId) {
 }
 
 function renderHome() {
+  cancelSearchRender()
   const focusedCard = document.activeElement?.closest?.('.tool-card')
   const focusToolId = returnFocusToolId || focusedCard?.getAttribute('href')?.replace(/^#\//, '')
   renderRequestId += 1

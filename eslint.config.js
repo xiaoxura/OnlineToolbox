@@ -12,8 +12,8 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      'no-unused-vars': 'off',
-      'no-dupe-keys': 'off',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-dupe-keys': 'error',
       'no-irregular-whitespace': 'off',
       'no-useless-escape': 'off',
       'no-prototype-builtins': 'off',

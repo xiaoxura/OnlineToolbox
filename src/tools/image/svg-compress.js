@@ -37,7 +37,8 @@ export default {
         'xmlns:dc', 'xmlns:cc', 'xmlns:rdf'
       ]
       nsList.forEach(ns => {
-        const re = new RegExp('\\s+' + ns + ':[a-zA-Z-]+="[^"]*"', 'gi')
+        const attr = ns.startsWith('xmlns:') ? ns : `${ns}:[a-zA-Z-]+`
+        const re = new RegExp('\\s+' + attr.replace(':', '\\:') + '="[^"]*"', 'gi')
         result = result.replace(re, '')
       })
 
@@ -52,7 +53,7 @@ export default {
 
       // Remove unnecessary attributes
       const removeAttrs = [
-        'data-name', 'id', 'class',
+        'data-name', 'class',
         'xml:space', 'enable-background',
         'xmlns:xlink', 'xml:lang'
       ]
@@ -60,6 +61,14 @@ export default {
         const re = new RegExp('\\s+' + attr.replace(':', '\\:') + '="[^"]*"', 'gi')
         result = result.replace(re, '')
       })
+
+      // Drop ids that nothing references, but keep those used by url(#id),
+      // href="#id" or xlink:href="#id" so gradients/masks/clips keep working.
+      const referencedIds = new Set()
+      for (const match of result.matchAll(/(?:url\(#|href="#|xlink:href="#)([^)"']+)/g)) {
+        referencedIds.add(match[1])
+      }
+      result = result.replace(/\s+id="([^"]*)"/gi, (match, id) => referencedIds.has(id) ? match : '')
 
       // Remove excess whitespace
       result = result.replace(/\n\s*/g, '')

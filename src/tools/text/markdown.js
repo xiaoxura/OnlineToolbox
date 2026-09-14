@@ -1,3 +1,4 @@
+import "../../styles/tools/markdown.css"
 import { createElement } from '../../utils/dom.js'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
@@ -45,7 +46,7 @@ export default {
       preview
     ])
 
-    const row = createElement('div', { className: 'form-row' }, [leftCol, rightCol])
+    const row = createElement('div', { className: 'form-row markdown-split' }, [leftCol, rightCol])
 
     container.appendChild(row)
     updatePreview()

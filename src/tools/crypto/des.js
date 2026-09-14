@@ -16,6 +16,20 @@ export default {
       ECB: CryptoJS.mode.ECB
     }
 
+    // Derive fixed-length raw key material so the explicit IV is honoured.
+    function deriveKey(passphrase, bytes) {
+      const digest = CryptoJS.SHA256(passphrase)
+      return CryptoJS.lib.WordArray.create(digest.words.slice(0, bytes / 4), bytes)
+    }
+
+    // Accept a 16-char hex IV or an 8-character text IV.
+    function parseIv(value) {
+      if (/^[0-9a-fA-F]{16}$/.test(value)) return CryptoJS.enc.Hex.parse(value)
+      const wordArray = CryptoJS.enc.Utf8.parse(value)
+      if (wordArray.sigBytes !== 8) throw new Error('IV 必须是 8 字节（8 个字符或 16 位十六进制）')
+      return wordArray
+    }
+
     // Input
     const inputLabel = createElement('label', { className: 'label' }, ['输入文本'])
     const inputTextarea = createElement('textarea', {
@@ -101,12 +115,13 @@ export default {
           if (currentMode === 'CBC') {
             let ivValue = ivInput.value
             if (!ivValue) {
-              ivValue = CryptoJS.lib.WordArray.random(8).toString()
+              ivValue = CryptoJS.lib.WordArray.random(8).toString(CryptoJS.enc.Hex)
               ivInput.value = ivValue
             }
-            options.iv = CryptoJS.enc.Utf8.parse(ivValue)
+            options.iv = parseIv(ivValue)
           }
-          const encrypted = getEncryptFunction()(text, key, options)
+          const keyBytes = currentAlgo === '3des' ? 24 : 8
+          const encrypted = getEncryptFunction()(text, deriveKey(key, keyBytes), options)
           outputTextarea.value = encrypted.toString()
         } catch (e) {
           outputTextarea.value = '加密错误: ' + e.message
@@ -135,9 +150,10 @@ export default {
               outputTextarea.value = 'CBC 模式解密需要提供 IV'
               return
             }
-            options.iv = CryptoJS.enc.Utf8.parse(ivValue)
+            options.iv = parseIv(ivValue)
           }
-          const decrypted = getDecryptFunction()(text, key, options)
+          const keyBytes = currentAlgo === '3des' ? 24 : 8
+          const decrypted = getDecryptFunction()(text, deriveKey(key, keyBytes), options)
           const result = decrypted.toString(CryptoJS.enc.Utf8)
           outputTextarea.value = result || '解密失败，请检查密钥和密文'
         } catch (e) {

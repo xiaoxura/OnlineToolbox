@@ -1,4 +1,4 @@
-import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
   id: 'sql',
@@ -48,9 +48,6 @@ export default {
       'EXCEPT', 'ON', 'VALUES', 'SET', 'INTO'
     ]
 
-    // Subquery indicators
-    const SUBQUERY_START = ['SELECT', 'CASE', 'WHEN', 'EXISTS']
-
     function formatSQL(sql) {
       // Normalize whitespace
       let text = sql.replace(/\s+/g, ' ').trim()
@@ -75,11 +72,13 @@ export default {
         text = text.replace(regex, kw)
       }
 
-      // Add newlines before major clauses
-      for (const clause of MAJOR_CLAUSES) {
-        const regex = new RegExp('\\b(' + clause.replace(/\s+/g, '\\s+') + ')\\b', 'gi')
-        text = text.replace(regex, '\n$1')
-      }
+      // Add newlines before major clauses. Use one longest-first alternation so
+      // compound clauses (LEFT JOIN) are handled before their suffix (JOIN).
+      const clausePattern = [...MAJOR_CLAUSES]
+        .sort((a, b) => b.length - a.length)
+        .map(clause => clause.replace(/\s+/g, '\\s+'))
+        .join('|')
+      text = text.replace(new RegExp('\\b(' + clausePattern + ')\\b', 'gi'), '\n$1')
 
       // Handle commas: put each select column on its own line
       // First, handle SELECT ... FROM (columns)

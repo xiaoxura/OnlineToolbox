@@ -1,4 +1,6 @@
+import "../../styles/tools/regex.css"
 import { createCopyButton, createElement, createSection, createTableScroll } from '../../utils/dom.js'
+import { escapeHtml } from '../../utils/html.js'
 
 const REGEX_COMPONENTS = [
   { pattern: /\(\?:/, desc: '非捕获分组' },
@@ -83,10 +85,6 @@ export default {
     copyRegexBtn.setAttribute('aria-label', '复制正则表达式')
 
     container.append(inputGroup, testGroup, btnGroup, errorText, resultContainer)
-
-    function escapeHtml(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    }
 
     function explainRegex(pattern) {
       const explanations = []

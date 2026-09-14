@@ -22,6 +22,7 @@
   --color-primary-light: #eef0fc;
   --color-primary-border: #c9cdf1;
   --color-focus-ring: rgba(94, 106, 210, 0.42);
+  --focus-ring-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 68%, transparent);
   --color-accent: #0f766e;
   --color-accent-soft: #e6f5f2;
   --color-favorite: #b45309;
@@ -133,11 +134,11 @@
   --color-accent: #5eead4;
   --color-accent-soft: rgba(45, 212, 191, 0.12);
   --color-favorite: #fbbf24;
-  --color-action-primary: #6b74d6;
-  --color-action-primary-hover: #7c85e0;
-  --color-action-success: #1f9d55;
+  --color-action-primary: #5b64c9;
+  --color-action-primary-hover: #6871d3;
+  --color-action-success: #15803d;
   --color-action-success-hover: #1a8848;
-  --color-action-danger: #d64545;
+  --color-action-danger: #cf3f3f;
   --color-action-danger-hover: #b93a3a;
   --color-on-action: #ffffff;
   --color-success: #4ade80;

@@ -35,13 +35,19 @@ async function requestWithFallback(providers, signal) {
     if (signal.aborted) throw new DOMException('请求已取消', 'AbortError')
     try {
       const data = await fetchJson(provider.url, signal)
-      return { data, provider: provider.name }
+      const normalized = provider.normalize ? provider.normalize(data) : data
+      return { data: normalized, provider: provider.name }
     } catch (error) {
       if (error.name === 'AbortError') throw error
       errors.push(`${provider.name}: ${error.message}`)
     }
   }
   throw new Error(`所有查询服务均不可用（${errors.join('；')}）`)
+}
+
+function requireIp(data) {
+  if (!data || !data.ip) throw new Error('服务未返回 IP 地址')
+  return data
 }
 
 export default {
@@ -92,11 +98,10 @@ export default {
         selfProvider.textContent = ''
         try {
           const { data, provider } = await requestWithFallback([
-            { name: 'ipify', url: 'https://api64.ipify.org?format=json' },
-            { name: 'ipify IPv4', url: 'https://api.ipify.org?format=json' }
+            { name: 'ipify', url: 'https://api64.ipify.org?format=json', normalize: requireIp },
+            { name: 'ipify IPv4', url: 'https://api.ipify.org?format=json', normalize: requireIp }
           ], selfController.signal)
           const ip = data.ip
-          if (!ip) throw new Error('服务未返回 IP 地址')
           selfIpValue.textContent = ip
           selfProvider.textContent = `数据来源：${provider}`
           lookupInput.value = ip
@@ -168,11 +173,10 @@ export default {
 
       try {
         const encodedIp = encodeURIComponent(ip)
-        const { data, provider } = await requestWithFallback([
-          { name: 'ipapi.co', url: `https://ipapi.co/${encodedIp}/json/` },
-          { name: 'ipwho.is', url: `https://ipwho.is/${encodedIp}` }
+        const { data: normalized, provider } = await requestWithFallback([
+          { name: 'ipapi.co', url: `https://ipapi.co/${encodedIp}/json/`, normalize: data => normalizeIpApi(data, 'ipapi.co') },
+          { name: 'ipwho.is', url: `https://ipwho.is/${encodedIp}`, normalize: data => normalizeIpApi(data, 'ipwho.is') }
         ], lookupController.signal)
-        const normalized = normalizeIpApi(data, provider)
         for (const key of fields.filter(key => key !== 'source')) {
           fieldEls[key].textContent = normalized[key] ?? '--'
         }

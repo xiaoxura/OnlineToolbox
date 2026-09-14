@@ -1,4 +1,5 @@
-import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
+import "../../styles/tools/qr.css"
+import { createElement } from '../../utils/dom.js'
 import QRCode from 'qrcode'
 
 export default {

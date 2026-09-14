@@ -1,3 +1,4 @@
+import "../../styles/tools/markdown.css"
 import { createCopyButton, createElement, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'

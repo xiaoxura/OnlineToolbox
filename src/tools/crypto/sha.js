@@ -1,5 +1,10 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
-import CryptoJS from 'crypto-js'
+
+const ALGORITHMS = {
+  sha1: 'SHA-1',
+  sha256: 'SHA-256',
+  sha512: 'SHA-512'
+}
 
 export default {
   id: 'sha',
@@ -9,21 +14,25 @@ export default {
   icon: 'sha',
   render(container) {
     let currentAlgo = 'sha256'
+    let requestId = 0
 
-    const hashFunctions = {
-      sha1: CryptoJS.SHA1,
-      sha256: CryptoJS.SHA256,
-      sha512: CryptoJS.SHA512
-    }
-
-    function computeHash() {
+    async function computeHash() {
       const text = inputTextarea.value
       if (!text) {
         outputTextarea.value = ''
         return
       }
-      const fn = hashFunctions[currentAlgo]
-      outputTextarea.value = fn(text).toString()
+      const id = ++requestId
+      try {
+        const digest = await crypto.subtle.digest(ALGORITHMS[currentAlgo], new TextEncoder().encode(text))
+        if (id !== requestId) return
+        outputTextarea.value = [...new Uint8Array(digest)]
+          .map(byte => byte.toString(16).padStart(2, '0'))
+          .join('')
+      } catch (error) {
+        if (id !== requestId) return
+        outputTextarea.value = `计算失败: ${error instanceof Error ? error.message : String(error)}`
+      }
     }
 
     const inputLabel = createElement('label', { className: 'label' }, ['输入文本'])

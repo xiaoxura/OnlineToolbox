@@ -43,7 +43,7 @@ export default {
       // Text node
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent.trim()
-        return text ? indent + text + '\n' : ''
+        return text ? indent + escapeXML(text) + '\n' : ''
       }
 
       // Comment node

@@ -1,3 +1,4 @@
+import "../../styles/tools/image-preview.css"
 import { createElement } from '../../utils/dom.js'
 
 export function calculateTargetSize(width,height,maxWidth,maxHeight){const scale=Math.min(1,(maxWidth||width)/width,(maxHeight||height)/height);return{width:Math.max(1,Math.round(width*scale)),height:Math.max(1,Math.round(height*scale))}}

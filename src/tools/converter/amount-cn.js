@@ -42,9 +42,7 @@ export default {
 
     container.append(inputGroup, btnGroup, errorText, resultSection)
 
-    function convertSection(num) {
-      if (num === 0) return '零'
-
+    function sectionToChinese(num) {
       let result = ''
       let zeroFlag = false
       let unitIdx = 0
@@ -52,7 +50,8 @@ export default {
       while (num > 0) {
         const digit = num % 10
         if (digit === 0) {
-          zeroFlag = true
+          // Only a zero that sits between two non-zero digits is spoken.
+          if (result) zeroFlag = true
         } else {
           if (zeroFlag) {
             result = CN_DIGITS[0] + result
@@ -65,6 +64,29 @@ export default {
       }
 
       return result
+    }
+
+    function integerToChinese(intPart) {
+      const groups = []
+      let remaining = intPart
+      while (remaining.length > 0) {
+        groups.unshift(remaining.slice(-4))
+        remaining = remaining.slice(0, -4)
+      }
+
+      let result = ''
+      groups.forEach((group, idx) => {
+        const bigUnitIdx = groups.length - 1 - idx
+        const num = parseInt(group, 10)
+        if (num === 0) {
+          if (result && idx < groups.length - 1 && !result.endsWith('零')) result += '零'
+        } else {
+          if (result && num < 1000 && !result.endsWith('零')) result += '零'
+          result += sectionToChinese(num) + CN_BIG_UNITS[bigUnitIdx]
+        }
+      })
+
+      return result.replace(/零+$/, '')
     }
 
     function numberToChinese(numStr) {
@@ -86,39 +108,7 @@ export default {
 
       intPart = intPart.replace(/^0+/, '') || '0'
 
-      let result = ''
-      if (intPart === '0') {
-        result = '零'
-      } else {
-        let groupIdx = 0
-        let remaining = intPart
-        const groups = []
-
-        while (remaining.length > 0) {
-          const chunk = remaining.length > 4 ? remaining.slice(-4) : remaining
-          remaining = remaining.length > 4 ? remaining.slice(0, -4) : ''
-          groups.unshift(chunk)
-        }
-
-        groups.forEach((group, idx) => {
-          const bigUnitIdx = groups.length - 1 - idx
-          const num = parseInt(group, 10)
-          if (num === 0) {
-            if (result && !result.endsWith('零')) {
-              result += '零'
-            }
-          } else {
-            let sectionStr = convertSection(num)
-            if (result && !result.endsWith('零') && sectionStr.startsWith('零')) {
-              // already has zero prefix handled
-            }
-            if (result && !result.endsWith('零') && bigUnitIdx > 0 && num < 1000) {
-              result += '零'
-            }
-            result += sectionStr + CN_BIG_UNITS[bigUnitIdx]
-          }
-        })
-      }
+      let result = intPart === '0' ? '零' : integerToChinese(intPart)
 
       if (decPart.length === 0) {
         result += '元整'

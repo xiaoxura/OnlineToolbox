@@ -84,12 +84,6 @@ export default {
       return str.replace(/-([a-z])/g, (_, c) => c.toUpperCase())
     }
 
-    // kebab-case to PascalCase
-    function toPascalCase(str) {
-      const camel = toCamelCase(str)
-      return camel.charAt(0).toUpperCase() + camel.slice(1)
-    }
-
     // Generate inline style object
     function toInlineStyle(pairs) {
       if (pairs.length === 0) return ''

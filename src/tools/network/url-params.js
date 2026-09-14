@@ -1,3 +1,4 @@
+import "../../styles/tools/url-params.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export function updateUrlParams(rawUrl, params) {

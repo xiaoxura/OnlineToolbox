@@ -1,4 +1,4 @@
-import { createElement } from '../../utils/dom.js'
+import { createElement, createCopyButton } from '../../utils/dom.js'
 import { renderTextTransform } from '../shared/text-transform.js'
 
 export default {
@@ -24,6 +24,10 @@ export default {
       createElement('label', { className: 'option-item' }, [finalNewline, createElement('span', { textContent: '保留末尾换行' })])
     ])
 
+    // A <textarea> normalizes CR/CRLF to LF, so keep the raw converted string
+    // and let the copy button emit the exact bytes the user selected.
+    let rawResult = ''
+
     const state = renderTextTransform(container, {
       inputTitle: '原始文本',
       outputTitle: '转换结果',
@@ -31,13 +35,15 @@ export default {
       actionLabel: '转换换行符',
       sample: 'first line\r\nsecond line  \r\nthird line\r\n',
       options,
+      outputActions: [createCopyButton(() => rawResult)],
       transform(text) {
         let normalized = text.replace(/\r\n|\r/g, '\n')
         if (trimTrailing.checked) normalized = normalized.split('\n').map(line => line.replace(/[\t ]+$/g, '')).join('\n')
         const finalNewlineCount = normalized.match(/\n+$/)?.[0].length || 0
         normalized = normalized.replace(/\n+$/, '')
         const converted = normalized.replace(/\n/g, format.value)
-        return finalNewline.checked ? converted + format.value.repeat(finalNewlineCount) : converted
+        rawResult = finalNewline.checked ? converted + format.value.repeat(finalNewlineCount) : converted
+        return rawResult
       }
     })
     format.addEventListener('change', state.run)

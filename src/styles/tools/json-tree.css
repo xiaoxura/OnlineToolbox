@@ -1,0 +1,113 @@
+/* --- JSON tree（JSON Path） --- */
+.json-tree-container {
+  max-height: min(60vh, 520px);
+  padding: 12px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1.8;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.json-tree-branch { margin-left: 18px; }
+
+.json-tree-row {
+  display: flex;
+  align-items: flex-start;
+  width: max-content;
+  min-width: 100%;
+  padding: 1px 3px;
+  border-radius: var(--radius-sm);
+}
+
+.json-tree-row:hover { background: var(--color-primary-light); }
+
+.json-tree-node {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: var(--radius-sm);
+}
+
+.json-tree-node:focus-visible { background: var(--color-primary-light); }
+
+.json-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  transition: transform 0.15s ease;
+}
+
+.json-key {
+  min-width: max-content;
+  min-height: 28px;
+  padding: 0 2px;
+  font-family: inherit;
+  font-weight: 600;
+  text-align: left;
+  color: var(--color-primary);
+}
+
+.json-key:hover { text-decoration: underline; }
+
+.json-node-select {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 4px;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.json-node-select:hover,
+.json-node-select:focus-visible { background: var(--color-primary-light); }
+
+.json-preview { display: none; font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.json-index { min-width: 28px; color: var(--color-text-muted); user-select: none; }
+
+.json-string { color: var(--color-success-text); }
+.json-number { color: var(--color-primary); }
+.json-boolean { color: var(--color-danger-text); }
+.json-null { color: var(--color-text-muted); font-style: italic; }
+.json-bracket { color: var(--color-text-muted); font-weight: 600; }
+
+.json-tree-empty {
+  padding: var(--space-lg);
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.json-tree-empty.error { color: var(--color-danger-text); }
+
+/* 选中路径展示（点击复制） */
+.json-selected-path {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.json-selected-path code { padding: 2px 6px; background: var(--color-bg-secondary); border-radius: var(--radius-sm); }
+.json-selected-path > span { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.json-selected-path.copied { background: var(--color-primary-light); }
+
+@media (max-width: 720px) {
+  /* JSON tree 触控目标加大 */
+  .json-node-select,
+  .json-toggle,
+  .json-key { min-height: 32px; }
+
+  .json-toggle { width: 32px; height: 32px; flex-basis: 32px; }
+}

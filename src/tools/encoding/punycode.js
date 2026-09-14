@@ -30,59 +30,56 @@ export default {
       return k + Math.floor(((BASE - TMIN + 1) * delta) / (delta + SKEW))
     }
 
+    function digitToChar(digit) {
+      return String.fromCharCode(digit < 26 ? digit + 97 : digit - 26 + 48)
+    }
+
+    function charToDigit(code) {
+      if (code >= 48 && code <= 57) return code - 48 + 26
+      if (code >= 97 && code <= 122) return code - 97
+      return -1
+    }
+
     function encodePunycode(input) {
-      const chars = Array.from(input)
+      const codePoints = Array.from(input, ch => ch.codePointAt(0))
       let n = INITIAL_N
       let delta = 0
       let bias = INITIAL_BIAS
-      let b = 0
-
-      // Count basic code points
-      for (const ch of chars) {
-        const cp = ch.codePointAt(0)
-        if (cp < 128) b++
-      }
-
-      if (b === 0) return ''
-
       let output = ''
-      // Append basic code points
-      for (const ch of chars) {
-        const cp = ch.codePointAt(0)
-        if (cp < 128) output += ch
+      let basicCount = 0
+
+      for (const cp of codePoints) {
+        if (cp < 128) {
+          output += String.fromCharCode(cp)
+          basicCount++
+        }
       }
 
-      let h = b
-      if (b > 0) output += DELIMITER
+      let h = basicCount
+      if (basicCount > 0) output += DELIMITER
 
-      // Encode non-basic code points
-      while (h < chars.length) {
-        // Find minimum non-basic code point >= n
+      while (h < codePoints.length) {
         let m = 0x7FFFFFFF
-        for (const ch of chars) {
-          const cp = ch.codePointAt(0)
+        for (const cp of codePoints) {
           if (cp >= n && cp < m) m = cp
         }
 
         delta += (m - n) * (h + 1)
         n = m
 
-        for (const ch of chars) {
-          const cp = ch.codePointAt(0)
+        for (const cp of codePoints) {
           if (cp < n) {
             delta++
           } else if (cp === n) {
             let q = delta
-            let k = BASE
-            while (true) {
+            for (let k = BASE; ; k += BASE) {
               const t = k <= bias ? TMIN : (k >= bias + TMAX ? TMAX : k - bias)
               if (q < t) break
-              output += String.fromCharCode(t + ((q - t) % (BASE - t)) + 97) // 'a' = 97
+              output += digitToChar(t + ((q - t) % (BASE - t)))
               q = Math.floor((q - t) / (BASE - t))
-              k += BASE
             }
-            output += String.fromCharCode(q + 97)
-            bias = adapt(delta, h + 1, h === b)
+            output += digitToChar(q)
+            bias = adapt(delta, h + 1, h === basicCount)
             delta = 0
             h++
           }
@@ -96,45 +93,31 @@ export default {
 
     function decodePunycode(input) {
       let s = input.trim().toLowerCase()
-      // Remove xn-- prefix if present
-      if (s.startsWith('xn--')) {
-        s = s.substring(4)
-      }
+      if (s.startsWith('xn--')) s = s.substring(4)
 
-      // Split at last delimiter
-      const delimIdx = s.lastIndexOf(DELIMITER)
-      let output = []
+      const output = []
       let n = INITIAL_N
       let bias = INITIAL_BIAS
 
-      if (delimIdx >= 0) {
-        // Extract basic code points
-        for (let i = 0; i < delimIdx; i++) {
-          output.push(s.charCodeAt(i))
-        }
-        s = s.substring(delimIdx + 1)
+      const basicEnd = s.lastIndexOf(DELIMITER)
+      let index = 0
+      if (basicEnd > 0) {
+        for (let j = 0; j < basicEnd; j++) output.push(s.charCodeAt(j))
+        index = basicEnd + 1
       }
 
       let i = 0
-      let idx = 0
-
-      while (s.length > 0) {
+      while (index < s.length) {
         const oldi = i
         let w = 1
-        let k = BASE
-
-        while (true) {
-          if (idx >= s.length) throw new Error('无效的 Punycode 编码')
-          const digit = s.charCodeAt(idx) - 97 // 'a' = 97
-          idx++
-          if (digit < 0 || digit >= BASE) throw new Error('无效的 Punycode 字符')
+        for (let k = BASE; ; k += BASE) {
+          if (index >= s.length) throw new Error('无效的 Punycode 编码')
+          const digit = charToDigit(s.charCodeAt(index++))
+          if (digit < 0) throw new Error('无效的 Punycode 字符')
           i += digit * w
-
           const t = k <= bias ? TMIN : (k >= bias + TMAX ? TMAX : k - bias)
           if (digit < t) break
-
           w *= BASE - t
-          k += BASE
         }
 
         const len = output.length + 1
@@ -146,7 +129,6 @@ export default {
         i++
       }
 
-      // Convert code points to string
       return String.fromCodePoint(...output)
     }
 
@@ -174,7 +156,7 @@ export default {
       mode = key
       inputTextarea.placeholder = key === 'text-to-punycode'
         ? '请输入中文域名，如 例子.测试'
-        : '请输入 Punycode，如 xn--fsq028c.xn--0zwm56d'
+        : '请输入 Punycode，如 xn--fsqu00a.xn--0zwm56d'
     })
 
     const convertBtn = createElement('button', {
@@ -214,7 +196,7 @@ export default {
       onClick: () => {
         const samples = {
           'text-to-punycode': '例子.测试',
-          'punycode-to-text': 'xn--fsq028c.xn--0zwm56d'
+          'punycode-to-text': 'xn--fsqu00a.xn--0zwm56d'
         }
         inputTextarea.value = samples[mode]
         convertBtn.click()

@@ -1,3 +1,4 @@
+import "../../styles/tools/diff.css"
 import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 
 export default {

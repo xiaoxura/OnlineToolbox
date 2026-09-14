@@ -1,0 +1,38 @@
+/* --- URL 参数编辑 --- */
+.param-heading,
+.param-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) var(--control-height);
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.param-heading {
+  padding: var(--space-md) 0 var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.param-rows { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-md); }
+.param-row > * { min-width: 0; }
+
+.param-remove {
+  width: var(--control-height);
+  height: var(--control-height);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-danger);
+  border-color: var(--color-border);
+}
+
+.param-remove:hover {
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+}
+
+@media (max-width: 520px) {
+  .param-heading { display: none; }
+  .param-row { grid-template-columns: minmax(0, 1fr) var(--control-height); }
+  .param-row > :first-child { grid-column: 1 / -1; }
+}

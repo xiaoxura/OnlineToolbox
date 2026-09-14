@@ -1,3 +1,4 @@
+import "../../styles/tools/unit.css"
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 const unitCategories = {
@@ -94,7 +95,7 @@ export default {
       )
 
       const toSelect = createElement('select', { className: 'select', 'aria-label': `${cat.name}目标单位` },
-        unitKeys.map((k, i) => createElement('option', { value: k, textContent: cat.units[k].name }))
+        unitKeys.map(k => createElement('option', { value: k, textContent: cat.units[k].name }))
       )
       if (unitKeys.length > 1) toSelect.selectedIndex = 1
 

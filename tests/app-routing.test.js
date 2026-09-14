@@ -71,7 +71,7 @@ describe('application routing', () => {
     const search = document.querySelector('#searchInput')
     search.value = 'JWT'
     search.dispatchEvent(new Event('input', { bubbles: true }))
-    expect(document.querySelectorAll('.all-tools-section .tool-card')).toHaveLength(1)
+    await vi.waitFor(() => expect(document.querySelectorAll('.all-tools-section .tool-card')).toHaveLength(1))
     expect(document.querySelector('[data-category="encoding"]').getAttribute('aria-pressed')).toBe('true')
     expect(document.querySelector('#searchClear').hidden).toBe(false)
     search.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))

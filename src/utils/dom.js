@@ -1,5 +1,8 @@
 import allIcons from '../icons.js'
 import { downloadText } from './download.js'
+import { copyToClipboard } from './clipboard.js'
+
+export { showToast } from './toast.js'
 
 let generatedId = 0
 const choiceScrollObservers = new WeakMap()
@@ -61,29 +64,30 @@ export function createElement(tag, attrs = {}, children = []) {
   return el
 }
 
-// Toast notification
-let toastEl = null
-let toastTimer = null
+// Copy button helper
+const copySuccessIcon = `<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+const copiedTimers = new WeakMap()
 
-export function showToast(message, duration = 2000) {
-  if (!toastEl) {
-    toastEl = createElement('div', {
-      className: 'toast',
-      role: 'status',
-      'aria-live': 'polite',
-      'aria-atomic': 'true'
-    })
-    document.body.appendChild(toastEl)
+// Briefly turn a copy button into a success state so the user gets feedback
+// next to the content they copied (the toast stays for screen readers).
+export function flashCopied(button) {
+  if (!button) return
+  if (!button.dataset.originalHtml) {
+    button.dataset.originalHtml = button.innerHTML
+    button.dataset.originalLabel = button.getAttribute('aria-label') || ''
   }
-  clearTimeout(toastTimer)
-  toastEl.textContent = message
-  toastEl.classList.add('show')
-  toastTimer = setTimeout(() => {
-    toastEl.classList.remove('show')
-  }, duration)
+  button.classList.add('copied')
+  button.innerHTML = copySuccessIcon
+  button.setAttribute('aria-label', '已复制')
+  clearTimeout(copiedTimers.get(button))
+  copiedTimers.set(button, setTimeout(() => {
+    button.classList.remove('copied')
+    button.innerHTML = button.dataset.originalHtml
+    if (button.dataset.originalLabel) button.setAttribute('aria-label', button.dataset.originalLabel)
+    else button.removeAttribute('aria-label')
+  }, 1200))
 }
 
-// Copy button helper
 export function createCopyButton(text) {
   return createElement('button', {
     className: 'btn-icon',
@@ -91,14 +95,13 @@ export function createCopyButton(text) {
     title: '复制',
     'aria-label': '复制到剪贴板',
     innerHTML: `<svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
-    onClick: () => {
+    onClick: event => {
       const value = typeof text === 'function' ? text() : text
       copyToClipboard(value)
+      flashCopied(event.currentTarget)
     }
   })
 }
-
-import { copyToClipboard } from './clipboard.js'
 
 // Tool section helper
 export function createSection(title, contentEl, actions = []) {
@@ -485,11 +488,29 @@ export function applyTwoColumnLayout(container) {
   const outputNodes = children.slice(outputIndex)
   if (!inputNodes.length || !outputNodes.length) return false
 
+  // A lone label immediately before the input run belongs inside the input
+  // column, not floating above the split (e.g. "输入文本" on the hash tools).
+  while (head.length && head[head.length - 1].matches?.('.label')) {
+    inputNodes.unshift(head.pop())
+  }
+
   const grid = createElement('div', { className: 'tool-io-grid' })
   const inputCol = createElement('div', { className: 'tool-io-col tool-io-input' })
   const outputCol = createElement('div', { className: 'tool-io-col tool-io-output' })
   inputCol.append(...inputNodes)
   outputCol.append(...outputNodes)
+
+  // Keep the input card tidy: bare option rows / action buttons that sat next
+  // to the input section belong inside it, not loose under the card.
+  const firstInputSection = inputCol.querySelector(':scope > .tool-section')
+  const firstInputBody = firstInputSection?.querySelector(':scope > .tool-section-body')
+  if (firstInputBody) {
+    for (const child of [...inputCol.children]) {
+      if (child !== firstInputSection && !child.classList.contains('tool-section')) {
+        firstInputBody.appendChild(child)
+      }
+    }
+  }
 
   // When both sides hold a textarea, offer a swap control between the columns:
   // it pushes the output back into the input and re-runs the tool. For a
@@ -542,7 +563,14 @@ function resultContentOf(section) {
   const textarea = section.querySelector('.tool-section-body textarea[readonly]')
   if (textarea) return () => textarea.value
   const box = section.querySelector('.tool-section-body .result-box, .tool-section-body .result-table')
-  if (box) return () => box.innerText
+  if (box) {
+    // Visual previews (shadow/gradient/image/calculator) have no textual
+    // content, so copy/download/wrap/collapse would be meaningless noise.
+    if (box.matches('.visual-preview, .placeholder-preview, .calculator-display') || box.hasAttribute('data-no-toolbar')) {
+      return null
+    }
+    return () => box.innerText
+  }
   return null
 }
 
@@ -577,7 +605,10 @@ export function enhanceResultSections(container, { toolName = 'result' } = {}) {
 
     // Copy — only when the tool didn't already provide one for this section.
     if (!group.querySelector('.btn-icon[title="复制"], .btn-icon[aria-label^="复制"]')) {
-      group.appendChild(toolbarButton(resultIcons.copy, '复制', () => copyToClipboard(getContent())))
+      group.appendChild(toolbarButton(resultIcons.copy, '复制', event => {
+        copyToClipboard(getContent())
+        flashCopied(event.currentTarget)
+      }))
     }
 
     // Download.

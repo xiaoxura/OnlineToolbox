@@ -1,4 +1,5 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
+import { escapeHtml } from '../../utils/html.js'
 
 export default {
   id: 'text-replace',
@@ -99,7 +100,7 @@ export default {
           try {
             regex = new RegExp(search, flags)
           } catch (e) {
-            countEl.innerHTML = `<span class="error-text">正则表达式语法错误: ${e.message}</span>`
+            countEl.innerHTML = `<span class="error-text">正则表达式语法错误: ${escapeHtml(e.message)}</span>`
             return
           }
         } else {
@@ -147,7 +148,7 @@ export default {
         try {
           regex = new RegExp(search, flags)
         } catch (e) {
-          countEl.innerHTML = `<span class="error-text">正则表达式语法错误: ${e.message}</span>`
+          countEl.innerHTML = `<span class="error-text">正则表达式语法错误: ${escapeHtml(e.message)}</span>`
           return
         }
       } else {

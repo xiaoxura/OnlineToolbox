@@ -1,3 +1,4 @@
+import "../../styles/tools/color-picker.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {

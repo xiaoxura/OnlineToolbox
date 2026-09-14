@@ -141,6 +141,7 @@ OnlineToolbox/
 ├── vite.config.js                # Vite 配置
 ├── vitest.config.js              # Vitest 配置
 ├── eslint.config.js              # ESLint 配置
+├── .github/workflows/ci.yml      # CI：lint、测试与生产构建
 ├── public/
 │   ├── favicon.svg               # 网站图标
 │   └── site.webmanifest          # Web App Manifest
@@ -151,10 +152,14 @@ OnlineToolbox/
     ├── main.js                   # 入口、异步工具加载与页面渲染
     ├── router.js                 # Hash 路由实现
     ├── icons.js                  # SVG 图标集
-    ├── styles/                   # 全局、布局、工具及主题样式
+    ├── styles/                   # 全局、布局及主题样式
+    │   └── tools/                # 各工具按需加载的样式
     ├── utils/
     │   ├── dom.js                # DOM、Tab 和无障碍辅助
-    │   └── clipboard.js          # 剪贴板操作
+    │   ├── html.js               # HTML 转义
+    │   ├── clipboard.js          # 剪贴板操作
+    │   ├── download.js           # 文件下载
+    │   └── toast.js              # 轻提示
     └── tools/
         ├── registry.js           # 轻量元数据与动态 import 注册表
         ├── encoding/

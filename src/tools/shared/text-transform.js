@@ -9,6 +9,7 @@ export function renderTextTransform(container, {
   sample,
   transform,
   options = [],
+  outputActions = [],
   rows = 12,
   live = false
 }) {
@@ -63,7 +64,7 @@ export function renderTextTransform(container, {
     createElement('div', { className: 'btn-group form-action-row' }, actions),
     error,
     createSection(inputTitle, input),
-    createSection(outputTitle, output)
+    createSection(outputTitle, output, outputActions)
   )
 
   if (live) input.addEventListener('input', run)

@@ -14,7 +14,7 @@ export default {
         patternStr: '^1[3-9]\\d{9}$',
         placeholder: '请输入手机号',
         extract(val) {
-          const m = val.match(/^(1[3-9])(\d{4})(\d{4})$/)
+          const m = val.match(/^(1[3-9]\d)(\d{4})(\d{4})$/)
           return m ? `运营商号段: ${m[1]}` : ''
         }
       },
@@ -100,6 +100,15 @@ export default {
         pattern: /^\d{4}[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])$/,
         patternStr: '^\\d{4}[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\\d|3[01])$',
         placeholder: '请输入日期 (如 2024-01-15)',
+        validate(val) {
+          const m = val.match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/)
+          if (!m) return false
+          const year = Number(m[1])
+          const month = Number(m[2])
+          const day = Number(m[3])
+          const date = new Date(year, month - 1, day)
+          return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+        },
         extract(val) {
           const d = new Date(val.replace(/\//g, '-'))
           if (!isNaN(d.getTime())) {
@@ -193,6 +202,10 @@ export default {
       patternDisplay.appendChild(patternValue)
     })
 
+    function matchesCheck(check, value) {
+      return check.validate ? check.validate(value) : check.pattern.test(value)
+    }
+
     function doCheck() {
       const check = CHECKS.find(c => c.value === currentMode)
       resultContainer.removeAttribute('hidden')
@@ -213,7 +226,7 @@ export default {
         return
       }
 
-      const isValid = check.pattern.test(value)
+      const isValid = matchesCheck(check, value)
       const statusItem = createElement('div', { className: 'stat-item' }, [
         createElement('span', { className: 'stat-label', textContent: '校验结果' }),
         createElement('span', {
@@ -257,7 +270,7 @@ export default {
       let validCount = 0
 
       lines.forEach(line => {
-        const isValid = check.pattern.test(line)
+        const isValid = matchesCheck(check, line)
         if (isValid) validCount++
         const info = isValid && check.extract ? check.extract(line) : ''
 

@@ -74,4 +74,14 @@ describe('result section toolbar', () => {
     // Input section holds an editable textarea, so no result toolbar.
     expect(input.querySelector('.btn-icon[aria-label="下载为文件"]')).toBeNull()
   })
+
+  it('shows inline copy feedback on copy buttons', async () => {
+    const container = await renderEnhanced('base64')
+    const copy = [...container.querySelectorAll('.tool-section-header .btn-icon')]
+      .find(button => button.getAttribute('aria-label')?.startsWith('复制'))
+    expect(copy).not.toBeNull()
+    copy.click()
+    expect(copy.classList.contains('copied')).toBe(true)
+    expect(copy.getAttribute('aria-label')).toBe('已复制')
+  })
 })

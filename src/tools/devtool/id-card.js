@@ -142,15 +142,16 @@ export default {
 
     function generateTest() {
       const areaCodes = Object.keys(AREA_CODES)
-      const area = areaCodes[Math.floor(Math.random() * areaCodes.length)]
+      const province = areaCodes[Math.floor(Math.random() * areaCodes.length)]
+      // Full address code = 6 digits (province + city + district).
+      const areaCode = province + String(Math.floor(Math.random() * 10000)).padStart(4, '0')
 
       const year = 1970 + Math.floor(Math.random() * 40)
       const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')
       const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')
-      const seq = String(Math.floor(Math.random() * 99) + 1).padStart(3, '0')
-      const genderDigit = String(Math.floor(Math.random() * 10))
+      const seq = String(Math.floor(Math.random() * 1000)).padStart(3, '0')
 
-      const idBase = `${area}${year}${month}${day}${seq}${genderDigit}`
+      const idBase = `${areaCode}${year}${month}${day}${seq}`
 
       let weightedSum = 0
       for (let i = 0; i < 17; i++) {

@@ -1,4 +1,4 @@
-import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
+import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
   id: 'json',

@@ -1,0 +1,36 @@
+/* --- 图片预览 --- */
+.img-preview-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  overflow: hidden;
+}
+
+.img-preview {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.preview-placeholder { font-size: var(--font-size-sm); color: var(--color-text-muted); text-align: center; }
+.image-stats { padding-top: var(--space-sm); }
+
+.placeholder-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+
+.placeholder-canvas {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(65vh, 680px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}

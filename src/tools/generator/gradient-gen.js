@@ -1,3 +1,4 @@
+import "../../styles/tools/gradient-palette.css"
 import { createElement, createSection, createSegmentedGroup, createCopyButton } from '../../utils/dom.js'
 
 export default {
@@ -22,7 +23,7 @@ export default {
       max: '360',
       onInput: updatePreview
     })
-    const angleGroup = createElement('div', { className: 'form-group' }, [
+    const angleGroup = createElement('div', { className: 'form-group gradient-angle' }, [
       createElement('label', { className: 'label', for: 'gg-angle' }, ['角度 (0-360)']),
       angleInput
     ])
@@ -31,7 +32,7 @@ export default {
       createElement('option', { value: 'circle' }, ['圆形 (circle)']),
       createElement('option', { value: 'ellipse', selected: 'true' }, ['椭圆 (ellipse)'])
     ])
-    const shapeGroup = createElement('div', { className: 'form-group' }, [
+    const shapeGroup = createElement('div', { className: 'form-group gradient-shape' }, [
       createElement('label', { className: 'label', for: 'gg-shape' }, ['形状']),
       shapeSelect
     ])

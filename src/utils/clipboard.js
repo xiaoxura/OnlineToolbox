@@ -1,4 +1,4 @@
-import { showToast } from './dom.js'
+import { showToast } from './toast.js'
 
 export async function copyToClipboard(text) {
   try {

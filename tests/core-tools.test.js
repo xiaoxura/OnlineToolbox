@@ -1,6 +1,18 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 describe('core tool behavior', () => {
+  it('computes SHA-256 hashes through the Web Crypto API', async () => {
+    const { default: tool } = await import('../src/tools/crypto/sha.js')
+    const container = document.createElement('main')
+    tool.render(container)
+    const [input, output] = container.querySelectorAll('textarea')
+    input.value = 'abc'
+    input.dispatchEvent(new Event('input'))
+    await vi.waitFor(() => {
+      expect(output.value).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
+    })
+  })
+
   it('encodes and decodes UTF-8 Base64', async () => {
     const { default: tool } = await import('../src/tools/encoding/base64.js')
     const container = document.createElement('main')

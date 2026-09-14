@@ -63,7 +63,9 @@ export default {
           // Skip whitespace after ;
           while (i < result.length && result[i] === ' ') i++
         } else if (ch === ':') {
-          formatted += ': '
+          // Inside a declaration block the colon separates property/value;
+          // at selector level it belongs to :pseudo / ::pseudo.
+          formatted += indent > 0 ? ': ' : ':'
           i++
           // Skip whitespace after :
           while (i < result.length && result[i] === ' ') i++

@@ -1,4 +1,6 @@
+import "../../styles/tools/image-preview.css"
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
+import { escapeHtml } from '../../utils/html.js'
 
 export default {
   id: 'placeholder-img',
@@ -122,7 +124,7 @@ export default {
       const svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
   <rect width="100%" height="100%" fill="${bgColor}"/>
   <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
-        font-family="sans-serif" font-size="${fontSize}" fill="${textColor}">${displayText}</text>
+        font-family="sans-serif" font-size="${fontSize}" fill="${textColor}">${escapeHtml(displayText)}</text>
 </svg>`
       svgOutput.value = svgCode
     }

@@ -23,6 +23,21 @@ export default {
       NoPadding: CryptoJS.pad.NoPadding
     }
 
+    // Derive a fixed 256-bit key from the passphrase so the explicit IV is
+    // actually honoured (passing a string key makes crypto-js generate its own
+    // salt + IV and silently ignore options.iv).
+    function deriveKey(passphrase) {
+      return CryptoJS.SHA256(passphrase)
+    }
+
+    // Accept a 32-char hex IV or a 16-character text IV.
+    function parseIv(value) {
+      if (/^[0-9a-fA-F]{32}$/.test(value)) return CryptoJS.enc.Hex.parse(value)
+      const wordArray = CryptoJS.enc.Utf8.parse(value)
+      if (wordArray.sigBytes !== 16) throw new Error('IV 必须是 16 字节（16 个字符或 32 位十六进制）')
+      return wordArray
+    }
+
     // Input
     const inputLabel = createElement('label', { className: 'label' }, ['输入文本'])
     const inputTextarea = createElement('textarea', {
@@ -102,12 +117,12 @@ export default {
           if (currentMode === 'CBC' || currentMode === 'CTR') {
             let ivValue = ivInput.value
             if (!ivValue) {
-              ivValue = CryptoJS.lib.WordArray.random(16).toString()
+              ivValue = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex)
               ivInput.value = ivValue
             }
-            options.iv = CryptoJS.enc.Utf8.parse(ivValue)
+            options.iv = parseIv(ivValue)
           }
-          const encrypted = CryptoJS.AES.encrypt(text, key, options)
+          const encrypted = CryptoJS.AES.encrypt(text, deriveKey(key), options)
           outputTextarea.value = encrypted.toString()
         } catch (e) {
           outputTextarea.value = '加密错误: ' + e.message
@@ -136,9 +151,9 @@ export default {
               outputTextarea.value = 'CBC/CTR 模式解密需要提供 IV'
               return
             }
-            options.iv = CryptoJS.enc.Utf8.parse(ivValue)
+            options.iv = parseIv(ivValue)
           }
-          const decrypted = CryptoJS.AES.decrypt(text, key, options)
+          const decrypted = CryptoJS.AES.decrypt(text, deriveKey(key), options)
           const result = decrypted.toString(CryptoJS.enc.Utf8)
           outputTextarea.value = result || '解密失败，请检查密钥和密文'
         } catch (e) {

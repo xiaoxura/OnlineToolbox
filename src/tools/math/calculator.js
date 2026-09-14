@@ -1,3 +1,4 @@
+import "../../styles/tools/calculator.css"
 import { createElement, createSection } from '../../utils/dom.js'
 
 export default {
@@ -16,15 +17,24 @@ export default {
     let currentExpr = ''
     let history = []
 
+    function isNumericLiteral(text) {
+      return /^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(text)
+    }
+
     function updateDisplay() {
       exprEl.textContent = currentExpr || ''
       try {
-        if (currentExpr) {
-          const val = evaluateExpr(currentExpr)
-          resultEl.textContent = formatNumber(val)
-        } else {
+        if (!currentExpr) {
           resultEl.textContent = '0'
+          return
         }
+        // A finished numeric result (possibly in exponent form like 1e-7) must
+        // be shown verbatim — re-evaluating it would rewrite the "e".
+        if (isNumericLiteral(currentExpr)) {
+          resultEl.textContent = formatNumber(Number(currentExpr))
+          return
+        }
+        resultEl.textContent = formatNumber(evaluateExpr(currentExpr))
       } catch {
         resultEl.textContent = currentExpr ? '...' : '0'
       }
@@ -56,6 +66,10 @@ export default {
         .replace(/ln\(/g, 'Math.log(')
         .replace(/√\(/g, 'Math.sqrt(')
         .replace(/\^/g, '**')
+
+      // A trailing % is a postfix percentage (50% → 50/100); a % between two
+      // operands stays the modulo operator.
+      js = js.replace(/%+$/, match => '/100'.repeat(match.length))
 
       // Safety check: only allow math characters
       if (/[^0-9+\-*/().%,\s]|Math\.\w+/.test(js.replace(/Math\.\w+/g, ''))) {
@@ -248,7 +262,7 @@ export default {
     document.addEventListener('keydown', handleKeydown)
 
     // --- History ---
-    const historyEl = createElement('div', { className: 'result-box' })
+    const historyEl = createElement('div', { className: 'result-box', 'data-no-toolbar': '' })
 
     function renderHistory() {
       historyEl.innerHTML = ''
@@ -281,8 +295,10 @@ export default {
     })
 
     // --- Layout ---
-    const calcSection = createSection('计算器', createElement('div', {}, [display, gridEl]))
+    const calcSection = createSection('计算器', createElement('div', { className: 'calculator-layout' }, [display, gridEl]))
     const historySection = createSection('计算历史', historyEl, [clearHistoryBtn])
+    calcSection.classList.add('calculator-section')
+    historySection.classList.add('calculator-section')
 
     container.appendChild(calcSection)
     container.appendChild(historySection)

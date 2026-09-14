@@ -225,13 +225,6 @@ export default {
       placeholder: '搜索 Linux 命令或描述（如 grep, 权限, 进程, 压缩）...'
     })
 
-    const searchRow = createElement('div', { className: 'form-row' }, [
-      createElement('div', { className: 'form-group' }, [
-        createElement('label', { className: 'label', textContent: '搜索' }),
-        searchInput
-      ])
-    ])
-
     const contentEl = createElement('div', {})
 
     function renderContent() {
@@ -276,7 +269,7 @@ export default {
     searchInput.addEventListener('input', renderContent)
     renderContent()
 
-    const searchSection = createSection('搜索', searchRow)
+    const searchSection = createSection('搜索', searchInput)
 
     container.appendChild(searchSection)
     container.appendChild(contentEl)

@@ -1,3 +1,4 @@
+import "../../styles/tools/gradient-palette.css"
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {

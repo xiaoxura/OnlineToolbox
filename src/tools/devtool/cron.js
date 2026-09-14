@@ -1,4 +1,5 @@
-import { createElement, createSection, createTabGroup } from '../../utils/dom.js'
+import { createElement, createSection } from '../../utils/dom.js'
+import { escapeHtml } from '../../utils/html.js'
 
 const PRESETS = [
   { label: '每分钟', value: '* * * * *' },
@@ -258,7 +259,7 @@ export default {
           })
         }
       } catch (e) {
-        nextResult.innerHTML = `<span class="error-text">计算执行时间出错: ${e.message}</span>`
+        nextResult.innerHTML = `<span class="error-text">计算执行时间出错: ${escapeHtml(e.message)}</span>`
       }
     }
 

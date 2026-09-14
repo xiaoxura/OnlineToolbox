@@ -1,4 +1,6 @@
+import "../../styles/tools/regex.css"
 import { createElement, createSection, createTableScroll } from '../../utils/dom.js'
+import { escapeHtml } from '../../utils/html.js'
 
 export default {
   id: 'regex',
@@ -53,13 +55,6 @@ export default {
 
     function getFlags() {
       return ['g', 'i', 'm', 's'].filter(f => flagCheckboxes[f].checked).join('')
-    }
-
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
     }
 
     function runTest() {

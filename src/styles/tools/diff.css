@@ -1,0 +1,56 @@
+/* --- Diff 输出（text-diff / json-diff） --- */
+.diff-output {
+  max-height: 440px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1.7;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* Empty state — otherwise the empty bordered box collapses to a hairline. */
+.diff-output:empty::before {
+  content: '差异将显示在这里';
+  display: flex;
+  min-height: 90px;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.diff-line {
+  padding: 2px var(--space-md);
+  white-space: pre-wrap;
+  word-break: break-all;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.diff-line:last-child { border-bottom: none; }
+.diff-added { color: var(--color-success-text); background: var(--color-success-soft); }
+.diff-removed { color: var(--color-danger-text); background: var(--color-danger-soft); }
+.diff-changed { color: var(--color-warning-text); background: var(--color-warning-soft); }
+
+.diff-summary,
+.diff-empty { padding: 14px var(--space-md); background: var(--color-section-header); }
+
+.diff-summary {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.diff-empty {
+  display: flex;
+  min-height: 90px;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.json-diff-output { min-height: 92px; }

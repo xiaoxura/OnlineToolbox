@@ -27,13 +27,6 @@ export default {
       'link', 'meta', 'param', 'source', 'track', 'wbr'
     ])
 
-    const inlineTags = new Set([
-      'a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'cite', 'code',
-      'dfn', 'em', 'i', 'img', 'input', 'kbd', 'label', 'map', 'object',
-      'output', 'q', 'samp', 'select', 'small', 'span', 'strong', 'sub',
-      'sup', 'textarea', 'time', 'tt', 'u', 'var'
-    ])
-
     function beautifyHTML(html) {
       // Parse using DOMParser
       const parser = new DOMParser()

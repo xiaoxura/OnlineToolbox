@@ -1,4 +1,6 @@
+import "../../styles/tools/json-tree.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
+import { escapeHtml } from '../../utils/html.js'
 import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
@@ -105,7 +107,6 @@ export default {
       }
 
       if (Array.isArray(data)) {
-        const isArray = true
         const openBracket = '['
         const closeBracket = ']'
 
@@ -277,7 +278,7 @@ export default {
     }
 
     // Select a path in the tree
-    function selectPath(path, value) {
+    function selectPath(path) {
       // Update path input
       pathInput.value = path
 
@@ -295,10 +296,6 @@ export default {
 
       // Run query with the selected path
       runQuery()
-    }
-
-    function escapeHtml(text) {
-      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     }
 
     // Query button
@@ -425,10 +422,14 @@ export default {
     const treeSection = createSection('JSON 树 (点击字段获取路径)', treeContainer)
     const resultSection = createSection('查询结果', resultBox, [copyResultBtn])
 
-    container.appendChild(pathGroup)
-    container.appendChild(quickRow)
-    container.appendChild(btnRow)
-    container.appendChild(errorEl)
+    const querySection = createSection('查询条件', createElement('div', { className: 'tool-stack' }, [
+      pathGroup,
+      quickRow,
+      btnRow,
+      errorEl
+    ]))
+
+    container.appendChild(querySection)
     container.appendChild(inputSection)
     container.appendChild(treeSection)
     container.appendChild(selectedPathDisplay)
@@ -486,7 +487,7 @@ function parsePath(pathStr) {
           i++
         }
         if (key) {
-          segments.push({ type: 'key', key })
+          segments.push(key === '*' ? { type: 'wildcard' } : { type: 'key', key })
         }
       }
     } else if (s[i] === '[') {

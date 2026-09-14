@@ -39,9 +39,8 @@ export default {
 
     const xmlTextarea = createElement('textarea', {
       className: 'textarea',
-      placeholder: '转换结果将显示在此...',
-      rows: 12,
-      readOnly: true
+      placeholder: '在此输入或显示 XML...',
+      rows: 12
     })
 
     // Error display
@@ -172,8 +171,6 @@ function jsonToXml(data, rootName, indentSize) {
 
   const safeRoot = sanitizeTagName(rootName)
   if (typeof data === 'object' && !Array.isArray(data) && data !== null) {
-    // If it's a plain object with a single key matching root, unwrap
-    const keys = Object.keys(data)
     lines.push(`${indent(0)}<${safeRoot}>`)
     for (const [key, val] of Object.entries(data)) {
       const safeName = sanitizeTagName(key)

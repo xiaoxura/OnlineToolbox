@@ -60,17 +60,21 @@ export default {
     }
 
     function jsUnescape(text) {
-      return text
-        .replace(/\\n/g, '\n')
-        .replace(/\\r/g, '\r')
-        .replace(/\\t/g, '\t')
-        .replace(/\\0/g, '\0')
-        .replace(/\\x3c/gi, '<')
-        .replace(/\\x3e/gi, '>')
-        .replace(/\\x26/gi, '&')
-        .replace(/\\'/g, "'")
-        .replace(/\\"/g, '"')
-        .replace(/\\\\/g, '\\')
+      return text.replace(/\\(\\|'|"|n|r|t|0|x3c|x3e|x26)/gi, (match, sequence) => {
+        switch (sequence.toLowerCase()) {
+          case '\\': return '\\'
+          case "'": return "'"
+          case '"': return '"'
+          case 'n': return '\n'
+          case 'r': return '\r'
+          case 't': return '\t'
+          case '0': return '\0'
+          case 'x3c': return '<'
+          case 'x3e': return '>'
+          case 'x26': return '&'
+          default: return match
+        }
+      })
     }
 
     // HTML escape/unescape
