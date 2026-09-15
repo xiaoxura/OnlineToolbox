@@ -348,7 +348,15 @@ for (const tool of tools) {
   // lastmod should reflect when the page's content actually changed, otherwise a
   // rebuild that touches nothing still claims every URL changed and search
   // engines learn to ignore the signal.
-  const hash = createHash('sha256').update(html).digest('hex').slice(0, 16)
+  //
+  // The site URL is normalised out first: it is baked into every canonical and
+  // OG tag, so building the same content for a different domain (a preview
+  // deployment, or a local build without SITE_URL set) would otherwise look
+  // like a full-site content change and reset every lastmod.
+  const hash = createHash('sha256')
+    .update(html.split(siteUrl).join('{{SITE_URL}}'))
+    .digest('hex')
+    .slice(0, 16)
   const previous = manifest[tool.id]
   const lastmod = previous && previous.hash === hash ? previous.lastmod : today
   nextManifest[tool.id] = { hash, lastmod }

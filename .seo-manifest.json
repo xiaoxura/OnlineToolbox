@@ -1,630 +1,630 @@
 {
   "base64": {
-    "hash": "d05385d2c749bb76",
+    "hash": "6fdfa604eea9df65",
     "lastmod": "2026-09-15"
   },
   "url-encode": {
-    "hash": "54d8e41dd0fbf06e",
+    "hash": "a83313db3a27b122",
     "lastmod": "2026-09-15"
   },
   "html-entity": {
-    "hash": "134fd788d914e5e7",
+    "hash": "da620f2e4da7d748",
     "lastmod": "2026-09-15"
   },
   "unicode": {
-    "hash": "95a61e266f753fcd",
+    "hash": "2fd7bb184e13ffcb",
     "lastmod": "2026-09-15"
   },
   "hex": {
-    "hash": "1ca6b7d1798a0e05",
+    "hash": "08e0cea6c6da0607",
     "lastmod": "2026-09-15"
   },
   "jwt": {
-    "hash": "43f27b463017d411",
+    "hash": "afc55ebb90fa9bb9",
     "lastmod": "2026-09-15"
   },
   "base58": {
-    "hash": "e010daf4bb276320",
+    "hash": "69d61a3c072007d7",
     "lastmod": "2026-09-15"
   },
   "base32": {
-    "hash": "8e682a88c5a0b18f",
+    "hash": "b100c3246f327af6",
     "lastmod": "2026-09-15"
   },
   "punycode": {
-    "hash": "0e52380d43046bcb",
+    "hash": "1891f82aa82d63b4",
     "lastmod": "2026-09-15"
   },
   "data-url": {
-    "hash": "eda2c67a4f3ce390",
+    "hash": "83fae44ca5d3408e",
     "lastmod": "2026-09-15"
   },
   "morse-code": {
-    "hash": "00d94f8e9c3d662d",
+    "hash": "822118027cf35305",
     "lastmod": "2026-09-15"
   },
   "md5": {
-    "hash": "c848cda6dd8b864e",
+    "hash": "b24cfb4b933b9fbd",
     "lastmod": "2026-09-15"
   },
   "sha": {
-    "hash": "f7c28d6a07cbf853",
+    "hash": "0eb5b22706ab982e",
     "lastmod": "2026-09-15"
   },
   "aes": {
-    "hash": "6baa84fabead7fac",
+    "hash": "6ca02c6c2d185bcf",
     "lastmod": "2026-09-15"
   },
   "des": {
-    "hash": "ed667c94a42d198b",
+    "hash": "aa07c79a879bd4f5",
     "lastmod": "2026-09-15"
   },
   "file-hash": {
-    "hash": "b2f9ada215994b5a",
+    "hash": "2b12cec095ee61f1",
     "lastmod": "2026-09-15"
   },
   "hmac": {
-    "hash": "99c75226fb6016f0",
+    "hash": "6023b13f9ead0993",
     "lastmod": "2026-09-15"
   },
   "totp": {
-    "hash": "6dc44912d1e4ff2e",
+    "hash": "5e75c81fe63d4564",
     "lastmod": "2026-09-15"
   },
   "crc-calculator": {
-    "hash": "90951a6c115b1ae6",
+    "hash": "f2655f46f71a6675",
     "lastmod": "2026-09-15"
   },
   "jwt-sign": {
-    "hash": "ba1ad207cfa6680c",
+    "hash": "2ce59bb3514528df",
     "lastmod": "2026-09-15"
   },
   "key-pair-generator": {
-    "hash": "b75d30436ee761d6",
+    "hash": "89e4ae84922c88f2",
     "lastmod": "2026-09-15"
   },
   "bcrypt": {
-    "hash": "cdd17582e2a2b785",
+    "hash": "f43940da114754bb",
     "lastmod": "2026-09-15"
   },
   "password-strength": {
-    "hash": "62cbc77c04fd493b",
+    "hash": "7cd14f94bef6e2e7",
     "lastmod": "2026-09-15"
   },
   "classic-cipher": {
-    "hash": "42f81a3865dbf186",
+    "hash": "620d45e8e301e104",
     "lastmod": "2026-09-15"
   },
   "bip39": {
-    "hash": "951ca5f0b3030fd9",
+    "hash": "e2ecee4697485973",
     "lastmod": "2026-09-15"
   },
   "char-count": {
-    "hash": "10fb28aae2f21f54",
+    "hash": "3178a31bc7595740",
     "lastmod": "2026-09-15"
   },
   "text-diff": {
-    "hash": "29a0684b8ebee710",
+    "hash": "3307743e34e9eb39",
     "lastmod": "2026-09-15"
   },
   "case-convert": {
-    "hash": "674a0cd658f68ecc",
+    "hash": "00fe92b5d883f802",
     "lastmod": "2026-09-15"
   },
   "text-dedup": {
-    "hash": "27f0338a883b6238",
+    "hash": "d7179512aa737614",
     "lastmod": "2026-09-15"
   },
   "text-sort": {
-    "hash": "8995489148981dff",
+    "hash": "15d8384722903766",
     "lastmod": "2026-09-15"
   },
   "regex": {
-    "hash": "f9b8f8b9b059c3e1",
+    "hash": "0880c89a894d6362",
     "lastmod": "2026-09-15"
   },
   "text-replace": {
-    "hash": "2c1e3108a5881edd",
+    "hash": "29de056d89d106a0",
     "lastmod": "2026-09-15"
   },
   "escape": {
-    "hash": "18758dd5856f8edc",
+    "hash": "eb92a77419c2516b",
     "lastmod": "2026-09-15"
   },
   "markdown": {
-    "hash": "21fad587b78b91af",
+    "hash": "6e74fc59d431b480",
     "lastmod": "2026-09-15"
   },
   "set-operations": {
-    "hash": "213c069430f42217",
+    "hash": "0f08e29de6db990f",
     "lastmod": "2026-09-15"
   },
   "text-encrypt": {
-    "hash": "d82b6b93d0381e0e",
+    "hash": "63be99d8025d2d0a",
     "lastmod": "2026-09-15"
   },
   "slugify": {
-    "hash": "b78e71c7ebd00134",
+    "hash": "208d27c2c664fed9",
     "lastmod": "2026-09-15"
   },
   "line-endings": {
-    "hash": "5220325e30a9088e",
+    "hash": "8282efb06bd1f999",
     "lastmod": "2026-09-15"
   },
   "text-wrap": {
-    "hash": "978870e92c34351d",
+    "hash": "cf99fd7d491100fe",
     "lastmod": "2026-09-15"
   },
   "markdown-table": {
-    "hash": "196dae5214293dae",
+    "hash": "6fa1082ea4e0f24e",
     "lastmod": "2026-09-15"
   },
   "word-frequency": {
-    "hash": "dbc2d52dd4c3da81",
+    "hash": "5876136299c21817",
     "lastmod": "2026-09-15"
   },
   "text-extract": {
-    "hash": "b19983e5ee19e7fe",
+    "hash": "2a6036bd820c7697",
     "lastmod": "2026-09-15"
   },
   "hidden-chars": {
-    "hash": "1997d8a00f61b5fc",
+    "hash": "434b4f223b1bdc93",
     "lastmod": "2026-09-15"
   },
   "text-mask": {
-    "hash": "efb5120b2fa79a99",
+    "hash": "6018df4c29b8b377",
     "lastmod": "2026-09-15"
   },
   "list-tools": {
-    "hash": "b29033744e8a4601",
+    "hash": "5d7f3bc2c8d0e77b",
     "lastmod": "2026-09-15"
   },
   "uuid": {
-    "hash": "10216d8abf2d0c52",
+    "hash": "8b6450f4d0e9e63d",
     "lastmod": "2026-09-15"
   },
   "password": {
-    "hash": "fe17c2727669b508",
+    "hash": "67721a0d8bdc7939",
     "lastmod": "2026-09-15"
   },
   "random": {
-    "hash": "e223d65ad2f50b6a",
+    "hash": "fd71ad53c84e503a",
     "lastmod": "2026-09-15"
   },
   "lorem": {
-    "hash": "f9a9364188cdb0f9",
+    "hash": "51f762066bbc5825",
     "lastmod": "2026-09-15"
   },
   "qrcode": {
-    "hash": "814e0c1735f7d16a",
+    "hash": "d724b73f7f945151",
     "lastmod": "2026-09-15"
   },
   "placeholder-img": {
-    "hash": "5f7b298f26227586",
+    "hash": "4e68b8f73f203dae",
     "lastmod": "2026-09-15"
   },
   "gradient-gen": {
-    "hash": "4ec726370c2207fd",
+    "hash": "30e21ab75c3172f0",
     "lastmod": "2026-09-15"
   },
   "shadow-gen": {
-    "hash": "066d655eabc4c8ff",
+    "hash": "99a1282d6b5ea10a",
     "lastmod": "2026-09-15"
   },
   "palette-gen": {
-    "hash": "1cc9ecb553e8673f",
+    "hash": "d4c443055b32d76f",
     "lastmod": "2026-09-15"
   },
   "ulid": {
-    "hash": "9ac26dda02fcb341",
+    "hash": "bbbabd080670bf13",
     "lastmod": "2026-09-15"
   },
   "uuid-converter": {
-    "hash": "5817f2a76a9fa743",
+    "hash": "48de87a71cfd2eeb",
     "lastmod": "2026-09-15"
   },
   "barcode": {
-    "hash": "3f83d8450595a11c",
+    "hash": "3a05b5fdf3c99f34",
     "lastmod": "2026-09-15"
   },
   "wifi-qr": {
-    "hash": "e7434f2821fea5b6",
+    "hash": "99351c87e9ef5f66",
     "lastmod": "2026-09-15"
   },
   "timestamp": {
-    "hash": "8eedaa9b08c1d758",
+    "hash": "116ea794ceb2ae48",
     "lastmod": "2026-09-15"
   },
   "radix": {
-    "hash": "c4fc5f43ade81a24",
+    "hash": "ac344c84d62d6053",
     "lastmod": "2026-09-15"
   },
   "color": {
-    "hash": "81f0062662098c3e",
+    "hash": "4f3e822aa3e2e5cf",
     "lastmod": "2026-09-15"
   },
   "unit": {
-    "hash": "25d3c334da816180",
+    "hash": "55042b36a44a543a",
     "lastmod": "2026-09-15"
   },
   "json-yaml": {
-    "hash": "21d120d1aadcee5f",
+    "hash": "e761e61aa25ca667",
     "lastmod": "2026-09-15"
   },
   "codex-credential-converter": {
-    "hash": "9706701b4edfc734",
+    "hash": "47aa06323a84cc0e",
     "lastmod": "2026-09-15"
   },
   "toml-json": {
-    "hash": "26e0f6f18df0414c",
+    "hash": "c942359fd42114ed",
     "lastmod": "2026-09-15"
   },
   "json-xml": {
-    "hash": "d42dae9c3ca6bfc5",
+    "hash": "72ee5041f27ad612",
     "lastmod": "2026-09-15"
   },
   "json-csv": {
-    "hash": "d7b3a8ad787a2304",
+    "hash": "a04d3e0879bd43b7",
     "lastmod": "2026-09-15"
   },
   "csv-json": {
-    "hash": "e0e447c15ab27509",
+    "hash": "fc8856f7c6c0d323",
     "lastmod": "2026-09-15"
   },
   "json-path": {
-    "hash": "09160b7f9975c12b",
+    "hash": "b8041596010a1e33",
     "lastmod": "2026-09-15"
   },
   "md-to-html": {
-    "hash": "30d5d8694fa8691e",
+    "hash": "c0a7cf628ec56477",
     "lastmod": "2026-09-15"
   },
   "html-to-jsx": {
-    "hash": "84cf34abcac67a0a",
+    "hash": "3a19f89d7ae5a078",
     "lastmod": "2026-09-15"
   },
   "css-to-js": {
-    "hash": "dcad5b301a9a3e0e",
+    "hash": "133eeae99709513b",
     "lastmod": "2026-09-15"
   },
   "json-diff": {
-    "hash": "77463812041e8656",
+    "hash": "ac4fce327c1afc49",
     "lastmod": "2026-09-15"
   },
   "timezone": {
-    "hash": "c6b5a57d3146a7e9",
+    "hash": "e8d4072cc3dcc60b",
     "lastmod": "2026-09-15"
   },
   "date-calc": {
-    "hash": "da32b4459938669c",
+    "hash": "762c6ca25bb11a36",
     "lastmod": "2026-09-15"
   },
   "json-typescript": {
-    "hash": "7e382032a412fd24",
+    "hash": "f7f84b644adccdb7",
     "lastmod": "2026-09-15"
   },
   "amount-cn": {
-    "hash": "474af770a29966ed",
+    "hash": "13ef6941896e5145",
     "lastmod": "2026-09-15"
   },
   "regex-visual": {
-    "hash": "fa619c16b0013514",
+    "hash": "75f0a8efb8686bc3",
     "lastmod": "2026-09-15"
   },
   "html-to-markdown": {
-    "hash": "da7554ae05b772b1",
+    "hash": "ee1e839e905959d6",
     "lastmod": "2026-09-15"
   },
   "markdown-toc": {
-    "hash": "7ef53932965749fe",
+    "hash": "80a5e66744d6af7b",
     "lastmod": "2026-09-15"
   },
   "csv-toolbox": {
-    "hash": "854ef12679a94513",
+    "hash": "f1a67cf7f7396785",
     "lastmod": "2026-09-15"
   },
   "json-to-code": {
-    "hash": "3987617dd13e7be2",
+    "hash": "c2a9cb45adf11d1c",
     "lastmod": "2026-09-15"
   },
   "json-flatten": {
-    "hash": "ee780d5004c12d5f",
+    "hash": "e657414b0463a45f",
     "lastmod": "2026-09-15"
   },
   "json-sort": {
-    "hash": "cd760c421746edc4",
+    "hash": "bb396583c8745b57",
     "lastmod": "2026-09-15"
   },
   "objectid": {
-    "hash": "192e77a9f056fd09",
+    "hash": "7aa32e8b534a78c7",
     "lastmod": "2026-09-15"
   },
   "number-to-words": {
-    "hash": "550bcdfcf208d14c",
+    "hash": "0a6ee7d8a548ba17",
     "lastmod": "2026-09-15"
   },
   "lunar-calendar": {
-    "hash": "97fecb973e9c3c43",
+    "hash": "cc2ed99eb38003fd",
     "lastmod": "2026-09-15"
   },
   "ieee754": {
-    "hash": "487de89663050352",
+    "hash": "7a86de47b1fb6023",
     "lastmod": "2026-09-15"
   },
   "json-lines": {
-    "hash": "3e8b02c9c933cac6",
+    "hash": "f221ce5857b7cccf",
     "lastmod": "2026-09-15"
   },
   "json-pointer": {
-    "hash": "162db87e356e8f0f",
+    "hash": "aebd1917b7b1f6a7",
     "lastmod": "2026-09-15"
   },
   "json-patch": {
-    "hash": "f709b4d4ab3e5e60",
+    "hash": "0da98c41f2788325",
     "lastmod": "2026-09-15"
   },
   "duration-converter": {
-    "hash": "d1d9801d8eefe845",
+    "hash": "61fb9023fec71e6f",
     "lastmod": "2026-09-15"
   },
   "number-format": {
-    "hash": "2241265d1ba28445",
+    "hash": "a473e174c93053c6",
     "lastmod": "2026-09-15"
   },
   "json": {
-    "hash": "15b65612460d302a",
+    "hash": "c440a9f284a78c9a",
     "lastmod": "2026-09-15"
   },
   "css": {
-    "hash": "e9c73330d67a9793",
+    "hash": "1077921b1b9fb74b",
     "lastmod": "2026-09-15"
   },
   "html": {
-    "hash": "054a2e52de80f467",
+    "hash": "8cd540cf506f7aa1",
     "lastmod": "2026-09-15"
   },
   "sql": {
-    "hash": "692a508f763882c9",
+    "hash": "615e48cdd257ce4a",
     "lastmod": "2026-09-15"
   },
   "xml": {
-    "hash": "e82d13036b59c710",
+    "hash": "167a1ce477ea6705",
     "lastmod": "2026-09-15"
   },
   "cron": {
-    "hash": "fd7b0db36060eec8",
+    "hash": "4a6e5e3747d6a79b",
     "lastmod": "2026-09-15"
   },
   "http-status": {
-    "hash": "500281669f891188",
+    "hash": "3cbdcf5db03dadad",
     "lastmod": "2026-09-15"
   },
   "user-agent": {
-    "hash": "c7d30caa98891666",
+    "hash": "b8d9debdc9a6b28c",
     "lastmod": "2026-09-15"
   },
   "regex-ref": {
-    "hash": "6a6112d5f732c900",
+    "hash": "a64490be686fcd4b",
     "lastmod": "2026-09-15"
   },
   "css-unit": {
-    "hash": "87b339de2925f3fa",
+    "hash": "875d779214ddf74a",
     "lastmod": "2026-09-15"
   },
   "json-schema": {
-    "hash": "8aed1fb2c8a39a8a",
+    "hash": "48733ce92331870d",
     "lastmod": "2026-09-15"
   },
   "mock-data": {
-    "hash": "d3afdbf6fb05fb84",
+    "hash": "8f6853f05d8de181",
     "lastmod": "2026-09-15"
   },
   "git-ref": {
-    "hash": "f2c489c43d1df15b",
+    "hash": "e9b0655ecb3a9a95",
     "lastmod": "2026-09-15"
   },
   "linux-ref": {
-    "hash": "c0e13b561c2dff07",
+    "hash": "d1237189de846422",
     "lastmod": "2026-09-15"
   },
   "id-card": {
-    "hash": "0148b809de0e5033",
+    "hash": "de26b61097dd1aa6",
     "lastmod": "2026-09-15"
   },
   "bank-card": {
-    "hash": "5645ea1cd7da53a4",
+    "hash": "7288627cecffc949",
     "lastmod": "2026-09-15"
   },
   "credit-code": {
-    "hash": "c2eed76e252d90a9",
+    "hash": "0d616b9331271653",
     "lastmod": "2026-09-15"
   },
   "chmod-calculator": {
-    "hash": "be12f487911c3332",
+    "hash": "c1567e5b4eb3a253",
     "lastmod": "2026-09-15"
   },
   "sql-in": {
-    "hash": "32147526fbe9889d",
+    "hash": "1cf97ed68a5ca289",
     "lastmod": "2026-09-15"
   },
   "format-check": {
-    "hash": "a2715e626e66b413",
+    "hash": "a86dd1ca83cd871a",
     "lastmod": "2026-09-15"
   },
   "color-contrast": {
-    "hash": "b8932bef4117359b",
+    "hash": "373b965a2bac97e4",
     "lastmod": "2026-09-15"
   },
   "semver": {
-    "hash": "b4be297e3bb4ca72",
+    "hash": "42d8f1633186fc1f",
     "lastmod": "2026-09-15"
   },
   "mime-types": {
-    "hash": "ff779fe93156d7b3",
+    "hash": "5e957c56e9477d48",
     "lastmod": "2026-09-15"
   },
   "env-json": {
-    "hash": "c2830639bc614c4b",
+    "hash": "235222c7eb5a7632",
     "lastmod": "2026-09-15"
   },
   "properties-json": {
-    "hash": "c01379207615ce30",
+    "hash": "596449cd14dd033e",
     "lastmod": "2026-09-15"
   },
   "db-connection-string": {
-    "hash": "7b7849f74e1186af",
+    "hash": "7da8b8155dbcfb74",
     "lastmod": "2026-09-15"
   },
   "htpasswd-generator": {
-    "hash": "85e8da83101d5b98",
+    "hash": "c24be559ad76a745",
     "lastmod": "2026-09-15"
   },
   "iban-validator": {
-    "hash": "26e4d01855cabf39",
+    "hash": "96d60a611fd9eb54",
     "lastmod": "2026-09-15"
   },
   "docker-compose-converter": {
-    "hash": "5077cd11b3490585",
+    "hash": "f4e310b3b6632f94",
     "lastmod": "2026-09-15"
   },
   "gitignore-generator": {
-    "hash": "3fc85a1b9ae0f286",
+    "hash": "32d1ec37db4c04c2",
     "lastmod": "2026-09-15"
   },
   "cron-builder": {
-    "hash": "91cfa99594a9903b",
+    "hash": "9323e750f86462fc",
     "lastmod": "2026-09-15"
   },
   "csp-generator": {
-    "hash": "ce290a86cc950d67",
+    "hash": "fe1091e4d315ba1c",
     "lastmod": "2026-09-15"
   },
   "xpath-tester": {
-    "hash": "05c038d0547e7947",
+    "hash": "5a4dd94fd898257b",
     "lastmod": "2026-09-15"
   },
   "image-compress": {
-    "hash": "682b4e36afdb1188",
+    "hash": "cf0e8d36393481e7",
     "lastmod": "2026-09-15"
   },
   "img-to-base64": {
-    "hash": "2a91561cf4610c9d",
+    "hash": "d1857665f80279f7",
     "lastmod": "2026-09-15"
   },
   "svg-compress": {
-    "hash": "83b68fe50d1d562c",
+    "hash": "33027ab8adb360eb",
     "lastmod": "2026-09-15"
   },
   "favicon-generator": {
-    "hash": "d82e33a50729f707",
+    "hash": "6ce19f1c2a9ca9cf",
     "lastmod": "2026-09-15"
   },
   "exif": {
-    "hash": "71501dcc54006ba3",
+    "hash": "271ce292f06c3135",
     "lastmod": "2026-09-15"
   },
   "ip-info": {
-    "hash": "8c432139e65aab2e",
+    "hash": "b8d99ab5517e7580",
     "lastmod": "2026-09-15"
   },
   "port-check": {
-    "hash": "5e9ab492280a9647",
+    "hash": "04fbed10e77cdf92",
     "lastmod": "2026-09-15"
   },
   "url-parser": {
-    "hash": "6146c8fbf69c262c",
+    "hash": "b696b5b42e5a3d1d",
     "lastmod": "2026-09-15"
   },
   "header-parse": {
-    "hash": "290c392248e119fb",
+    "hash": "090992e0a88bc080",
     "lastmod": "2026-09-15"
   },
   "cidr-calculator": {
-    "hash": "5a795493462e82f9",
+    "hash": "28de98b93c36c27e",
     "lastmod": "2026-09-15"
   },
   "ipv6-calculator": {
-    "hash": "0ef55539d1c1a314",
+    "hash": "5e77a586a6fcce8a",
     "lastmod": "2026-09-15"
   },
   "curl-generator": {
-    "hash": "ee055d881968a59a",
+    "hash": "bcafb2738ae204bb",
     "lastmod": "2026-09-15"
   },
   "url-params": {
-    "hash": "e65d7761e6307259",
+    "hash": "46c6a3dc238c928d",
     "lastmod": "2026-09-15"
   },
   "cookie-viewer": {
-    "hash": "c95326bcda4974cd",
+    "hash": "76596a33627991b3",
     "lastmod": "2026-09-15"
   },
   "query-string": {
-    "hash": "a5df7a79c6a4bee0",
+    "hash": "7e5d96919d2901ca",
     "lastmod": "2026-09-15"
   },
   "url-defang": {
-    "hash": "d468327ebef72dd7",
+    "hash": "07d0f6c1528b3b8d",
     "lastmod": "2026-09-15"
   },
   "utm-builder": {
-    "hash": "4a10c8424ce369c9",
+    "hash": "78c215c9142b24ae",
     "lastmod": "2026-09-15"
   },
   "calculator": {
-    "hash": "33f07ceafff06e2b",
+    "hash": "c52dada06e107613",
     "lastmod": "2026-09-15"
   },
   "big-number": {
-    "hash": "99165b674d9239ef",
+    "hash": "e5c8d5b46b528cc9",
     "lastmod": "2026-09-15"
   },
   "percentage": {
-    "hash": "bd6cc8625d0149c6",
+    "hash": "3fc9fbbc38799de3",
     "lastmod": "2026-09-15"
   },
   "statistics": {
-    "hash": "d7d79aac60dd3ea8",
+    "hash": "1d66bde02f220949",
     "lastmod": "2026-09-15"
   },
   "token-counter": {
-    "hash": "db3dc7aea2da80e2",
+    "hash": "d9a38c767e2d7382",
     "lastmod": "2026-09-15"
   },
   "llm-cost": {
-    "hash": "f01128d9e7e8bcf6",
+    "hash": "698af73a6a8d324e",
     "lastmod": "2026-09-15"
   },
   "llm-models": {
-    "hash": "0358a930eebf2a45",
+    "hash": "083fc199642d00a8",
     "lastmod": "2026-09-15"
   },
   "prompt-template": {
-    "hash": "cf53b2c3a7f60d00",
+    "hash": "246375df06a58f65",
     "lastmod": "2026-09-15"
   },
   "chat-builder": {
-    "hash": "ff24116c54e6465e",
+    "hash": "5f89b7d9bec14fc1",
     "lastmod": "2026-09-15"
   },
   "message-convert": {
-    "hash": "cd46ebc623eb8108",
+    "hash": "82cde55b894de39d",
     "lastmod": "2026-09-15"
   },
   "tool-schema": {
-    "hash": "8ccf5987faba2c46",
+    "hash": "550d5337dd1fb0f0",
     "lastmod": "2026-09-15"
   },
   "llm-json-repair": {
-    "hash": "100c16036a418161",
+    "hash": "153e91150497d512",
     "lastmod": "2026-09-15"
   },
   "text-chunker": {
-    "hash": "af7457df13ec5a35",
+    "hash": "1af4d13ce9bede9b",
     "lastmod": "2026-09-15"
   },
   "vector-similarity": {
-    "hash": "8f1f8184fcab6e6c",
+    "hash": "07bc5e8ef28e40cd",
     "lastmod": "2026-09-15"
   }
 }
