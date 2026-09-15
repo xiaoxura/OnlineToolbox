@@ -1,0 +1,630 @@
+{
+  "base64": {
+    "hash": "d05385d2c749bb76",
+    "lastmod": "2026-09-15"
+  },
+  "url-encode": {
+    "hash": "54d8e41dd0fbf06e",
+    "lastmod": "2026-09-15"
+  },
+  "html-entity": {
+    "hash": "134fd788d914e5e7",
+    "lastmod": "2026-09-15"
+  },
+  "unicode": {
+    "hash": "95a61e266f753fcd",
+    "lastmod": "2026-09-15"
+  },
+  "hex": {
+    "hash": "1ca6b7d1798a0e05",
+    "lastmod": "2026-09-15"
+  },
+  "jwt": {
+    "hash": "43f27b463017d411",
+    "lastmod": "2026-09-15"
+  },
+  "base58": {
+    "hash": "e010daf4bb276320",
+    "lastmod": "2026-09-15"
+  },
+  "base32": {
+    "hash": "8e682a88c5a0b18f",
+    "lastmod": "2026-09-15"
+  },
+  "punycode": {
+    "hash": "0e52380d43046bcb",
+    "lastmod": "2026-09-15"
+  },
+  "data-url": {
+    "hash": "eda2c67a4f3ce390",
+    "lastmod": "2026-09-15"
+  },
+  "morse-code": {
+    "hash": "00d94f8e9c3d662d",
+    "lastmod": "2026-09-15"
+  },
+  "md5": {
+    "hash": "c848cda6dd8b864e",
+    "lastmod": "2026-09-15"
+  },
+  "sha": {
+    "hash": "f7c28d6a07cbf853",
+    "lastmod": "2026-09-15"
+  },
+  "aes": {
+    "hash": "6baa84fabead7fac",
+    "lastmod": "2026-09-15"
+  },
+  "des": {
+    "hash": "ed667c94a42d198b",
+    "lastmod": "2026-09-15"
+  },
+  "file-hash": {
+    "hash": "b2f9ada215994b5a",
+    "lastmod": "2026-09-15"
+  },
+  "hmac": {
+    "hash": "99c75226fb6016f0",
+    "lastmod": "2026-09-15"
+  },
+  "totp": {
+    "hash": "6dc44912d1e4ff2e",
+    "lastmod": "2026-09-15"
+  },
+  "crc-calculator": {
+    "hash": "90951a6c115b1ae6",
+    "lastmod": "2026-09-15"
+  },
+  "jwt-sign": {
+    "hash": "ba1ad207cfa6680c",
+    "lastmod": "2026-09-15"
+  },
+  "key-pair-generator": {
+    "hash": "b75d30436ee761d6",
+    "lastmod": "2026-09-15"
+  },
+  "bcrypt": {
+    "hash": "cdd17582e2a2b785",
+    "lastmod": "2026-09-15"
+  },
+  "password-strength": {
+    "hash": "62cbc77c04fd493b",
+    "lastmod": "2026-09-15"
+  },
+  "classic-cipher": {
+    "hash": "42f81a3865dbf186",
+    "lastmod": "2026-09-15"
+  },
+  "bip39": {
+    "hash": "951ca5f0b3030fd9",
+    "lastmod": "2026-09-15"
+  },
+  "char-count": {
+    "hash": "10fb28aae2f21f54",
+    "lastmod": "2026-09-15"
+  },
+  "text-diff": {
+    "hash": "29a0684b8ebee710",
+    "lastmod": "2026-09-15"
+  },
+  "case-convert": {
+    "hash": "674a0cd658f68ecc",
+    "lastmod": "2026-09-15"
+  },
+  "text-dedup": {
+    "hash": "27f0338a883b6238",
+    "lastmod": "2026-09-15"
+  },
+  "text-sort": {
+    "hash": "8995489148981dff",
+    "lastmod": "2026-09-15"
+  },
+  "regex": {
+    "hash": "f9b8f8b9b059c3e1",
+    "lastmod": "2026-09-15"
+  },
+  "text-replace": {
+    "hash": "2c1e3108a5881edd",
+    "lastmod": "2026-09-15"
+  },
+  "escape": {
+    "hash": "18758dd5856f8edc",
+    "lastmod": "2026-09-15"
+  },
+  "markdown": {
+    "hash": "21fad587b78b91af",
+    "lastmod": "2026-09-15"
+  },
+  "set-operations": {
+    "hash": "213c069430f42217",
+    "lastmod": "2026-09-15"
+  },
+  "text-encrypt": {
+    "hash": "d82b6b93d0381e0e",
+    "lastmod": "2026-09-15"
+  },
+  "slugify": {
+    "hash": "b78e71c7ebd00134",
+    "lastmod": "2026-09-15"
+  },
+  "line-endings": {
+    "hash": "5220325e30a9088e",
+    "lastmod": "2026-09-15"
+  },
+  "text-wrap": {
+    "hash": "978870e92c34351d",
+    "lastmod": "2026-09-15"
+  },
+  "markdown-table": {
+    "hash": "196dae5214293dae",
+    "lastmod": "2026-09-15"
+  },
+  "word-frequency": {
+    "hash": "dbc2d52dd4c3da81",
+    "lastmod": "2026-09-15"
+  },
+  "text-extract": {
+    "hash": "b19983e5ee19e7fe",
+    "lastmod": "2026-09-15"
+  },
+  "hidden-chars": {
+    "hash": "1997d8a00f61b5fc",
+    "lastmod": "2026-09-15"
+  },
+  "text-mask": {
+    "hash": "efb5120b2fa79a99",
+    "lastmod": "2026-09-15"
+  },
+  "list-tools": {
+    "hash": "b29033744e8a4601",
+    "lastmod": "2026-09-15"
+  },
+  "uuid": {
+    "hash": "10216d8abf2d0c52",
+    "lastmod": "2026-09-15"
+  },
+  "password": {
+    "hash": "fe17c2727669b508",
+    "lastmod": "2026-09-15"
+  },
+  "random": {
+    "hash": "e223d65ad2f50b6a",
+    "lastmod": "2026-09-15"
+  },
+  "lorem": {
+    "hash": "f9a9364188cdb0f9",
+    "lastmod": "2026-09-15"
+  },
+  "qrcode": {
+    "hash": "814e0c1735f7d16a",
+    "lastmod": "2026-09-15"
+  },
+  "placeholder-img": {
+    "hash": "5f7b298f26227586",
+    "lastmod": "2026-09-15"
+  },
+  "gradient-gen": {
+    "hash": "4ec726370c2207fd",
+    "lastmod": "2026-09-15"
+  },
+  "shadow-gen": {
+    "hash": "066d655eabc4c8ff",
+    "lastmod": "2026-09-15"
+  },
+  "palette-gen": {
+    "hash": "1cc9ecb553e8673f",
+    "lastmod": "2026-09-15"
+  },
+  "ulid": {
+    "hash": "9ac26dda02fcb341",
+    "lastmod": "2026-09-15"
+  },
+  "uuid-converter": {
+    "hash": "5817f2a76a9fa743",
+    "lastmod": "2026-09-15"
+  },
+  "barcode": {
+    "hash": "3f83d8450595a11c",
+    "lastmod": "2026-09-15"
+  },
+  "wifi-qr": {
+    "hash": "e7434f2821fea5b6",
+    "lastmod": "2026-09-15"
+  },
+  "timestamp": {
+    "hash": "8eedaa9b08c1d758",
+    "lastmod": "2026-09-15"
+  },
+  "radix": {
+    "hash": "c4fc5f43ade81a24",
+    "lastmod": "2026-09-15"
+  },
+  "color": {
+    "hash": "81f0062662098c3e",
+    "lastmod": "2026-09-15"
+  },
+  "unit": {
+    "hash": "25d3c334da816180",
+    "lastmod": "2026-09-15"
+  },
+  "json-yaml": {
+    "hash": "21d120d1aadcee5f",
+    "lastmod": "2026-09-15"
+  },
+  "codex-credential-converter": {
+    "hash": "9706701b4edfc734",
+    "lastmod": "2026-09-15"
+  },
+  "toml-json": {
+    "hash": "26e0f6f18df0414c",
+    "lastmod": "2026-09-15"
+  },
+  "json-xml": {
+    "hash": "d42dae9c3ca6bfc5",
+    "lastmod": "2026-09-15"
+  },
+  "json-csv": {
+    "hash": "d7b3a8ad787a2304",
+    "lastmod": "2026-09-15"
+  },
+  "csv-json": {
+    "hash": "e0e447c15ab27509",
+    "lastmod": "2026-09-15"
+  },
+  "json-path": {
+    "hash": "09160b7f9975c12b",
+    "lastmod": "2026-09-15"
+  },
+  "md-to-html": {
+    "hash": "30d5d8694fa8691e",
+    "lastmod": "2026-09-15"
+  },
+  "html-to-jsx": {
+    "hash": "84cf34abcac67a0a",
+    "lastmod": "2026-09-15"
+  },
+  "css-to-js": {
+    "hash": "dcad5b301a9a3e0e",
+    "lastmod": "2026-09-15"
+  },
+  "json-diff": {
+    "hash": "77463812041e8656",
+    "lastmod": "2026-09-15"
+  },
+  "timezone": {
+    "hash": "c6b5a57d3146a7e9",
+    "lastmod": "2026-09-15"
+  },
+  "date-calc": {
+    "hash": "da32b4459938669c",
+    "lastmod": "2026-09-15"
+  },
+  "json-typescript": {
+    "hash": "7e382032a412fd24",
+    "lastmod": "2026-09-15"
+  },
+  "amount-cn": {
+    "hash": "474af770a29966ed",
+    "lastmod": "2026-09-15"
+  },
+  "regex-visual": {
+    "hash": "fa619c16b0013514",
+    "lastmod": "2026-09-15"
+  },
+  "html-to-markdown": {
+    "hash": "da7554ae05b772b1",
+    "lastmod": "2026-09-15"
+  },
+  "markdown-toc": {
+    "hash": "7ef53932965749fe",
+    "lastmod": "2026-09-15"
+  },
+  "csv-toolbox": {
+    "hash": "854ef12679a94513",
+    "lastmod": "2026-09-15"
+  },
+  "json-to-code": {
+    "hash": "3987617dd13e7be2",
+    "lastmod": "2026-09-15"
+  },
+  "json-flatten": {
+    "hash": "ee780d5004c12d5f",
+    "lastmod": "2026-09-15"
+  },
+  "json-sort": {
+    "hash": "cd760c421746edc4",
+    "lastmod": "2026-09-15"
+  },
+  "objectid": {
+    "hash": "192e77a9f056fd09",
+    "lastmod": "2026-09-15"
+  },
+  "number-to-words": {
+    "hash": "550bcdfcf208d14c",
+    "lastmod": "2026-09-15"
+  },
+  "lunar-calendar": {
+    "hash": "97fecb973e9c3c43",
+    "lastmod": "2026-09-15"
+  },
+  "ieee754": {
+    "hash": "487de89663050352",
+    "lastmod": "2026-09-15"
+  },
+  "json-lines": {
+    "hash": "3e8b02c9c933cac6",
+    "lastmod": "2026-09-15"
+  },
+  "json-pointer": {
+    "hash": "162db87e356e8f0f",
+    "lastmod": "2026-09-15"
+  },
+  "json-patch": {
+    "hash": "f709b4d4ab3e5e60",
+    "lastmod": "2026-09-15"
+  },
+  "duration-converter": {
+    "hash": "d1d9801d8eefe845",
+    "lastmod": "2026-09-15"
+  },
+  "number-format": {
+    "hash": "2241265d1ba28445",
+    "lastmod": "2026-09-15"
+  },
+  "json": {
+    "hash": "15b65612460d302a",
+    "lastmod": "2026-09-15"
+  },
+  "css": {
+    "hash": "e9c73330d67a9793",
+    "lastmod": "2026-09-15"
+  },
+  "html": {
+    "hash": "054a2e52de80f467",
+    "lastmod": "2026-09-15"
+  },
+  "sql": {
+    "hash": "692a508f763882c9",
+    "lastmod": "2026-09-15"
+  },
+  "xml": {
+    "hash": "e82d13036b59c710",
+    "lastmod": "2026-09-15"
+  },
+  "cron": {
+    "hash": "fd7b0db36060eec8",
+    "lastmod": "2026-09-15"
+  },
+  "http-status": {
+    "hash": "500281669f891188",
+    "lastmod": "2026-09-15"
+  },
+  "user-agent": {
+    "hash": "c7d30caa98891666",
+    "lastmod": "2026-09-15"
+  },
+  "regex-ref": {
+    "hash": "6a6112d5f732c900",
+    "lastmod": "2026-09-15"
+  },
+  "css-unit": {
+    "hash": "87b339de2925f3fa",
+    "lastmod": "2026-09-15"
+  },
+  "json-schema": {
+    "hash": "8aed1fb2c8a39a8a",
+    "lastmod": "2026-09-15"
+  },
+  "mock-data": {
+    "hash": "d3afdbf6fb05fb84",
+    "lastmod": "2026-09-15"
+  },
+  "git-ref": {
+    "hash": "f2c489c43d1df15b",
+    "lastmod": "2026-09-15"
+  },
+  "linux-ref": {
+    "hash": "c0e13b561c2dff07",
+    "lastmod": "2026-09-15"
+  },
+  "id-card": {
+    "hash": "0148b809de0e5033",
+    "lastmod": "2026-09-15"
+  },
+  "bank-card": {
+    "hash": "5645ea1cd7da53a4",
+    "lastmod": "2026-09-15"
+  },
+  "credit-code": {
+    "hash": "c2eed76e252d90a9",
+    "lastmod": "2026-09-15"
+  },
+  "chmod-calculator": {
+    "hash": "be12f487911c3332",
+    "lastmod": "2026-09-15"
+  },
+  "sql-in": {
+    "hash": "32147526fbe9889d",
+    "lastmod": "2026-09-15"
+  },
+  "format-check": {
+    "hash": "a2715e626e66b413",
+    "lastmod": "2026-09-15"
+  },
+  "color-contrast": {
+    "hash": "b8932bef4117359b",
+    "lastmod": "2026-09-15"
+  },
+  "semver": {
+    "hash": "b4be297e3bb4ca72",
+    "lastmod": "2026-09-15"
+  },
+  "mime-types": {
+    "hash": "ff779fe93156d7b3",
+    "lastmod": "2026-09-15"
+  },
+  "env-json": {
+    "hash": "c2830639bc614c4b",
+    "lastmod": "2026-09-15"
+  },
+  "properties-json": {
+    "hash": "c01379207615ce30",
+    "lastmod": "2026-09-15"
+  },
+  "db-connection-string": {
+    "hash": "7b7849f74e1186af",
+    "lastmod": "2026-09-15"
+  },
+  "htpasswd-generator": {
+    "hash": "85e8da83101d5b98",
+    "lastmod": "2026-09-15"
+  },
+  "iban-validator": {
+    "hash": "26e4d01855cabf39",
+    "lastmod": "2026-09-15"
+  },
+  "docker-compose-converter": {
+    "hash": "5077cd11b3490585",
+    "lastmod": "2026-09-15"
+  },
+  "gitignore-generator": {
+    "hash": "3fc85a1b9ae0f286",
+    "lastmod": "2026-09-15"
+  },
+  "cron-builder": {
+    "hash": "91cfa99594a9903b",
+    "lastmod": "2026-09-15"
+  },
+  "csp-generator": {
+    "hash": "ce290a86cc950d67",
+    "lastmod": "2026-09-15"
+  },
+  "xpath-tester": {
+    "hash": "05c038d0547e7947",
+    "lastmod": "2026-09-15"
+  },
+  "image-compress": {
+    "hash": "682b4e36afdb1188",
+    "lastmod": "2026-09-15"
+  },
+  "img-to-base64": {
+    "hash": "2a91561cf4610c9d",
+    "lastmod": "2026-09-15"
+  },
+  "svg-compress": {
+    "hash": "83b68fe50d1d562c",
+    "lastmod": "2026-09-15"
+  },
+  "favicon-generator": {
+    "hash": "d82e33a50729f707",
+    "lastmod": "2026-09-15"
+  },
+  "exif": {
+    "hash": "71501dcc54006ba3",
+    "lastmod": "2026-09-15"
+  },
+  "ip-info": {
+    "hash": "8c432139e65aab2e",
+    "lastmod": "2026-09-15"
+  },
+  "port-check": {
+    "hash": "5e9ab492280a9647",
+    "lastmod": "2026-09-15"
+  },
+  "url-parser": {
+    "hash": "6146c8fbf69c262c",
+    "lastmod": "2026-09-15"
+  },
+  "header-parse": {
+    "hash": "290c392248e119fb",
+    "lastmod": "2026-09-15"
+  },
+  "cidr-calculator": {
+    "hash": "5a795493462e82f9",
+    "lastmod": "2026-09-15"
+  },
+  "ipv6-calculator": {
+    "hash": "0ef55539d1c1a314",
+    "lastmod": "2026-09-15"
+  },
+  "curl-generator": {
+    "hash": "ee055d881968a59a",
+    "lastmod": "2026-09-15"
+  },
+  "url-params": {
+    "hash": "e65d7761e6307259",
+    "lastmod": "2026-09-15"
+  },
+  "cookie-viewer": {
+    "hash": "c95326bcda4974cd",
+    "lastmod": "2026-09-15"
+  },
+  "query-string": {
+    "hash": "a5df7a79c6a4bee0",
+    "lastmod": "2026-09-15"
+  },
+  "url-defang": {
+    "hash": "d468327ebef72dd7",
+    "lastmod": "2026-09-15"
+  },
+  "utm-builder": {
+    "hash": "4a10c8424ce369c9",
+    "lastmod": "2026-09-15"
+  },
+  "calculator": {
+    "hash": "33f07ceafff06e2b",
+    "lastmod": "2026-09-15"
+  },
+  "big-number": {
+    "hash": "99165b674d9239ef",
+    "lastmod": "2026-09-15"
+  },
+  "percentage": {
+    "hash": "bd6cc8625d0149c6",
+    "lastmod": "2026-09-15"
+  },
+  "statistics": {
+    "hash": "d7d79aac60dd3ea8",
+    "lastmod": "2026-09-15"
+  },
+  "token-counter": {
+    "hash": "db3dc7aea2da80e2",
+    "lastmod": "2026-09-15"
+  },
+  "llm-cost": {
+    "hash": "f01128d9e7e8bcf6",
+    "lastmod": "2026-09-15"
+  },
+  "llm-models": {
+    "hash": "0358a930eebf2a45",
+    "lastmod": "2026-09-15"
+  },
+  "prompt-template": {
+    "hash": "cf53b2c3a7f60d00",
+    "lastmod": "2026-09-15"
+  },
+  "chat-builder": {
+    "hash": "ff24116c54e6465e",
+    "lastmod": "2026-09-15"
+  },
+  "message-convert": {
+    "hash": "cd46ebc623eb8108",
+    "lastmod": "2026-09-15"
+  },
+  "tool-schema": {
+    "hash": "8ccf5987faba2c46",
+    "lastmod": "2026-09-15"
+  },
+  "llm-json-repair": {
+    "hash": "100c16036a418161",
+    "lastmod": "2026-09-15"
+  },
+  "text-chunker": {
+    "hash": "af7457df13ec5a35",
+    "lastmod": "2026-09-15"
+  },
+  "vector-similarity": {
+    "hash": "8f1f8184fcab6e6c",
+    "lastmod": "2026-09-15"
+  }
+}

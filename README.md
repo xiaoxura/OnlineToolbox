@@ -76,8 +76,11 @@ npm run build
 构建产物输出到 `dist/`。除 Vite 应用资源外，构建脚本还会生成：
 
 - `dist/tools/{tool-id}/index.html`：157 个工具的独立 SEO 落地页
+- `dist/tools/{tool-id}/og.png`：每个工具的社交分享卡片（1200×630）
+- `dist/og.png`：首页分享卡片
 - `dist/sitemap.xml`：首页及全部工具页的网站地图
-- `dist/robots.txt`：爬虫规则和网站地图地址
+- `dist/robots.txt`：爬虫规则、AI 爬虫策略和网站地图地址
+- `dist/llms.txt` / `dist/llms-full.txt`：供生成式 AI 引擎读取的工具索引
 
 默认站点地址为 `https://xiaoxura.github.io/OnlineToolbox/`。部署到其他域名时，请通过 `SITE_URL` 传入包含部署子路径的完整公开地址：
 
@@ -98,6 +101,24 @@ npm run check       # 依次执行 lint、测试和生产构建
 ```
 
 测试覆盖工具注册表、全部 157 个工具的渲染冒烟测试、表单可访问名称、核心工具行为、Markdown XSS 防护、路由懒加载和主题偏好持久化。
+
+## 🔍 SEO 与 GEO
+
+站点同时面向传统搜索引擎（SEO）和生成式 AI 引擎（GEO，即让 ChatGPT、Perplexity、AI Overviews 等能够检索并引用本站内容）做了优化。
+
+**落地页内容由实现推导，而非手写。** 构建时会在 jsdom 中真实渲染每一个工具，读取它自己的区块标题、输入标签、按钮文案、下拉选项与开关（`scripts/tool-facts.mjs`），据此生成该工具的用途说明、使用步骤、可配置选项表和常见问题。所以：
+
+- 页面描述的是真实实现，不是模板复读——每个工具的分隔符选项、按钮名称、输出区块都来自代码本身。
+- 给工具加一个选项，它的落地页会在下次构建时自动更新，不会和实现脱节。
+- 「是否需要联网」不是写死的文案：构建脚本会扫描工具源码中的 `fetch` / `XMLHttpRequest` / `sendBeacon`，只有确实发起请求的工具才会出现联网提示（当前仅「IP 地址信息查询」）。
+
+**结构化数据**：每个工具页输出 `SoftwareApplication`、`BreadcrumbList` 和 `FAQPage` 三段 JSON-LD；首页输出 `WebSite`（含 `SearchAction`）、`ItemList` 和 `FAQPage`。工具页之间通过「同类工具」相互链接，避免出现孤立页面。
+
+**`llms.txt` 与 `llms-full.txt`**：`llms.txt` 是按分类组织的全量工具索引，`llms-full.txt` 额外包含每个工具的用途、输入输出、选项与联网说明。两者都在构建时生成。
+
+**`sitemap.xml` 的 `lastmod` 与内容挂钩**：构建脚本对每个落地页取内容哈希并记录在 `.seo-manifest.json`（需提交到仓库）。只有页面内容真正变化时才更新该页的 `lastmod`，未变化的页面保持原值——否则每次构建都宣称全站更新，搜索引擎会逐渐忽略这个信号。
+
+**爬虫策略**：`robots.txt` 显式放行 GPTBot、ClaudeBot、PerplexityBot、Google-Extended 等 AI 爬虫。本站的目标是被检索和引用，因此不屏蔽生成式引擎。
 
 ## 🔒 隐私与联网说明
 
@@ -152,8 +173,12 @@ OnlineToolbox/
 ├── public/
 │   ├── favicon.svg               # 网站图标
 │   └── site.webmanifest          # Web App Manifest
+├── .seo-manifest.json            # 各落地页内容哈希与 lastmod，供增量更新判断
 ├── scripts/
-│   └── generate-seo-pages.mjs    # SEO 页面、sitemap、robots 生成脚本
+│   ├── generate-seo-pages.mjs    # 落地页、OG 卡片、sitemap、robots、llms.txt 生成
+│   ├── tool-facts.mjs            # 在 jsdom 中渲染每个工具并提取其 UI 事实
+│   ├── og-image.mjs              # 零依赖 PNG 编码器，生成分享卡片
+│   └── css-stub.mjs              # Node 加载器钩子，使工具模块的 CSS 导入可被忽略
 ├── tests/                        # 注册表、冒烟、安全、路由及核心行为测试
 └── src/
     ├── main.js                   # 入口、异步工具加载与页面渲染
