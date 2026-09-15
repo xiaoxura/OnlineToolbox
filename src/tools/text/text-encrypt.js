@@ -70,8 +70,18 @@ export default {
             const encrypted = CryptoJS.AES.encrypt(text, key).toString()
             outputTextarea.value = encrypted
           } else {
-            const decrypted = CryptoJS.AES.decrypt(text, key)
-            const result = decrypted.toString(CryptoJS.enc.Utf8)
+            // A wrong key can fail in two different ways depending on the random
+            // IV: the padding check may reject the block (leaving an empty
+            // result), or it may pass while the bytes are not valid UTF-8 (which
+            // makes toString() throw). Both mean "could not decrypt", so decode
+            // failures are folded into the same message instead of surfacing
+            // CryptoJS's raw error inconsistently.
+            let result = ''
+            try {
+              result = CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8)
+            } catch {
+              result = ''
+            }
             outputTextarea.value = result || '解密失败，请检查密钥和密文'
           }
         } catch (e) {
