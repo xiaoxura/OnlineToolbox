@@ -135,9 +135,13 @@ IP 查询采用用户主动触发、超时取消和失败回退机制：
 
 ### EdgeOne Pages
 
-1. 设置正确的 `SITE_URL` 并执行 `npm run build`
-2. 将 `dist/` 目录上传到 EdgeOne Pages
+1. 在项目设置的环境变量中添加 `SITE_URL`（值为完整公开地址，需含结尾斜杠），例如 `https://tools.xiaoxura.com/`
+2. 设置正确的 `SITE_URL` 并执行 `npm run build`，或将构建命令设为 `npm run build`、输出目录设为 `dist` 交给平台构建
 3. 完成部署
+
+部署后建议自检 `https://你的域名/sitemap.xml`，确认 `<loc>` 使用的是你的域名——**未设置 `SITE_URL` 时构建不会报错**，而是会把 canonical、OG、sitemap 静默写成默认的 GitHub Pages 地址。
+
+`edgeone.json` 用于修正 `site.webmanifest` 的 `Content-Type`：EdgeOne Pages 对 `.webmanifest` 扩展名返回 `application/octet-stream`，而规范要求 `application/manifest+json`。该文件仅对 EdgeOne 生效，部署到其他平台时会被忽略。
 
 ### GitHub Pages
 
@@ -174,6 +178,7 @@ OnlineToolbox/
 │   ├── favicon.svg               # 网站图标
 │   └── site.webmanifest          # Web App Manifest
 ├── .seo-manifest.json            # 各落地页内容哈希与 lastmod，供增量更新判断
+├── edgeone.json                  # EdgeOne Pages 响应头配置（修正 webmanifest 的 MIME）
 ├── scripts/
 │   ├── generate-seo-pages.mjs    # 落地页、OG 卡片、sitemap、robots、llms.txt 生成
 │   ├── tool-facts.mjs            # 在 jsdom 中渲染每个工具并提取其 UI 事实

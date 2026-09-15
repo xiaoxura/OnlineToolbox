@@ -535,6 +535,14 @@ index = index.replace('</head>', `  <link rel="canonical" href="${escapeHtml(sit
 index = index.replaceAll('%TOOL_COUNT%', String(tools.length))
 await writeFile(resolve(outputDir, 'index.html'), index)
 
+// The web app manifest carries the tool count too, so it uses the same
+// placeholder. It previously hard-coded the number and silently went stale.
+const webmanifest = await readFile(resolve(outputDir, 'site.webmanifest'), 'utf8')
+await writeFile(
+  resolve(outputDir, 'site.webmanifest'),
+  webmanifest.replaceAll('%TOOL_COUNT%', String(tools.length))
+)
+
 await writeFile(resolve(outputDir, 'og.png'), renderOgCard({ id: 'onlinetoolbox', category: 'converter' }))
 await writeFile(manifestPath, `${JSON.stringify(nextManifest, null, 2)}\n`)
 
