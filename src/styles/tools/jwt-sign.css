@@ -1,0 +1,32 @@
+/* --- JWT 签发与验签：校验结论横幅 / 时间声明状态 --- */
+
+.jwt-status {
+  padding: 9px 12px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+}
+
+/* display 由 .jwt-status 决定，hidden 属性需要显式还原 */
+.jwt-status[hidden] { display: none; }
+
+.jwt-status.valid {
+  color: var(--color-success-text);
+  background: var(--color-success-soft);
+  border-color: var(--color-success-border);
+}
+
+.jwt-status.invalid {
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+}
+
+.jwt-claim-status { font-weight: 600; }
+.jwt-claim-status.ok { color: var(--color-success-text); }
+
+.jwt-claim-status.expired,
+.jwt-claim-status.not-yet-valid,
+.jwt-claim-status.invalid { color: var(--color-danger-text); }

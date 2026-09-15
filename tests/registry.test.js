@@ -21,7 +21,7 @@ describe('tool registry', () => {
   })
 
   it('filters by category and case-insensitive search', () => {
-    expect(getToolsByCategoryAndSearch('crypto', '')).toHaveLength(7)
+    expect(getToolsByCategoryAndSearch('crypto', '')).toHaveLength(14)
     expect(getToolsByCategoryAndSearch('all', 'base64').map(tool => tool.id)).toContain('base64')
     expect(getToolsByCategoryAndSearch('converter', 'JSON')).not.toHaveLength(0)
     expect(getToolsByCategoryAndSearch('all', 'token').map(tool => tool.id)).toContain('jwt')

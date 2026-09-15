@@ -15,6 +15,11 @@ const EXPECT_SPLIT = new Set([
   'html', 'sql', 'xml', 'user-agent', 'json-schema', 'format-check', 'svg-compress',
   'slugify', 'line-endings', 'text-wrap', 'markdown-table', 'json-lines', 'json-pointer',
   'duration-converter', 'number-format', 'query-string',
+  'crc-calculator', 'url-defang', 'env-json', 'properties-json', 'morse-code',
+  'markdown-toc', 'csv-toolbox', 'word-frequency', 'text-extract',
+  'json-flatten', 'json-sort', 'objectid', 'number-to-words',
+  'classic-cipher', 'bip39', 'docker-compose-converter', 'xpath-tester',
+  'hidden-chars', 'text-mask', 'list-tools', 'ieee754', 'statistics',
   // AI tools: paste an input, read a result. The estimators and lookup tables
   // (llm-cost, llm-models) and the custom grid layouts (message-convert,
   // tool-schema) deliberately stay full-width.

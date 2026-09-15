@@ -1,0 +1,31 @@
+/* --- XPath 测试器（xpath-tester） --- */
+.xpath-preview {
+  min-height: 120px;
+  max-height: min(60vh, 480px);
+  padding: 12px 14px;
+  overflow: auto;
+  font-size: var(--font-size-sm);
+  line-height: 1.7;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* 空预览的占位文案与其他结果区保持一致 */
+.xpath-preview:empty::before {
+  content: '匹配到的节点将在这里高亮显示';
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* 命中的节点用警示色底纹标记，颜色全部取自主题变量 */
+.xpath-hit {
+  background: var(--color-warning-soft);
+  outline: 1px solid var(--color-warning-border);
+  border-radius: 2px;
+}
