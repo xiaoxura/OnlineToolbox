@@ -22,6 +22,11 @@
   color: var(--color-text-muted);
 }
 
+/* A hint that reports a problem (unfilled template variables, a prompt that
+   overflows the context window) should read as a warning, not as neutral
+   help text. */
+.form-hint-warn { color: var(--color-warning-text); }
+
 /* Focus: 1px primary border + 3px ring, same recipe as #searchInput in app.css.
    The base outline is suppressed on these controls (it would double the ring). */
 .input:focus-visible,
@@ -541,6 +546,17 @@ input[type='range'].input {
 .tool-section-body { min-width: 0; padding: var(--space-md) var(--space-lg); }
 .tool-section-body:empty { display: none; }
 
+/* A body normally holds one control. When the IO tidy step (dom.js) moves the
+   loose siblings that sat next to the input card — option rows, action buttons,
+   inline results — into that card, the body stacks several blocks and they would
+   touch. Give them the tool-body rhythm; flex also drops the inline-block
+   descender gap under the <textarea> sitting at the top of the stack. */
+.tool-section-body:has(> * + *) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
 /* Sections nested inside a result box render flat, separated by hairlines */
 .result-box > .tool-section {
   padding: var(--space-md) 0;
@@ -805,6 +821,9 @@ input[type='range'].input {
 
 .inline-result .result-value { flex: 1; min-width: 0; user-select: all; }
 
+/* Same as the stat row: filled on run, so an unfilled one is an empty bar. */
+.inline-result:empty { display: none; }
+
 /* Result tables */
 .result-table {
   width: 100%;
@@ -893,6 +912,10 @@ input[type='range'].input {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
 }
+
+/* Stats are filled on run and cleared on error, so an unfilled one would
+   otherwise show up as an empty grey bar next to its neighbours. */
+.stat-item:empty { display: none; }
 
 .stat-label { color: var(--color-text-muted); }
 

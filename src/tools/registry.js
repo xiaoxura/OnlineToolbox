@@ -12,6 +12,7 @@ export const categories = [
   { id: 'image', name: '图片工具', description: '压缩、编码与 SVG' },
   { id: 'network', name: '网络工具', description: 'URL、请求与网段' },
   { id: 'math', name: '数学计算', description: '表达式与高精度数字' },
+  { id: 'ai', name: 'AI 工具', description: '分词、提示词与向量' },
 ]
 
 export const tools = [
@@ -120,6 +121,16 @@ export const tools = [
   { id: "query-string", name: "Query String 转换", description: "在 JSON 对象与 URL 查询字符串之间双向转换", category: "network", icon: "url-encode", keywords: ["query params", "url query", "search params"], load: () => import("./network/query-string.js") },
   { id: "calculator", name: "科学计算器", description: "支持科学函数、键盘输入和计算历史的科学计算器", category: "math", icon: "unit", load: () => import("./math/calculator.js") },
   { id: "big-number", name: "大数计算器", description: "大数进制转换和高精度四则运算，支持任意长度整数", category: "math", icon: "radix", load: () => import("./math/big-number.js") },
+  { id: "token-counter", name: "Token 计数器", description: "按 BPE 分词器精确计算文本或对话消息的 token 数", category: "ai", icon: "ai-token", keywords: ["token", "分词", "bpe", "tiktoken", "上下文"], load: () => import("./ai/token-counter.js") },
+  { id: "llm-cost", name: "大模型成本估算", description: "按 token 用量和模型单价估算 API 调用成本，支持缓存计价", category: "ai", icon: "ai-cost", keywords: ["cost", "价格", "费用", "计费", "caching"], load: () => import("./ai/llm-cost.js") },
+  { id: "llm-models", name: "大模型对照表", description: "对比主流大模型的上下文窗口与每百万 token 价格", category: "ai", icon: "ai-model", keywords: ["模型价格", "上下文窗口", "context window", "pricing"], load: () => import("./ai/llm-models.js") },
+  { id: "prompt-template", name: "Prompt 模板填充", description: "用 JSON 变量填充 {{占位符}}，并列出未填充的变量", category: "ai", icon: "ai-prompt", keywords: ["prompt", "模板", "变量", "占位符"], load: () => import("./ai/prompt-template.js") },
+  { id: "chat-builder", name: "对话消息组装器", description: "可视化拼装 system / user / assistant 消息，导出为各家 API 的消息格式", category: "ai", icon: "ai-chat", keywords: ["chat", "messages", "对话", "system prompt"], load: () => import("./ai/chat-builder.js") },
+  { id: "message-convert", name: "对话格式互转", description: "在 OpenAI、Anthropic、Gemini 三种消息格式之间互转，支持工具调用", category: "ai", icon: "ai-convert", keywords: ["messages", "tool_calls", "function call", "格式转换"], load: () => import("./ai/message-convert.js") },
+  { id: "tool-schema", name: "Function Schema 生成", description: "根据参数示例 JSON 生成 OpenAI 或 Anthropic 的工具调用 Schema", category: "ai", icon: "ai-tool-schema", keywords: ["function calling", "tools", "json schema", "工具调用"], load: () => import("./ai/tool-schema.js") },
+  { id: "llm-json-repair", name: "LLM 输出 JSON 修复", description: "从模型回复中提取 JSON，修复尾随逗号、单引号等常见错误", category: "ai", icon: "ai-json", keywords: ["json 修复", "parse", "markdown 代码块", "提取"], load: () => import("./ai/json-repair.js") },
+  { id: "text-chunker", name: "文本分块器", description: "把长文本按字符或 token 切成带重叠的片段，用于 RAG 索引", category: "ai", icon: "ai-chunk", keywords: ["chunk", "分块", "rag", "重叠", "overlap"], load: () => import("./ai/text-chunker.js") },
+  { id: "vector-similarity", name: "向量相似度计算", description: "计算两个 embedding 向量的余弦相似度、点积和欧氏距离", category: "ai", icon: "ai-vector", keywords: ["embedding", "cosine", "向量", "相似度"], load: () => import("./ai/vector-similarity.js") },
 ]
 
 const searchAliases = {
@@ -130,7 +141,12 @@ const searchAliases = {
   calculator: ['计算', '科学计算'], cron: ['定时任务'], base58: ['bitcoin', 'btc'],
   'file-hash': ['文件摘要', 'checksum'], 'cidr-calculator': ['子网', '掩码', '网段'], 'chmod-calculator': ['linux权限', '八进制权限'], 'json-typescript': ['json to ts', 'interface', '类型生成'],
   'curl-generator': ['curl', 'api请求'], 'url-params': ['query', '查询参数'], 'sql-in': ['数据库', '批量id'],
-  'set-operations': ['交集', '并集', '差集'], 'image-compress': ['图片压缩', 'webp', '图片转换'], 'ip-info': ['公网ip', '地址查询']
+  'set-operations': ['交集', '并集', '差集'], 'image-compress': ['图片压缩', 'webp', '图片转换'], 'ip-info': ['公网ip', '地址查询'],
+  'token-counter': ['token 计数', '分词器', '上下文长度', 'context length'], 'llm-cost': ['api 费用', 'token 价格', '计费'],
+  'llm-models': ['模型列表', '模型对比', '窗口大小'], 'prompt-template': ['提示词', 'prompt 变量', '占位符填充'],
+  'chat-builder': ['消息拼接', 'prompt 组装', 'system prompt'], 'message-convert': ['消息格式', 'openai 转 anthropic', 'gemini 格式'],
+  'tool-schema': ['函数调用', 'tool use', 'tools 定义'], 'llm-json-repair': ['json 提取', '模型输出解析', '代码块提取'],
+  'text-chunker': ['文本切分', 'rag 分块', 'chunking'], 'vector-similarity': ['余弦相似度', 'embedding 对比', 'cosine']
 }
 
 function matchesSearch(tool, query) {

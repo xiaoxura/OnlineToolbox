@@ -14,7 +14,12 @@ const EXPECT_SPLIT = new Set([
   'json-yaml', 'toml-json', 'json-csv', 'csv-json', 'html-to-jsx', 'json', 'css',
   'html', 'sql', 'xml', 'user-agent', 'json-schema', 'format-check', 'svg-compress',
   'slugify', 'line-endings', 'text-wrap', 'markdown-table', 'json-lines', 'json-pointer',
-  'duration-converter', 'number-format', 'query-string'
+  'duration-converter', 'number-format', 'query-string',
+  // AI tools: paste an input, read a result. The estimators and lookup tables
+  // (llm-cost, llm-models) and the custom grid layouts (message-convert,
+  // tool-schema) deliberately stay full-width.
+  'token-counter', 'prompt-template', 'chat-builder', 'llm-json-repair',
+  'text-chunker', 'vector-similarity'
 ])
 
 describe('two-column IO layout', () => {
