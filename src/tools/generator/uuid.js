@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'uuid',
-  name: 'UUID 生成',
-  description: '生成 UUID v4 随机唯一标识符',
-  category: 'generator',
-  icon: 'uuid',
   render(container) {
     // Quantity input
     const countLabel = createElement('label', { className: 'label' }, ['数量'])

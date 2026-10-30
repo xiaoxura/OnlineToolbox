@@ -10,11 +10,6 @@ function serializeScalar(params, key, value) {
 }
 
 export default {
-  id: 'query-string',
-  name: 'Query String 转换',
-  description: '在 JSON 对象与 URL 查询字符串之间双向转换',
-  category: 'network',
-  icon: 'url-encode',
   render(container) {
     let mode = 'json-to-query'
     let rerun = () => {}

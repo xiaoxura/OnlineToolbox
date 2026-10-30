@@ -263,12 +263,6 @@ const DEFAULT_STATE = expressionToState('0 3 * * *')
 const SAMPLE_STATE = expressionToState('30 9 * * 1-5')
 
 export default {
-  id: 'cron-builder',
-  name: 'Cron 表达式构建器',
-  description: '可视化构建 cron 表达式并生成人类可读的中文描述',
-  category: 'devtool',
-  icon: 'cron',
-  keywords: ['cron', 'crontab', '定时任务', '表达式'],
   render(container) {
     const output = createElement('textarea', {
       className: 'textarea',

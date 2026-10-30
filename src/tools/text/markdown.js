@@ -1,7 +1,8 @@
 import "../../styles/tools/markdown.css"
 import { createElement } from '../../utils/dom.js'
 import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '../../utils/sanitize.js'
+import { debounce } from '../../utils/debounce.js'
 
 marked.setOptions({
   gfm: true,
@@ -10,11 +11,6 @@ marked.setOptions({
 })
 
 export default {
-  id: 'markdown',
-  name: 'Markdown 预览',
-  description: '实时预览 Markdown 文本',
-  category: 'text',
-  icon: 'html',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',
@@ -31,10 +27,15 @@ export default {
         preview.innerHTML = '<p style="color:var(--color-text-muted)">预览区域</p>'
         return
       }
-      preview.innerHTML = DOMPurify.sanitize(marked.parse(raw))
+      preview.innerHTML = sanitizeHtml(marked.parse(raw))
     }
 
-    input.addEventListener('input', updatePreview)
+    const schedulePreview = debounce(updatePreview)
+    input.addEventListener('input', () => {
+      // Keep small documents instant; debounce only when parsing gets costly.
+      if (input.value.length > 20000) schedulePreview()
+      else updatePreview()
+    })
 
     const leftCol = createElement('div', { className: 'form-group' }, [
       createElement('label', { className: 'label' }, ['Markdown 源码']),
@@ -50,5 +51,7 @@ export default {
 
     container.appendChild(row)
     updatePreview()
+
+    return () => schedulePreview.cancel()
   }
 }

@@ -1,11 +1,6 @@
 import { createElement } from '../../utils/dom.js'
 
 export default {
-  id: 'bank-card',
-  name: '银行卡号校验',
-  description: '使用 Luhn 算法校验银行卡号，识别发卡银行和卡类型',
-  category: 'devtool',
-  icon: 'search',
   render(container) {
     const BANK_BIN = [
       { bin: '622202', name: '工商银行', type: '借记卡' },

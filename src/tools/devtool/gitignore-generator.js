@@ -231,12 +231,6 @@ export function keysByGroup(groupId) {
 const SAMPLE_KEYS = ['node', 'react', 'vscode', 'macos', 'windows', 'linux']
 
 export default {
-  id: 'gitignore-generator',
-  name: '.gitignore 生成器',
-  description: '按语言、框架、编辑器与操作系统勾选生成 .gitignore 文件',
-  category: 'devtool',
-  icon: 'text-sort',
-  keywords: ['git', 'gitignore', 'ignore', '版本控制'],
   render(container) {
     const checkboxes = new Map()
     const errorEl = createElement('div', { className: 'error-text' })

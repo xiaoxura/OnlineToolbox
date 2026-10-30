@@ -257,12 +257,6 @@ const SAMPLE_NESTED_JSON = JSON.stringify({
 }, null, 2)
 
 export default {
-  id: 'properties-json',
-  name: '.properties ↔ JSON',
-  description: 'Java properties 文件与 JSON 双向转换，支持转义与 Unicode',
-  category: 'devtool',
-  icon: 'json',
-  keywords: ['properties', 'java', '配置', 'unicode 转义'],
   render(container) {
     let mode = 'properties-to-json'
     let state

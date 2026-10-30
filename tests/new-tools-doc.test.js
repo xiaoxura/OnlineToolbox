@@ -399,7 +399,6 @@ describe('new document tools follow the UI conventions', () => {
   ]
 
   it.each(descriptors)('%s renders synchronously and stays accessible', (id, descriptor) => {
-    expect(descriptor.id).toBe(id)
     expect(typeof descriptor.render).toBe('function')
     expect(() => descriptor.render(root)).not.toThrow()
     enhanceFormAccessibility(root)

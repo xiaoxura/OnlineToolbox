@@ -2,11 +2,6 @@ import { createElement, createCopyButton, createSection, createSegmentedGroup } 
 import CryptoJS from 'crypto-js'
 
 export default {
-  id: 'hmac',
-  name: 'HMAC 生成',
-  description: '生成 HMAC 签名',
-  category: 'crypto',
-  icon: 'hmac',
   render(container) {
     let currentAlgo = 'sha256'
 

@@ -5,11 +5,6 @@ const CN_UNITS = ['', '拾', '佰', '仟']
 const CN_BIG_UNITS = ['', '万', '亿', '万亿']
 
 export default {
-  id: 'amount-cn',
-  name: '中文大写金额',
-  description: '将数字金额转换为中文大写',
-  category: 'converter',
-  icon: 'radix',
 
   render(container) {
     const inputGroup = createElement('div', { className: 'form-group' })

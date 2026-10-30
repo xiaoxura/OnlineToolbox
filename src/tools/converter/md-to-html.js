@@ -1,14 +1,9 @@
 import "../../styles/tools/markdown.css"
 import { createCopyButton, createElement, createSection, createSegmentedGroup } from '../../utils/dom.js'
 import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '../../utils/sanitize.js'
 
 export default {
-  id: 'md-to-html',
-  name: 'Markdown 转 HTML',
-  description: '将 Markdown 文本实时转换为 HTML 代码',
-  category: 'converter',
-  icon: 'markdown',
 
   render(container) {
     const textarea = createElement('textarea', {
@@ -61,7 +56,7 @@ export default {
 
       const html = marked.parse(markdown)
       htmlOutput.value = html
-      previewPanel.innerHTML = DOMPurify.sanitize(html)
+      previewPanel.innerHTML = sanitizeHtml(html)
     }
 
     textarea.addEventListener('input', doConvert)

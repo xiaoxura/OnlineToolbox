@@ -23,11 +23,6 @@ function compactNumber(value) {
 }
 
 export default {
-  id: 'duration-converter',
-  name: '时间长度转换',
-  description: '批量换算毫秒、秒、分钟、小时、天和周',
-  category: 'converter',
-  icon: 'timestamp',
   render(container) {
     const from = unitSelect('原始单位', 'ms')
     const to = unitSelect('目标单位', 's')

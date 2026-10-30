@@ -2,11 +2,6 @@ import { createSegmentedGroup } from '../../utils/dom.js'
 import { renderTextTransform } from '../shared/text-transform.js'
 
 export default {
-  id: 'json-lines',
-  name: 'JSONL ↔ JSON 转换',
-  description: '在 JSON Lines 与 JSON 数组之间双向转换和校验',
-  category: 'converter',
-  icon: 'json',
   render(container) {
     let mode = 'jsonl-to-json'
     let rerun = () => {}

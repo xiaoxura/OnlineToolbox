@@ -1,11 +1,6 @@
 import { createElement, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'char-count',
-  name: '字符统计',
-  description: '统计文本的字符数、行数、字节数等',
-  category: 'text',
-  icon: 'char-count',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

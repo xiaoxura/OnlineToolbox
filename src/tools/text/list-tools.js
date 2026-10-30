@@ -179,12 +179,6 @@ function textInput(label, value) {
 }
 
 export default {
-  id: 'list-tools',
-  name: '列表工具',
-  description: '对文本行进行反转、打乱、分组、轮转、编号与包装',
-  category: 'text',
-  icon: 'text-sort',
-  keywords: ['列表', '行操作', 'shuffle', 'rotate', '编号', '分组', '打乱'],
   render(container) {
     const operation = createElement('select', { className: 'select', 'aria-label': '操作' })
     for (const item of OPERATIONS) {

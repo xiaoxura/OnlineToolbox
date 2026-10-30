@@ -2,11 +2,6 @@ import "../../styles/tools/diff.css"
 import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'json-diff',
-  name: 'JSON 对比',
-  description: '对比两个 JSON 对象的差异，显示新增、删除和修改的内容',
-  category: 'converter',
-  icon: 'json-yaml',
 
   render(container) {
     // Two input areas side by side

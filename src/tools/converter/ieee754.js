@@ -218,12 +218,6 @@ function statCard(label, value) {
 }
 
 export default {
-  id: 'ieee754',
-  name: 'IEEE 754 浮点数',
-  description: '在十进制浮点数与 IEEE 754 二进制、十六进制表示之间转换',
-  category: 'converter',
-  icon: 'radix',
-  keywords: ['ieee754', 'float32', 'float64', '浮点数', '单精度', '双精度', 'denormal'],
   render(container) {
     const direction = createSegmentedGroup([
       { value: 'decode', label: '数值 → 位串' },

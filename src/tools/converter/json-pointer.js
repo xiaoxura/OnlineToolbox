@@ -18,11 +18,6 @@ function resolvePointer(value, pointer) {
 }
 
 export default {
-  id: 'json-pointer',
-  name: 'JSON Pointer 查询',
-  description: '使用 RFC 6901 JSON Pointer 精确读取 JSON 节点',
-  category: 'converter',
-  icon: 'json-path',
   render(container) {
     const pointer = createElement('input', {
       className: 'input',

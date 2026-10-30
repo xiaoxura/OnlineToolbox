@@ -2,11 +2,6 @@ import { createElement } from '../../utils/dom.js'
 import { renderTextTransform } from '../shared/text-transform.js'
 
 export default {
-  id: 'number-format',
-  name: '数字格式化',
-  description: '按地区格式化数字、货币和百分比',
-  category: 'converter',
-  icon: 'radix',
   render(container) {
     const locale = createElement('select', { className: 'select', 'aria-label': '地区格式' }, [
       createElement('option', { value: 'zh-CN', textContent: '中国大陆（zh-CN）' }),

@@ -192,12 +192,6 @@ function statItem(label, value) {
 }
 
 export default {
-  id: 'password-strength',
-  name: '密码强度分析',
-  description: '评估密码强度：字符集、熵值、常见模式与预估破解时间',
-  category: 'crypto',
-  icon: 'password',
-  keywords: ['密码强度', 'password', 'entropy', '熵', '破解时间', '弱密码'],
   render(container) {
     const passwordInput = createElement('input', {
       className: 'input',

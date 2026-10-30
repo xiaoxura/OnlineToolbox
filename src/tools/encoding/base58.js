@@ -32,7 +32,7 @@ export function decodeBase58(text) {
 }
 
 export default {
-  id: 'base58', name: 'Base58 编解码', description: '使用 Bitcoin 字母表进行 Base58 编码与解码', category: 'encoding', icon: 'base32',
+
   render(container) {
     const input = createElement('textarea', { className: 'textarea', rows: 6, placeholder: '输入文本或 Base58 编码…' })
     const output = createElement('textarea', { className: 'textarea', rows: 6, readOnly: true, placeholder: '结果将显示在这里…' })

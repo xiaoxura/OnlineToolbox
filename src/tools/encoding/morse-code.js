@@ -266,12 +266,6 @@ export function playMorseTimeline(timeline, { frequency = 620, volume = 0.22 } =
 const SAMPLE_TEXT = 'SOS HELLO WORLD 2026'
 
 export default {
-  id: 'morse-code',
-  name: '摩尔斯电码',
-  description: '文本与摩尔斯电码互转，支持音频播放与自定义分隔符',
-  category: 'encoding',
-  icon: 'unicode',
-  keywords: ['morse', '摩尔斯', '摩斯', '电码', 'sos', '音频', 'cw'],
   render(container) {
     let state
     const mode = createSegmentedGroup([

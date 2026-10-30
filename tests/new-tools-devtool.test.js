@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { applyTwoColumnLayout, enhanceFormAccessibility } from '../src/utils/dom.js'
+import { getToolById } from '../src/tools/registry.js'
 import dockerTool, {
   composeToDockerRun,
   composeToDockerRunWithNotices,
@@ -597,6 +598,14 @@ describe('xpath-tester', () => {
 // 布局：记录每个工具的 IO 分栏决策（供 registry/io-layout 普查使用）
 // ---------------------------------------------------------------------------
 
+const BATCH_IDS = new Map([
+  [dockerTool, 'docker-compose-converter'],
+  [gitignoreTool, 'gitignore-generator'],
+  [cronTool, 'cron-builder'],
+  [cspTool, 'csp-generator'],
+  [xpathTool, 'xpath-tester']
+])
+
 describe('devtool batch layout census', () => {
   const expectations = [
     [dockerTool, true],
@@ -607,7 +616,8 @@ describe('devtool batch layout census', () => {
   ]
 
   for (const [tool, expected] of expectations) {
-    it(`${tool.id}: ${expected ? 'split' : 'stacked'}`, () => {
+    const id = BATCH_IDS.get(tool)
+    it(`${id}: ${expected ? 'split' : 'stacked'}`, () => {
       tool.render(root)
       const split = applyTwoColumnLayout(root)
       enhanceFormAccessibility(root)
@@ -636,12 +646,14 @@ describe('devtool batch smoke rules', () => {
   const tools = [dockerTool, gitignoreTool, cronTool, cspTool, xpathTool]
 
   for (const tool of tools) {
-    it(`${tool.id}: metadata and rendered structure`, () => {
-      expect(tool.id).toMatch(/^[a-z0-9-]+$/)
-      expect(tool.name).toBeTruthy()
-      expect(tool.description).toBeTruthy()
-      expect(tool.category).toBe('devtool')
-      expect(tool.icon).toBeTruthy()
+    const id = BATCH_IDS.get(tool)
+    it(`${id}: metadata and rendered structure`, () => {
+      const registered = getToolById(id)
+      expect(registered).toBeTruthy()
+      expect(registered.name).toBeTruthy()
+      expect(registered.description).toBeTruthy()
+      expect(registered.category).toBe('devtool')
+      expect(registered.icon).toBeTruthy()
       expect(typeof tool.render).toBe('function')
 
       // render() 同步填满容器
@@ -652,20 +664,20 @@ describe('devtool batch smoke rules', () => {
       enhanceFormAccessibility(root)
       for (const control of root.querySelectorAll('input, textarea, select')) {
         const hasName = control.labels?.length || control.getAttribute('aria-label') || control.getAttribute('aria-labelledby')
-        expect(Boolean(hasName), `${tool.id}: unnamed ${control.tagName}`).toBe(true)
+        expect(Boolean(hasName), `${id}: unnamed ${control.tagName}`).toBe(true)
       }
-      expect(root.querySelector('select.input'), `${tool.id}: select uses text-input styling`).toBeNull()
-      expect(root.querySelector('button[class="btn"]'), `${tool.id}: button has no visual variant`).toBeNull()
+      expect(root.querySelector('select.input'), `${id}: select uses text-input styling`).toBeNull()
+      expect(root.querySelector('button[class="btn"]'), `${id}: button has no visual variant`).toBeNull()
       for (const choice of root.querySelectorAll('input[type="checkbox"], input[type="radio"]')) {
-        expect(choice.closest('label'), `${tool.id}: choice is not wrapped by a label`).not.toBeNull()
+        expect(choice.closest('label'), `${id}: choice is not wrapped by a label`).not.toBeNull()
       }
       expect(root.querySelector('.tool-section .tool-section, .result-box .tool-section, .tool-section.result-box')).toBeNull()
       for (const table of root.querySelectorAll('table.result-table')) {
-        expect(table.parentElement?.classList.contains('table-scroll'), `${tool.id}: result table is not scrollable`).toBe(true)
+        expect(table.parentElement?.classList.contains('table-scroll'), `${id}: result table is not scrollable`).toBe(true)
       }
       for (const tab of root.querySelectorAll('[role="tab"]')) {
         const panelId = tab.getAttribute('aria-controls')
-        expect(panelId, `${tool.id}: tab without aria-controls`).toBeTruthy()
+        expect(panelId, `${id}: tab without aria-controls`).toBeTruthy()
         expect(root.querySelector(`#${panelId}`)?.getAttribute('role')).toBe('tabpanel')
       }
       for (const group of root.querySelectorAll('[role="radiogroup"]')) {
@@ -677,7 +689,7 @@ describe('devtool batch smoke rules', () => {
       // 规则 13：有文本输入的工具都要有“示例数据”按钮（可带预设后缀）
       if (root.querySelector('input[type="text"], textarea:not([readonly])')) {
         const labels = [...root.querySelectorAll('button')].map(button => button.textContent.trim())
-        expect(labels.some(label => label.startsWith('示例数据')), `${tool.id}: 缺少示例数据按钮`).toBe(true)
+        expect(labels.some(label => label.startsWith('示例数据')), `${id}: 缺少示例数据按钮`).toBe(true)
       }
     })
   }

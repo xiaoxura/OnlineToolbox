@@ -1,11 +1,6 @@
 import { createElement, showToast } from '../../utils/dom.js'
 
 export default {
-  id: 'id-card',
-  name: '身份证号校验',
-  description: '校验18位身份证号码，提取省份、生日、性别等信息',
-  category: 'devtool',
-  icon: 'search',
   render(container) {
     const AREA_CODES = {
       '11': '北京', '12': '天津', '13': '河北', '14': '山西', '15': '内蒙古',

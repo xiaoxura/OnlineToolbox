@@ -182,7 +182,6 @@ describe('hard rules shared by every tool', () => {
         expect(group.querySelectorAll('[role="radio"][aria-checked="true"]')).toHaveLength(1)
       }
 
-      expect(tool.id).toBe(id)
     })
   }
 

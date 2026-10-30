@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'url-encode',
-  name: 'URL 编解码',
-  description: 'URL 编码与解码，支持组件编码和完整URL编码',
-  category: 'encoding',
-  icon: 'url-encode',
   render(container) {
     let mode = 'component' // 'component' or 'full'
 

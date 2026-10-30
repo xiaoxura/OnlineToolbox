@@ -541,11 +541,6 @@ function detailRow(label, getValue) {
 }
 
 export default {
-  id: 'codex-credential-converter',
-  name: 'CPA ↔ Sub2API 凭证转换',
-  description: 'CPA ↔ Sub2API，二者均可导出 auth.json',
-  category: 'converter',
-  icon: 'json-yaml',
 
   render(container) {
     let parsed = null

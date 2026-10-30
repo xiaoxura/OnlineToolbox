@@ -54,11 +54,6 @@ const SAMPLE_VARIABLES = `{
 }`
 
 export default {
-  id: 'prompt-template',
-  name: 'Prompt 模板填充',
-  description: '用 JSON 变量填充 {{占位符}}，并列出未填充的变量',
-  category: 'ai',
-  icon: 'ai-prompt',
   render(container) {
     const template = createElement('textarea', {
       className: 'textarea large',

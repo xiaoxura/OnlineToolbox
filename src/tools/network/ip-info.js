@@ -51,11 +51,6 @@ function requireIp(data) {
 }
 
 export default {
-  id: 'ip-info',
-  name: 'IP 地址信息',
-  description: '查询本机 IP 或指定 IP 地址的地理位置和网络信息',
-  category: 'network',
-  icon: 'unicode',
   render(container) {
     let selfController = null
     let lookupController = null
@@ -202,5 +197,12 @@ export default {
     const lookupContent = createElement('div', {}, [inputGroup, lookupErrorEl, lookupLoadingEl, resultBox])
     container.appendChild(selfSection)
     container.appendChild(createSection('IP 查询', lookupContent, [lookupBtn]))
+
+    return () => {
+      selfController?.abort()
+      lookupController?.abort()
+      selfController = null
+      lookupController = null
+    }
   }
 }

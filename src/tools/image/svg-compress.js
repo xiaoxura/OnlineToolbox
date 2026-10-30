@@ -1,11 +1,6 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'svg-compress',
-  name: 'SVG 压缩',
-  description: '压缩 SVG 代码，移除冗余内容',
-  category: 'image',
-  icon: 'html',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea large',

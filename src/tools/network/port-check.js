@@ -33,11 +33,6 @@ const categoryLabels = {
 const categoryOrder = ['web', 'email', 'database', 'remote', 'other']
 
 export default {
-  id: 'port-check',
-  name: '端口说明查询',
-  description: '查询常见网络端口号对应的服务和说明',
-  category: 'network',
-  icon: 'search',
   render(container) {
     // --- Search input ---
     const searchInput = createElement('input', {

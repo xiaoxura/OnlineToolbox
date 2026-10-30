@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'unicode',
-  name: 'Unicode 编解码',
-  description: '文本与 Unicode 编码互相转换',
-  category: 'encoding',
-  icon: 'unicode',
   render(container) {
     let mode = 'text-to-unicode' // 'text-to-unicode' or 'unicode-to-text'
 

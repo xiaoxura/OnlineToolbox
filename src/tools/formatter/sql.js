@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'sql',
-  name: 'SQL 格式化',
-  description: 'SQL 语句美化',
-  category: 'formatter',
-  icon: 'sql',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

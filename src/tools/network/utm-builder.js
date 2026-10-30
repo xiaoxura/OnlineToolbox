@@ -112,12 +112,6 @@ function tableRow(label, value) {
 }
 
 export default {
-  id: 'utm-builder',
-  name: 'UTM 链接构建器',
-  description: '可视化拼装带 UTM 跟踪参数的投放链接',
-  category: 'network',
-  icon: 'url-encode',
-  keywords: ['utm', 'campaign', '投放链接', '跟踪参数', 'marketing'],
   render(container) {
     const urlInput = createElement('input', {
       className: 'input',

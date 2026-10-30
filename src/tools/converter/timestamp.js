@@ -2,11 +2,6 @@ import "../../styles/tools/timestamp.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'timestamp',
-  name: '时间戳转换',
-  description: 'Unix 时间戳与日期时间相互转换',
-  category: 'converter',
-  icon: 'timestamp',
   render(container) {
     // Current timestamp display
     const currentTimeEl = createElement('div', { className: 'live-timestamp' })
@@ -23,10 +18,16 @@ export default {
     container.appendChild(currentSection)
 
     refreshCurrentTime()
-    const timer = setInterval(refreshCurrentTime, 1000)
-
-    // Cleanup on re-render
-    container.addEventListener('DOMNodeRemoved', () => clearInterval(timer))
+    let timer = setInterval(() => {
+      // Defensive: if the tool was removed without the SPA calling dispose(),
+      // stop the timer instead of updating detached DOM forever.
+      if (!container.isConnected) {
+        clearInterval(timer)
+        timer = null
+        return
+      }
+      refreshCurrentTime()
+    }, 1000)
 
     // --- Section 1: Timestamp → Date ---
     const tsInput = createElement('input', {
@@ -107,6 +108,11 @@ export default {
     const dateContent = createElement('div', {}, [dateInput, dateResult])
     const dateSection = createSection('日期 → 时间戳', dateContent, [dateCopyBtn])
     container.appendChild(dateSection)
+
+    return () => {
+      if (timer) clearInterval(timer)
+      timer = null
+    }
   }
 }
 

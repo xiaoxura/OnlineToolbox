@@ -69,12 +69,6 @@ const SAMPLE = {
 }
 
 export default {
-  id: 'json-sort',
-  name: 'JSON 键排序',
-  description: '递归排序 JSON 对象键名，可选保留数组顺序',
-  category: 'converter',
-  icon: 'json',
-  keywords: ['sort', '排序', '键排序', 'key order', '规范化', 'diff'],
   render(container) {
     const recursiveCheckbox = createElement('input', { className: 'checkbox', type: 'checkbox' })
     recursiveCheckbox.checked = true

@@ -4,11 +4,6 @@ import { escapeHtml } from '../../utils/html.js'
 import { copyToClipboard } from '../../utils/clipboard.js'
 
 export default {
-  id: 'json-path',
-  name: 'JSONPath 查询',
-  description: '使用 JSONPath 表达式查询 JSON 数据，支持点击 JSON 树节点获取路径',
-  category: 'converter',
-  icon: 'search',
   render(container) {
     // JSONPath expression input
     const pathLabel = createElement('label', { className: 'label', textContent: 'JSONPath 表达式:' })

@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'base32',
-  name: 'Base32 编解码',
-  description: 'Base32 编码与解码（RFC 4648 字母表: A-Z2-7）',
-  category: 'encoding',
-  icon: 'base32',
   render(container) {
     const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
 

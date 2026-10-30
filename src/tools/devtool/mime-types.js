@@ -14,11 +14,6 @@ const MIME_TYPES = [
 ]
 
 export default {
-  id: 'mime-types',
-  name: 'MIME 类型查询',
-  description: '按文件扩展名快速查找常用 MIME Content-Type',
-  category: 'devtool',
-  icon: 'search',
   render(container) {
     const search = createElement('input', { className: 'input', type: 'search', placeholder: '搜索扩展名或 MIME 类型...', 'aria-label': '搜索 MIME 类型' })
     const table = createElement('table', { className: 'result-table' })

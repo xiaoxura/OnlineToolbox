@@ -96,12 +96,6 @@ const PRESETS = {
 }
 
 export default {
-  id: 'csp-generator',
-  name: 'CSP 生成器',
-  description: '勾选指令生成 Content-Security-Policy 响应头',
-  category: 'devtool',
-  icon: 'shield-link',
-  keywords: ['csp', 'content-security-policy', '安全响应头', 'xss'],
   render(container) {
     // 当前配置：指令 → 来源列表；以及无取值指令的开关集合
     const sourceState = new Map()

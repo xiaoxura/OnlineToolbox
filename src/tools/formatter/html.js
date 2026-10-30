@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'html',
-  name: 'HTML 格式化',
-  description: 'HTML 代码美化和压缩',
-  category: 'formatter',
-  icon: 'html',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

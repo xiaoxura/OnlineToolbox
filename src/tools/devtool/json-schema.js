@@ -69,11 +69,6 @@ function generateSchema(jsonStr) {
 }
 
 export default {
-  id: 'json-schema',
-  name: 'JSON Schema 生成',
-  description: '根据 JSON 数据自动推断并生成 JSON Schema (draft-07)',
-  category: 'devtool',
-  icon: 'json',
   render(container) {
     const defaultJson = `{
   "name": "张三",

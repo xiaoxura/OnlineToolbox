@@ -141,12 +141,6 @@ npm install
 `
 
 export default {
-  id: 'markdown-toc',
-  name: 'Markdown 目录生成',
-  description: '为 Markdown 文档生成带锚点的可跳转目录',
-  category: 'converter',
-  icon: 'markdown',
-  keywords: ['toc', '目录', '锚点', 'markdown', 'outline'],
   render(container) {
     const levels = Array.from({ length: 6 }, (_, index) => index + 1)
     const minLevel = createElement('select', { className: 'select', 'aria-label': '最小层级' },

@@ -184,11 +184,6 @@ const sampleJson = {
 }
 
 export default {
-  id: 'toml-json',
-  name: 'TOML ↔ JSON 转换',
-  description: '在 TOML 配置与 JSON 对象之间双向转换，支持表和数组表',
-  category: 'converter',
-  icon: 'json',
   render(container) {
     let mode = 'toml-to-json'
     let rerun = () => {}

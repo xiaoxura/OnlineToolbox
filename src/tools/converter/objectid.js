@@ -90,12 +90,6 @@ export function parseObjectIds(text) {
 const SAMPLE_IDS = '507f1f77bcf86cd799439011\n5f2f1c2b9a3d4e5f6a7b8c9d\n000000000000000000000000'
 
 export default {
-  id: 'objectid',
-  name: 'MongoDB ObjectId',
-  description: '在时间戳与 ObjectId 之间互转并解析其结构',
-  category: 'converter',
-  icon: 'uuid',
-  keywords: ['mongodb', 'objectid', 'bson', '_id', '时间戳', '随机数'],
   render(container) {
     const mode = createSegmentedGroup([
       { value: 'ts2id', label: '时间戳 → ObjectId' },

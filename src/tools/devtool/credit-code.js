@@ -1,11 +1,6 @@
 import { createElement, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'credit-code',
-  name: '统一社会信用代码校验',
-  description: '校验18位统一社会信用代码，解析登记管理机关和机构类型',
-  category: 'devtool',
-  icon: 'search',
   render(container) {
     const BASE_CODES = '0123456789ABCDEFGHJKLMNPQRTUWXY'
     const WEIGHTS = [1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 13, 8, 24, 10, 30, 28]

@@ -178,11 +178,6 @@ export function calculateIPv6(input) {
 }
 
 export default {
-  id: 'ipv6-calculator',
-  name: 'IPv6 地址解析',
-  description: '解析 IPv6 地址并生成压缩、展开格式，支持 IPv4 尾段和 CIDR 前缀',
-  category: 'network',
-  icon: 'unicode',
   render(container) {
     const input = createElement('input', {
       className: 'input',

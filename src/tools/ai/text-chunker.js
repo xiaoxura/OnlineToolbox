@@ -94,11 +94,6 @@ function statsFor(chunks) {
 }
 
 export default {
-  id: 'text-chunker',
-  name: '文本分块器',
-  description: '把长文本按字符或 token 切成带重叠的片段，用于 RAG 索引',
-  category: 'ai',
-  icon: 'ai-chunk',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea large',
@@ -115,8 +110,8 @@ export default {
     const sizeInput = createElement('input', { className: 'input', type: 'number', value: '500', min: '1' })
     const overlapInput = createElement('input', { className: 'input', type: 'number', value: '50', min: '0' })
     const encodingSelect = createElement('select', { className: 'select', 'aria-label': '分词编码' }, [
-      createElement('option', { value: 'o200k_base', textContent: 'o200k_base' }),
-      createElement('option', { value: 'cl100k_base', textContent: 'cl100k_base' })
+      createElement('option', { value: 'cl100k_base', textContent: 'cl100k_base' }),
+      createElement('option', { value: 'o200k_base', textContent: 'o200k_base' })
     ])
     const boundaryToggle = createElement('input', { className: 'checkbox', type: 'checkbox', checked: true })
 

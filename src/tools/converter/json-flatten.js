@@ -114,12 +114,6 @@ const SAMPLE_FLAT = {
 }
 
 export default {
-  id: 'json-flatten',
-  name: 'JSON 扁平化',
-  description: '在嵌套 JSON 与点号路径的扁平结构之间双向转换',
-  category: 'converter',
-  icon: 'json',
-  keywords: ['flatten', 'unflatten', '扁平化', '路径', 'dot notation', '展开'],
   render(container) {
     let state
     const mode = createSegmentedGroup([

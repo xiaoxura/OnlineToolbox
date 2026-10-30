@@ -113,12 +113,6 @@ export function formatBytes(bytes) {
 }
 
 export default {
-  id: 'favicon-generator',
-  name: 'Favicon 生成',
-  description: '将图片转换为多尺寸 favicon PNG 与 ICO，并生成引用代码',
-  category: 'image',
-  icon: 'img-to-base64',
-  keywords: ['favicon', 'ico', '图标', 'site.webmanifest', 'apple-touch-icon'],
   render(container) {
     const status = createElement('div', { className: 'loading-text', role: 'status', 'aria-live': 'polite' })
 

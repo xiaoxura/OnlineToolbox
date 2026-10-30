@@ -135,12 +135,6 @@ export async function generateKeyPair(algorithmId = DEFAULT_KEY_ALGORITHM) {
 }
 
 export default {
-  id: 'key-pair-generator',
-  name: '密钥对生成',
-  description: '生成 RSA、ECDSA 与 Ed25519 密钥对，导出 PEM 与 JWK',
-  category: 'crypto',
-  icon: 'password',
-  keywords: ['rsa', 'ecdsa', 'ed25519', 'keypair', '密钥', 'pem', 'jwk', 'openssl'],
   render(container) {
     let current = null
     let busy = false

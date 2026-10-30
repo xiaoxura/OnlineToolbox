@@ -210,12 +210,6 @@ const SAMPLE_JSON = JSON.stringify({
 }, null, 2)
 
 export default {
-  id: 'env-json',
-  name: '.env ↔ JSON',
-  description: '在 dotenv 文件与 JSON 对象之间双向转换',
-  category: 'devtool',
-  icon: 'json',
-  keywords: ['dotenv', 'env', '环境变量', '配置文件'],
   render(container) {
     let mode = 'env-to-json'
     let state

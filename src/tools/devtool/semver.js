@@ -42,11 +42,6 @@ function versionText(version) {
 }
 
 export default {
-  id: 'semver',
-  name: 'SemVer 版本比较',
-  description: '校验、比较和升级语义化版本号',
-  category: 'devtool',
-  icon: 'json',
   render(container) {
     const first = createElement('input', { className: 'input', type: 'text', value: '1.4.0', placeholder: '1.4.0' })
     const second = createElement('input', { className: 'input', type: 'text', value: '2.0.0-beta.1', placeholder: '2.0.0' })

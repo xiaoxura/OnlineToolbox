@@ -1,11 +1,6 @@
 import { createElement, createSegmentedGroup, createTableScroll } from '../../utils/dom.js'
 
 export default {
-  id: 'format-check',
-  name: '格式校验工具',
-  description: '校验手机号、邮箱、身份证、URL、IP地址、MAC地址、日期等格式',
-  category: 'devtool',
-  icon: 'regex',
   render(container) {
     const CHECKS = [
       {

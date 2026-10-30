@@ -140,12 +140,6 @@ function formGroup(labelText, control) {
 }
 
 export default {
-  id: 'csv-toolbox',
-  name: 'CSV 工具箱',
-  description: 'CSV 转置、分隔符转换、列的增删与交换',
-  category: 'converter',
-  icon: 'json',
-  keywords: ['csv', 'tsv', '转置', '列操作', '分隔符'],
   render(container) {
     const sourceDelimiter = createElement('select', { className: 'select', 'aria-label': '输入分隔符' }, [
       createElement('option', { value: 'auto', textContent: '自动检测' }),

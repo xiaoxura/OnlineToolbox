@@ -9,6 +9,12 @@
 
 /* ---------- Header ---------- */
 
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header {
+    background: var(--color-surface);
+  }
+}
+
 .site-header {
   position: sticky;
   top: 0;
@@ -379,6 +385,10 @@
 .tool-card-wrap {
   position: relative;
   min-width: 0;
+  /* The home grid can contain 150+ cards; skip layout/paint for off-screen
+     ones while reserving their approximate height to avoid scroll jumps. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 62px;
 }
 
 .tool-card {
@@ -780,4 +790,43 @@
   .personal-sections {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------- No-JS fallback ---------- */
+
+.noscript-fallback {
+  width: min(var(--max-width), 100%);
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+}
+
+.noscript-fallback h1 {
+  margin-bottom: 12px;
+  font-size: 1.8rem;
+}
+
+.noscript-fallback p {
+  color: var(--color-text-muted);
+}
+
+.noscript-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.noscript-categories a {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text);
+}
+
+.noscript-categories a:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }

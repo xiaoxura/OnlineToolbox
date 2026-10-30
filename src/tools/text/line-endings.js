@@ -2,11 +2,6 @@ import { createElement, createCopyButton } from '../../utils/dom.js'
 import { renderTextTransform } from '../shared/text-transform.js'
 
 export default {
-  id: 'line-endings',
-  name: '换行符转换',
-  description: '在 LF、CRLF 和 CR 换行格式之间转换文本',
-  category: 'text',
-  icon: 'text-sort',
   render(container) {
     const format = createElement('select', { className: 'select', 'aria-label': '目标换行格式' }, [
       createElement('option', { value: '\n', textContent: 'LF（Unix / macOS）' }),

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { applyTwoColumnLayout, enhanceFormAccessibility, enhanceResultSections } from '../src/utils/dom.js'
+import { getToolById } from '../src/tools/registry.js'
 import hiddenChars, {
   annotateHiddenChars,
   detectHiddenChars,
@@ -72,6 +73,13 @@ function rowLabels(tableSelector = 'tbody') {
 }
 
 const ALL_TOOLS = [hiddenChars, textMask, listTools, ieee754, statisticsTool]
+const ID_BY_TOOL = new Map([
+  [hiddenChars, 'hidden-chars'],
+  [textMask, 'text-mask'],
+  [listTools, 'list-tools'],
+  [ieee754, 'ieee754'],
+  [statisticsTool, 'statistics']
+])
 
 const METADATA = [
   [hiddenChars, 'hidden-chars', '隐藏字符检测', '检测并清除零宽字符、BOM、控制符与易混淆字符', 'text'],
@@ -83,12 +91,13 @@ const METADATA = [
 
 describe('new tool metadata', () => {
   for (const [tool, id, name, description, category] of METADATA) {
-    it(`describes ${id} the way the registry expects`, () => {
-      expect(tool.id).toBe(id)
-      expect(tool.name).toBe(name)
-      expect(tool.description).toBe(description)
-      expect(tool.category).toBe(category)
-      expect(typeof tool.icon).toBe('string')
+    it(`registers ${id} with the expected metadata`, () => {
+      const registered = getToolById(id)
+      expect(registered).toBeTruthy()
+      expect(registered.name).toBe(name)
+      expect(registered.description).toBe(description)
+      expect(registered.category).toBe(category)
+      expect(typeof registered.icon).toBe('string')
       expect(typeof tool.render).toBe('function')
       expect(tool.render.length).toBe(1)
     })
@@ -97,16 +106,17 @@ describe('new tool metadata', () => {
 
 describe('tool page integration', () => {
   for (const tool of ALL_TOOLS) {
-    it(`survives the shared layout and result toolbar for ${tool.id}`, () => {
+    const id = ID_BY_TOOL.get(tool)
+    it(`survives the shared layout and result toolbar for ${id}`, () => {
       tool.render(root)
       enhanceFormAccessibility(root)
       expect(() => applyTwoColumnLayout(root)).not.toThrow()
-      expect(() => enhanceResultSections(root, { toolName: tool.id })).not.toThrow()
+      expect(() => enhanceResultSections(root, { toolName: id })).not.toThrow()
 
       // Every tool here is an input → output tool, so the shared heuristic must
       // split it into two columns with the input on the left.
       const grid = root.querySelector('.tool-io-grid')
-      expect(grid, `${tool.id}: no two-column split`).not.toBeNull()
+      expect(grid, `${id}: no two-column split`).not.toBeNull()
       expect(grid.querySelector('.tool-io-input .tool-section')).not.toBeNull()
       expect(grid.querySelector('.tool-io-output .tool-section')).not.toBeNull()
 
@@ -114,7 +124,7 @@ describe('tool page integration', () => {
         expect(table.parentElement?.classList.contains('table-scroll')).toBe(true)
       }
       for (const button of root.querySelectorAll('.btn-icon')) {
-        expect(button.getAttribute('aria-label'), `${tool.id}: icon button without a label`).toBeTruthy()
+        expect(button.getAttribute('aria-label'), `${id}: icon button without a label`).toBeTruthy()
       }
       expect(root.querySelector('.tool-section .tool-section')).toBeNull()
     })
@@ -123,26 +133,27 @@ describe('tool page integration', () => {
 
 describe('new tool UI conventions', () => {
   for (const tool of ALL_TOOLS) {
-    it(`renders ${tool.id} following the shared UI contract`, () => {
+    const id = ID_BY_TOOL.get(tool)
+    it(`renders ${id} following the shared UI contract`, () => {
       expect(() => tool.render(root)).not.toThrow()
       enhanceFormAccessibility(root)
       expect(root.childElementCount).toBeGreaterThan(0)
 
       for (const control of root.querySelectorAll('input, textarea, select')) {
         const hasName = control.labels?.length || control.getAttribute('aria-label') || control.getAttribute('aria-labelledby')
-        expect(Boolean(hasName), `${tool.id}: unnamed ${control.tagName}`).toBe(true)
+        expect(Boolean(hasName), `${id}: unnamed ${control.tagName}`).toBe(true)
       }
-      expect(root.querySelector('select.input'), `${tool.id}: select uses text-input styling`).toBeNull()
-      expect(root.querySelector('button[class="btn"]'), `${tool.id}: button has no variant`).toBeNull()
+      expect(root.querySelector('select.input'), `${id}: select uses text-input styling`).toBeNull()
+      expect(root.querySelector('button[class="btn"]'), `${id}: button has no variant`).toBeNull()
       for (const choice of root.querySelectorAll('input[type="checkbox"], input[type="radio"]')) {
-        expect(choice.closest('label'), `${tool.id}: choice not wrapped in a label`).not.toBeNull()
+        expect(choice.closest('label'), `${id}: choice not wrapped in a label`).not.toBeNull()
       }
       expect(root.querySelector('.tool-section .tool-section, .result-box .tool-section, .tool-section.result-box')).toBeNull()
       for (const table of root.querySelectorAll('table.result-table')) {
-        expect(table.parentElement?.classList.contains('table-scroll'), `${tool.id}: result table not scrollable`).toBe(true)
+        expect(table.parentElement?.classList.contains('table-scroll'), `${id}: result table not scrollable`).toBe(true)
       }
       for (const group of root.querySelectorAll('[role="radiogroup"]')) {
-        expect(group.querySelectorAll('[role="radio"][aria-checked="true"]'), `${tool.id}: invalid segmented state`).toHaveLength(1)
+        expect(group.querySelectorAll('[role="radio"][aria-checked="true"]'), `${id}: invalid segmented state`).toHaveLength(1)
       }
       for (const button of root.querySelectorAll('.form-action-row .btn-secondary')) {
         expect(button.textContent).toBe('示例数据')

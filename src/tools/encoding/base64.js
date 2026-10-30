@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'base64',
-  name: 'Base64 编解码',
-  description: 'Base64 编码与解码，支持 UTF-8 中文',
-  category: 'encoding',
-  icon: 'base64',
   render(container) {
     let mode = 'encode' // 'encode' or 'decode'
 

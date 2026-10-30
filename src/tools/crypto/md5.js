@@ -2,11 +2,6 @@ import { createElement, createCopyButton, createSection } from '../../utils/dom.
 import CryptoJS from 'crypto-js'
 
 export default {
-  id: 'md5',
-  name: 'MD5 哈希',
-  description: '计算文本的 MD5 哈希值',
-  category: 'crypto',
-  icon: 'md5',
   render(container) {
     let isUppercase = false
 

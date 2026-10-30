@@ -2,11 +2,6 @@ import { createElement, createCopyButton, createSection, createSegmentedGroup } 
 import jsYaml from 'js-yaml'
 
 export default {
-  id: 'json-yaml',
-  name: 'JSON ↔ YAML 转换',
-  description: 'JSON 和 YAML 格式相互转换',
-  category: 'converter',
-  icon: 'json-yaml',
   render(container) {
     // Input area
     const inputTextarea = createElement('textarea', {

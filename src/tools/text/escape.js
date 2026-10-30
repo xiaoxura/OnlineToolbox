@@ -1,11 +1,6 @@
 import { createElement, createSection, createSegmentedGroup, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'escape',
-  name: '转义工具',
-  description: 'JSON/JS/HTML 特殊字符转义',
-  category: 'text',
-  icon: 'escape',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

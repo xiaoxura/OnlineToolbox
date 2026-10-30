@@ -2,11 +2,6 @@ import "../../styles/tools/gradient-palette.css"
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'palette-gen',
-  name: '调色板生成',
-  description: '基于色彩理论生成互补色、三色组、类似色等配色方案',
-  category: 'generator',
-  icon: 'color',
   render(container) {
     function hexToHsl(hex) {
       let r = parseInt(hex.slice(1, 3), 16) / 255

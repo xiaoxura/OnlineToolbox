@@ -1,9 +1,9 @@
 import '../../styles/tools/qr.css'
-import bwipjs from 'bwip-js/browser'
+import JsBarcode from 'jsbarcode'
 import { createElement, createSection } from '../../utils/dom.js'
 import { downloadText } from '../../utils/download.js'
 
-// Barcode rendering is delegated to bwip-js; the input validation and the
+// Barcode rendering is delegated to JsBarcode; the input validation and the
 // check-digit maths below stay dependency-free so they are unit-testable.
 
 export const BARCODE_TYPES = [
@@ -18,6 +18,16 @@ const MAX_LENGTHS = {
   code128: 80,
   code39: 64,
   interleaved2of5: 64
+}
+
+// JsBarcode format identifiers. Keeping the mapping explicit means the UI ids
+// stay stable even if the library renames a symbology.
+const JSBARCODE_FORMATS = {
+  code128: 'CODE128',
+  ean13: 'EAN13',
+  upca: 'UPC',
+  code39: 'CODE39',
+  interleaved2of5: 'ITF'
 }
 
 // EAN-13 / UPC-A weighted 3-1 check digit. The rightmost payload digit always
@@ -84,12 +94,6 @@ export function validateBarcodeInput(text, type) {
 }
 
 export default {
-  id: 'barcode',
-  name: '条形码生成',
-  description: '生成 Code128、EAN-13、UPC-A 与 Code39 条形码，可下载 PNG 或 SVG',
-  category: 'generator',
-  icon: 'qrcode',
-  keywords: ['barcode', '条形码', 'code128', 'ean13', 'upca', 'code39'],
   render(container) {
     const typeSelect = createElement('select', { className: 'select', 'aria-label': '条码类型' },
       BARCODE_TYPES.map(item => createElement('option', { value: item.id, textContent: item.name })))
@@ -171,14 +175,19 @@ export default {
 
     const currentType = () => BARCODE_TYPES.find(item => item.id === typeSelect.value) || BARCODE_TYPES[0]
 
-    function buildOptions(value) {
+    function buildOptions() {
+      const heightMm = Math.min(60, Math.max(5, Number(heightInput.value) || 15))
       return {
-        bcid: typeSelect.value,
-        text: value,
-        scale: Math.min(8, Math.max(1, Number(scaleInput.value) || 3)),
-        height: Math.min(60, Math.max(5, Number(heightInput.value) || 15)),
-        includetext: textCheckbox.checked,
-        textxalign: 'center'
+        format: JSBARCODE_FORMATS[typeSelect.value] || 'CODE128',
+        width: Math.min(8, Math.max(1, Number(scaleInput.value) || 3)),
+        // JsBarcode works in CSS pixels; the UI stays in millimetres.
+        height: Math.round(heightMm * 3.78),
+        displayValue: textCheckbox.checked,
+        fontSize: 18,
+        textMargin: 4,
+        margin: 10,
+        background: '#ffffff',
+        lineColor: '#000000'
       }
     }
 
@@ -218,13 +227,13 @@ export default {
       return result
     }
 
-    // Rendering only happens on demand: bwip-js needs a real 2D context, which
-    // jsdom does not provide. Every failure is reported, never thrown.
+    // Rendering only happens on demand: JsBarcode needs a 2D context, which
+    // jsdom does not provide without a stub. Every failure is reported, never thrown.
     function generate() {
       const result = run()
       if (!result) return
       try {
-        bwipjs.toCanvas(canvas, buildOptions(result.value))
+        JsBarcode(canvas, result.value, buildOptions())
         if (!canvas.width || !canvas.height) throw new Error('画布未生成内容')
         canvas.hidden = false
         statusText.textContent = `${currentType().name} · ${result.value}`
@@ -246,13 +255,16 @@ export default {
       link.click()
     }
 
-    async function downloadSvg() {
+    function downloadSvg() {
       const result = run()
       if (!result) return
       try {
-        const svg = await bwipjs.toSVG(buildOptions(result.value))
-        if (typeof svg !== 'string' || !svg) throw new Error('未生成 SVG 内容')
-        downloadText(`${typeSelect.value}-barcode.svg`, svg, 'image/svg+xml;charset=utf-8')
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        JsBarcode(svg, result.value, buildOptions())
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        const serialized = new XMLSerializer().serializeToString(svg)
+        if (!serialized) throw new Error('未生成 SVG 内容')
+        downloadText(`${typeSelect.value}-barcode.svg`, serialized, 'image/svg+xml;charset=utf-8')
       } catch (cause) {
         errorEl.textContent = `生成 SVG 失败：${cause instanceof Error ? cause.message : String(cause)}`
       }

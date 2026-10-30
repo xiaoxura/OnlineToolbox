@@ -235,12 +235,6 @@ const SAMPLE_SINGLE = '1234567.89'
 const SAMPLE_BATCH = '21\n1234.56\n-9000000\n0.05'
 
 export default {
-  id: 'number-to-words',
-  name: '数字转英文',
-  description: '将数字转换为英文单词、序数词与货币读法',
-  category: 'converter',
-  icon: 'radix',
-  keywords: ['number', 'words', '英文', '序数词', 'spell', '货币读法', '中文读法'],
   render(container) {
     const mode = createSegmentedGroup([
       { value: 'cardinal', label: '基数词' },

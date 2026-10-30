@@ -28,13 +28,14 @@ describe('tool registry', () => {
     expect(getToolsByCategoryAndSearch('all', 'unix time').map(tool => tool.id)).toContain('timestamp')
   })
 
-  it('keeps lazy metadata aligned with every implementation', async () => {
+  it('loads every lazy implementation with a render function', async () => {
     for (const descriptor of tools) {
       const { default: implementation } = await descriptor.load()
-      expect(implementation.id).toBe(descriptor.id)
-      expect(implementation.name).toBe(descriptor.name)
-      expect(implementation.description).toBe(descriptor.description)
-      expect(implementation.category).toBe(descriptor.category)
+      // Registry metadata is the single source of truth; modules only implement
+      // render(). Keeping this assertion prevents the metadata from creeping
+      // back into 157 files where it would immediately drift.
+      expect(implementation.id).toBeUndefined()
+      expect(implementation.name).toBeUndefined()
       expect(implementation.render).toEqual(expect.any(Function))
     }
   })

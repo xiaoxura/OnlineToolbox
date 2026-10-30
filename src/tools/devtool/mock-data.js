@@ -115,11 +115,6 @@ const GENERATORS = {
 const GENERATOR_KEYS = Object.keys(GENERATORS)
 
 export default {
-  id: 'mock-data',
-  name: 'Mock 数据生成',
-  description: '生成各类模拟数据：姓名、手机号、邮箱、身份证号、地址等',
-  category: 'devtool',
-  icon: 'random',
   render(container) {
     const selectedTypes = new Set(['name', 'phone', 'email'])
 

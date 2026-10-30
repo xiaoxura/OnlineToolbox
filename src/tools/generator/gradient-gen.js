@@ -2,11 +2,6 @@ import "../../styles/tools/gradient-palette.css"
 import { createElement, createSection, createSegmentedGroup, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'gradient-gen',
-  name: 'CSS 渐变生成器',
-  description: '生成线性渐变和径向渐变的 CSS 代码',
-  category: 'generator',
-  icon: 'color',
   render(container) {
     let currentMode = 'linear'
     let colorStops = [

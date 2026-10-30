@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'csv-json',
-  name: 'CSV 转 JSON',
-  description: '将 CSV 格式转换为 JSON 数组，支持自动检测分隔符',
-  category: 'converter',
-  icon: 'json',
   render(container) {
     // Separator option
     const separatorLabel = createElement('label', { className: 'label', textContent: '分隔符:' })

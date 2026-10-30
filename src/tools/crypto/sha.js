@@ -7,11 +7,6 @@ const ALGORITHMS = {
 }
 
 export default {
-  id: 'sha',
-  name: 'SHA 哈希',
-  description: '计算 SHA-1/SHA-256/SHA-512 哈希值',
-  category: 'crypto',
-  icon: 'sha',
   render(container) {
     let currentAlgo = 'sha256'
     let requestId = 0

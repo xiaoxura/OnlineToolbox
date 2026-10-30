@@ -224,12 +224,6 @@ function tableRow(label, value) {
 }
 
 export default {
-  id: 'db-connection-string',
-  name: '数据库连接串',
-  description: '构建与解析 MySQL、PostgreSQL、MongoDB 与 Redis 连接字符串',
-  category: 'devtool',
-  icon: 'sql',
-  keywords: ['connection string', 'dsn', 'mysql', 'postgres', 'mongodb', 'redis', 'uri'],
   render(container) {
     const dialectSelect = createElement('select', { className: 'select', 'aria-label': '数据库协议' },
       DIALECTS.map(dialect => createElement('option', { value: dialect.id, textContent: `${dialect.label} (${dialect.scheme}://)` })))

@@ -609,12 +609,6 @@ const SAMPLE = {
 }
 
 export default {
-  id: 'json-to-code',
-  name: 'JSON 转代码',
-  description: '将 JSON 转换为 Go、Python、Java、C#、PHP 或 Rust 结构体代码',
-  category: 'converter',
-  icon: 'json',
-  keywords: ['json', 'struct', 'pojo', 'dataclass', 'record', '代码生成', 'go', 'rust'],
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea large',

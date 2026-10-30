@@ -3,11 +3,6 @@ import { createElement, createSection, createCopyButton } from '../../utils/dom.
 import * as Diff from 'diff'
 
 export default {
-  id: 'text-diff',
-  name: '文本对比',
-  description: '对比两段文本的差异',
-  category: 'text',
-  icon: 'text-diff',
   render(container) {
     const leftInput = createElement('textarea', {
       className: 'textarea',

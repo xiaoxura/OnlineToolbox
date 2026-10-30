@@ -207,12 +207,6 @@ const SAMPLE_TEXT = [
 ].join('\n')
 
 export default {
-  id: 'text-mask',
-  name: '文本脱敏',
-  description: '对邮箱、手机号、身份证、银行卡与密钥进行掩码脱敏',
-  category: 'text',
-  icon: 'shield-link',
-  keywords: ['脱敏', '掩码', 'mask', '隐私', '手机号', '身份证', '打码'],
   render(container) {
     const kindBoxes = new Map()
     const kindsGrid = createElement('div', { className: 'grid-3' })

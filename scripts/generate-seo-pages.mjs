@@ -22,7 +22,7 @@ const { categories, tools } = await import('../src/tools/registry.js')
 
 const outputDir = resolve('dist')
 const manifestPath = resolve('.seo-manifest.json')
-const siteUrl = (process.env.SITE_URL || 'https://xiaoxura.github.io/OnlineToolbox/').replace(/\/?$/, '/')
+const siteUrl = (process.env.SITE_URL || 'https://tools.xiaoxura.com/').replace(/\/?$/, '/')
 const siteName = '在线工具箱'
 const repoUrl = 'https://github.com/xiaoxura/OnlineToolbox'
 const today = new Date().toISOString().slice(0, 10)
@@ -44,6 +44,7 @@ const escapeHtml = value => String(value)
 const jsonLd = value => JSON.stringify(value).replaceAll('<', '\\u003c')
 
 const toolUrl = tool => `${siteUrl}tools/${encodeURIComponent(tool.id)}/`
+const categoryUrl = category => `${siteUrl}categories/${encodeURIComponent(category.id)}/`
 const appUrl = tool => `../../index.html#/${encodeURIComponent(tool.id)}`
 const categoryName = tool => categoryNames.get(tool.category) || '在线工具'
 
@@ -129,7 +130,7 @@ function buildFaq(tool, fact) {
   faq.push(local
     ? {
         question: `使用「${tool.name}」时，我的数据会被上传吗？`,
-        answer: `不会。「${tool.name}」的全部计算都在你的浏览器内完成，输入内容不会发送到任何服务器。页面本身是静态资源，加载后即可离线使用。`
+        answer: `不会。「${tool.name}」的全部计算都在你的浏览器内完成，输入内容不会发送到任何服务器。页面与已访问过的工具会缓存到本地，断网后仍可继续使用；首次打开某个工具时需要联网下载它。`
       }
     : {
         question: `使用「${tool.name}」时，我的数据会被上传吗？`,
@@ -198,6 +199,42 @@ function renderRelated(tool) {
       <ul class="related">${links}</ul>`
 }
 
+const PAGE_CSS = `    :root{color-scheme:light dark;--bg:#f4f5f8;--fg:#171923;--muted:#667085;--line:#e3e5ec;--accent:#4f46d9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg)}
+    @media(prefers-color-scheme:dark){:root{--bg:#111216;--fg:#f5f6f8;--muted:#c3c6ce;--line:#2a2d36;--accent:#aaa5ff}}
+    body{margin:0;padding:0 24px 72px}
+    main{width:min(760px,100%);margin:0 auto}
+    .top{border-top:3px solid var(--accent);padding:28px 0 20px}
+    nav[aria-label=breadcrumb]{font-size:13px;color:var(--muted);margin-bottom:14px}
+    nav[aria-label=breadcrumb] a{color:var(--accent);text-decoration:none}
+    nav[aria-label=breadcrumb] a:hover{text-decoration:underline}
+    h1{margin:8px 0 12px;font-size:30px;letter-spacing:0;line-height:1.3}
+    h2{margin:34px 0 10px;font-size:18px}
+    p,li{color:var(--muted);line-height:1.75}
+    ol,ul{padding-left:22px}
+    .lead{font-size:16px;color:var(--fg)}
+    .cta{display:inline-flex;margin:22px 0 4px;padding:12px 22px;border-radius:6px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700}
+    .cta:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+    th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+    th[scope=row]{color:var(--fg);font-weight:600;width:34%}
+    thead th{color:var(--muted);font-weight:600;font-size:13px}
+    .related{display:flex;flex-wrap:wrap;gap:8px 10px;list-style:none;padding:0;margin:12px 0}
+    .related a{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;font-size:13px}
+    .related a:hover{border-color:var(--accent);color:var(--accent)}
+    details{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:8px 0}
+    summary{cursor:pointer;font-weight:600;color:var(--fg)}
+    details p{margin:10px 0 2px}
+    footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+    footer a{color:var(--accent)}
+.tool-list{list-style:none;padding:0;margin:14px 0;display:grid;gap:10px}
+.tool-list a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:8px;color:var(--fg);text-decoration:none}
+.tool-list a:hover{border-color:var(--accent)}
+.tool-list strong{display:block;font-size:15px}
+.tool-list span{display:block;margin-top:3px;font-size:13px;color:var(--muted)}
+.category-nav{display:flex;flex-wrap:wrap;gap:8px 10px;list-style:none;padding:0;margin:12px 0}
+.category-nav a{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;font-size:13px}
+.category-nav a:hover{border-color:var(--accent);color:var(--accent)}`
+
 function toolPage(tool, fact) {
   const title = `${tool.name} - 在线免费使用 - ${siteName}`
   const canonical = toolUrl(tool)
@@ -228,7 +265,7 @@ function toolPage(tool, fact) {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: siteName, item: siteUrl },
-        { '@type': 'ListItem', position: 2, name: categoryName(tool), item: `${siteUrl}#/` },
+        { '@type': 'ListItem', position: 2, name: categoryName(tool), item: categoryUrl({ id: tool.category }) },
         { '@type': 'ListItem', position: 3, name: tool.name, item: canonical }
       ]
     },
@@ -269,41 +306,13 @@ function toolPage(tool, fact) {
   <meta name="twitter:description" content="${escapeHtml(tool.description)}">
   <meta name="twitter:image" content="${escapeHtml(`${canonical}og.png`)}">
   ${schema}
-  <style>
-    :root{color-scheme:light dark;--bg:#f4f5f8;--fg:#171923;--muted:#667085;--line:#e3e5ec;--accent:#4f46d9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg)}
-    @media(prefers-color-scheme:dark){:root{--bg:#111216;--fg:#f5f6f8;--muted:#c3c6ce;--line:#2a2d36;--accent:#aaa5ff}}
-    body{margin:0;padding:0 24px 72px}
-    main{width:min(760px,100%);margin:0 auto}
-    .top{border-top:3px solid var(--accent);padding:28px 0 20px}
-    nav[aria-label=breadcrumb]{font-size:13px;color:var(--muted);margin-bottom:14px}
-    nav[aria-label=breadcrumb] a{color:var(--accent);text-decoration:none}
-    nav[aria-label=breadcrumb] a:hover{text-decoration:underline}
-    h1{margin:8px 0 12px;font-size:30px;letter-spacing:0;line-height:1.3}
-    h2{margin:34px 0 10px;font-size:18px}
-    p,li{color:var(--muted);line-height:1.75}
-    ol,ul{padding-left:22px}
-    .lead{font-size:16px;color:var(--fg)}
-    .cta{display:inline-flex;margin:22px 0 4px;padding:12px 22px;border-radius:6px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700}
-    .cta:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-    table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
-    th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
-    th[scope=row]{color:var(--fg);font-weight:600;width:34%}
-    thead th{color:var(--muted);font-weight:600;font-size:13px}
-    .related{display:flex;flex-wrap:wrap;gap:8px 10px;list-style:none;padding:0;margin:12px 0}
-    .related a{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;font-size:13px}
-    .related a:hover{border-color:var(--accent);color:var(--accent)}
-    details{border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:8px 0}
-    summary{cursor:pointer;font-weight:600;color:var(--fg)}
-    details p{margin:10px 0 2px}
-    footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
-    footer a{color:var(--accent)}
-  </style>
+  <style>${PAGE_CSS}</style>
 </head>
 <body>
   <main>
     <div class="top">
       <nav aria-label="breadcrumb">
-        <a href="../../">${escapeHtml(siteName)}</a> / ${escapeHtml(categoryName(tool))} / ${escapeHtml(tool.name)}
+        <a href="../../">${escapeHtml(siteName)}</a> / <a href="../../categories/${escapeHtml(tool.category)}/">${escapeHtml(categoryName(tool))}</a> / ${escapeHtml(tool.name)}
       </nav>
       <h1>${escapeHtml(tool.name)}</h1>
       <p class="lead">${escapeHtml(capabilityParagraph(tool, fact))}</p>
@@ -322,6 +331,128 @@ ${faq.map(item => `    <details>
 
     <footer>
       <p>${escapeHtml(siteName)} · ${escapeHtml(categoryName(tool))} · 浏览器本地运行 · 无需登录</p>
+      <p><a href="${escapeHtml(repoUrl)}" rel="noopener">MIT 开源项目</a></p>
+    </footer>
+  </main>
+</body>
+</html>`
+}
+
+function categoryPage(category, list) {
+  const canonical = categoryUrl(category)
+  const title = `${category.name}工具 - 在线免费使用 - ${siteName}`
+  const description = `${list.length} 个${category.name}类在线工具，浏览器本地运行，无需注册，免费使用。`
+  const related = categories.filter(item => item.id !== 'all' && item.id !== category.id).slice(0, 8)
+  const faq = [
+    {
+      question: `${category.name}分类包含哪些工具？`,
+      answer: `当前包含 ${list.map(tool => `「${tool.name}」`).join('、')}，共 ${list.length} 个工具。`
+    },
+    {
+      question: `使用${category.name}工具需要付费或登录吗？`,
+      answer: '不需要。全部工具免费使用，无需注册、登录或安装，直接在浏览器中打开即可。'
+    }
+  ]
+
+  const schema = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: `${category.name}工具`,
+      description,
+      url: canonical,
+      inLanguage: 'zh-CN',
+      isPartOf: { '@type': 'WebSite', name: siteName, url: siteUrl }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: `${category.name}工具列表`,
+      numberOfItems: list.length,
+      itemListElement: list.map((tool, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: tool.name,
+        description: tool.description,
+        url: toolUrl(tool)
+      }))
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: siteName, item: siteUrl },
+        { '@type': 'ListItem', position: 2, name: category.name, item: canonical }
+      ]
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faq.map(item => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer }
+      }))
+    }
+  ].map(entry => `<script type="application/ld+json">${jsonLd(entry)}</script>`).join('\n  ')
+
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(title)}</title>
+  <meta name="description" content="${escapeHtml(description)}">
+  <meta name="theme-color" content="#f4f5f8">
+  <meta name="color-scheme" content="light dark">
+  <link rel="canonical" href="${escapeHtml(canonical)}">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${escapeHtml(siteName)}">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:title" content="${escapeHtml(title)}">
+  <meta property="og:description" content="${escapeHtml(description)}">
+  <meta property="og:url" content="${escapeHtml(canonical)}">
+  <meta property="og:image" content="${escapeHtml(`${canonical}og.png`)}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${escapeHtml(`${category.name}工具`)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeHtml(title)}">
+  <meta name="twitter:description" content="${escapeHtml(description)}">
+  <meta name="twitter:image" content="${escapeHtml(`${canonical}og.png`)}">
+  ${schema}
+  <style>${PAGE_CSS}</style>
+</head>
+<body>
+  <main>
+    <div class="top">
+      <nav aria-label="breadcrumb">
+        <a href="../../">${escapeHtml(siteName)}</a> / ${escapeHtml(category.name)}
+      </nav>
+      <h1>${escapeHtml(category.name)}工具</h1>
+      <p class="lead">${escapeHtml(description)}</p>
+      <a class="cta" href="../../index.html?category=${encodeURIComponent(category.id)}">在工具箱中浏览</a>
+    </div>
+
+    <h2>本分类的工具</h2>
+    <ul class="tool-list">
+${list.map(tool => `      <li><a href="../../tools/${encodeURIComponent(tool.id)}/"><strong>${escapeHtml(tool.name)}</strong><span>${escapeHtml(tool.description)}</span></a></li>`).join('\n')}
+    </ul>
+
+    <h2>其他分类</h2>
+    <ul class="category-nav">
+${related.map(item => `      <li><a href="../${encodeURIComponent(item.id)}/">${escapeHtml(item.name)}</a></li>`).join('\n')}
+    </ul>
+
+    <h2>常见问题</h2>
+${faq.map(item => `    <details>
+      <summary>${escapeHtml(item.question)}</summary>
+      <p>${escapeHtml(item.answer)}</p>
+    </details>`).join('\n')}
+
+    <footer>
+      <p>${escapeHtml(siteName)} · ${escapeHtml(category.name)} · 浏览器本地运行 · 无需登录</p>
       <p><a href="${escapeHtml(repoUrl)}" rel="noopener">MIT 开源项目</a></p>
     </footer>
   </main>
@@ -361,6 +492,25 @@ for (const tool of tools) {
   const lastmod = previous && previous.hash === hash ? previous.lastmod : today
   nextManifest[tool.id] = { hash, lastmod }
   sitemapEntries.push({ loc: toolUrl(tool), lastmod, changefreq: 'monthly', priority: '0.8' })
+}
+
+for (const category of categories.filter(item => item.id !== 'all')) {
+  const list = toolsByCategory.get(category.id) || []
+  if (!list.length) continue
+  const html = categoryPage(category, list)
+  const directory = resolve(outputDir, 'categories', category.id)
+  await mkdir(directory, { recursive: true })
+  await writeFile(resolve(directory, 'index.html'), html)
+  await writeFile(resolve(directory, 'og.png'), renderOgCard({ id: `category-${category.id}`, category: category.id }))
+  const hash = createHash('sha256')
+    .update(html.split(siteUrl).join('{{SITE_URL}}'))
+    .digest('hex')
+    .slice(0, 16)
+  const key = `category:${category.id}`
+  const previous = manifest[key]
+  const lastmod = previous && previous.hash === hash ? previous.lastmod : today
+  nextManifest[key] = { hash, lastmod }
+  sitemapEntries.push({ loc: categoryUrl(category), lastmod, changefreq: 'monthly', priority: '0.7' })
 }
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -409,6 +559,7 @@ const llmsHeader = `# ${siteName}
 > ${tools.length} 个在浏览器本地运行的开发者与办公实用工具，涵盖编码解码、哈希加密、文本处理、数据转换、格式化、生成器、网络与数学计算。纯静态站点，无需注册，除 IP 查询外所有输入不离开浏览器。
 
 - 站点首页：${siteUrl}
+- 分类索引：${categories.filter(category => category.id !== 'all').map(category => `[${category.name}](${categoryUrl(category)})`).join('、')}
 - 源码仓库：${repoUrl}
 - 开源协议：MIT
 - 语言：简体中文

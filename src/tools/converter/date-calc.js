@@ -3,11 +3,6 @@ import { createCopyButton, createElement, createSection, createTabGroup } from '
 const WEEKDAYS = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 
 export default {
-  id: 'date-calc',
-  name: '日期计算器',
-  description: '计算日期差和日期加减',
-  category: 'converter',
-  icon: 'timestamp',
 
   render(container) {
     const tabs = createTabGroup([

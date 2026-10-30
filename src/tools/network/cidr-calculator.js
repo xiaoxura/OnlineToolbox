@@ -24,7 +24,7 @@ export function calculateCidr(value) {
 }
 
 export default {
-  id: 'cidr-calculator', name: 'IPv4/CIDR 计算器', description: '计算 IPv4 网段、子网掩码、广播地址和可用地址范围', category: 'network', icon: 'unicode',
+
   render(container) {
     const input = createElement('input', { className: 'input', value: '192.168.1.10/24', placeholder: '例如 192.168.1.10/24' })
     const error = createElement('div', { className: 'error-text' })

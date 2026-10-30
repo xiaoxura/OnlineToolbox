@@ -2,11 +2,6 @@ import { createElement, createCopyButton, createSection, createSegmentedGroup } 
 import CryptoJS from 'crypto-js'
 
 export default {
-  id: 'text-encrypt',
-  name: '文本加密',
-  description: '使用 AES 加密和解密文本',
-  category: 'text',
-  icon: 'aes',
   render(container) {
     let mode = 'encrypt'
 

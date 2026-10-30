@@ -64,11 +64,6 @@ const CATEGORIES = [
 ]
 
 export default {
-  id: 'regex-ref',
-  name: '正则表达式速查表',
-  description: '正则表达式语法参考，按分类查看常用模式、描述和示例',
-  category: 'devtool',
-  icon: 'regex',
   render(container) {
     const searchInput = createElement('input', {
       className: 'input',

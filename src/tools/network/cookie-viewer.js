@@ -1,11 +1,6 @@
 import { createCopyButton, createElement, createSection, createTableScroll } from '../../utils/dom.js'
 
 export default {
-  id: 'cookie-viewer',
-  name: 'Cookie 查看器',
-  description: '查看当前页面的 Cookie 信息',
-  category: 'network',
-  icon: 'search',
 
   render(container) {
     const notice = createElement('div', {

@@ -2,7 +2,7 @@ import '../../styles/tools/markdown.css'
 import { createElement, createSection } from '../../utils/dom.js'
 import { renderTextTransform } from '../shared/text-transform.js'
 import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '../../utils/sanitize.js'
 
 // --- HTML → Markdown --------------------------------------------------------
 // The document is parsed with DOMParser and walked node by node (never with a
@@ -457,7 +457,7 @@ function renderPreview(target, markdown) {
     target.innerHTML = ''
     return
   }
-  target.innerHTML = DOMPurify.sanitize(marked.parse(markdown, { gfm: true, breaks: false }))
+  target.innerHTML = sanitizeHtml(marked.parse(markdown, { gfm: true, breaks: false }))
 }
 
 const SAMPLE_HTML = `<article>
@@ -486,12 +486,6 @@ const SAMPLE_HTML = `<article>
 </article>`
 
 export default {
-  id: 'html-to-markdown',
-  name: 'HTML 转 Markdown',
-  description: '将 HTML 转换为 Markdown，支持标题、列表、链接、表格与代码块',
-  category: 'converter',
-  icon: 'markdown',
-  keywords: ['html', 'markdown', '转换', '富文本'],
   render(container) {
     const keepHtmlBox = createElement('input', { type: 'checkbox' })
     const absoluteBox = createElement('input', { type: 'checkbox' })

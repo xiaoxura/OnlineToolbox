@@ -30,7 +30,7 @@ export function jsonToTypeScript(value, rootName = 'Root', useType = false, opti
 }
 
 export default {
-  id: 'json-typescript', name: 'JSON 转 TypeScript', description: '根据 JSON 自动生成 TypeScript interface 或 type', category: 'converter', icon: 'json',
+
   render(container) {
     const input = createElement('textarea', { className: 'textarea large', placeholder: '粘贴 JSON 数据…' })
     const output = createElement('textarea', { className: 'textarea large', readOnly: true, placeholder: 'TypeScript 类型将在这里生成…' })

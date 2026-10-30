@@ -2,11 +2,6 @@ import "../../styles/tools/radix.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'radix',
-  name: '进制转换',
-  description: '2/8/10/16 进制数相互转换',
-  category: 'converter',
-  icon: 'radix',
   render(container) {
     const radixLabels = {
       2: '二进制',

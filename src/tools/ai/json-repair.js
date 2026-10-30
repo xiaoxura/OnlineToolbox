@@ -207,11 +207,6 @@ const SAMPLE = `模型输出如下：
 以上是结构化结果。`
 
 export default {
-  id: 'llm-json-repair',
-  name: 'LLM 输出 JSON 修复',
-  description: '从模型回复中提取 JSON，修复尾随逗号、单引号等常见错误',
-  category: 'ai',
-  icon: 'ai-json',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea large',

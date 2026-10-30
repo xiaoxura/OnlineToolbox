@@ -84,12 +84,6 @@ const SAMPLE_TEXT = '123456789'
 const SAMPLE_HEX = '48 65 6C 6C 6F'
 
 export default {
-  id: 'crc-calculator',
-  name: 'CRC 校验和',
-  description: '计算 CRC-16、CRC-32、CRC-32C 与 Adler-32 校验和，支持文本与十六进制输入',
-  category: 'crypto',
-  icon: 'crc',
-  keywords: ['crc32', 'crc16', 'adler', '校验和', 'checksum', 'modbus'],
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

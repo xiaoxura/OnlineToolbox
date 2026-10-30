@@ -2,11 +2,6 @@ import "../../styles/tools/color-picker.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'color',
-  name: '颜色转换',
-  description: 'HEX/RGB/HSL 颜色格式相互转换',
-  category: 'converter',
-  icon: 'color',
   render(container) {
     // Color picker + preview
     const pickerWrapper = createElement('div', { className: 'color-picker-wrap' })

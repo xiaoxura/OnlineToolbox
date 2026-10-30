@@ -1,11 +1,6 @@
 import { createElement, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'big-number',
-  name: '大数计算器',
-  description: '大数进制转换和高精度四则运算，支持任意长度整数',
-  category: 'math',
-  icon: 'radix',
   render(container) {
     const tabContainer = createElement('div')
     const contentContainer = createElement('div')

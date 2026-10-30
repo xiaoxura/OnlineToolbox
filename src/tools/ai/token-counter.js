@@ -4,8 +4,10 @@ import { createElement, createSection, createSegmentedGroup, createTableScroll }
 // chunk, so a run only pays for the encoding it actually asks for and the
 // chunk never reaches the first paint.
 const ENCODINGS = [
-  { value: 'o200k_base', label: 'o200k_base', chatModel: 'gpt-4o' },
-  { value: 'cl100k_base', label: 'cl100k_base', chatModel: 'gpt-4' }
+  // cl100k is the default because its vocabulary is less than half the size of
+  // o200k (~440 KB vs ~1.0 MB gzip), so the first run stays cheap.
+  { value: 'cl100k_base', label: 'cl100k_base', chatModel: 'gpt-4' },
+  { value: 'o200k_base', label: 'o200k_base', chatModel: 'gpt-4o' }
 ]
 
 const ENCODING_HINTS = {
@@ -88,11 +90,6 @@ function utf8Bytes(text) {
 }
 
 export default {
-  id: 'token-counter',
-  name: 'Token 计数器',
-  description: '按 BPE 分词器精确计算文本或对话消息的 token 数',
-  category: 'ai',
-  icon: 'ai-token',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea large',
@@ -105,7 +102,7 @@ export default {
     const tableHost = createElement('div')
     const tableHint = createElement('div', { className: 'form-hint' })
 
-    const encodingHint = createElement('div', { className: 'form-hint', textContent: ENCODING_HINTS.o200k_base })
+    const encodingHint = createElement('div', { className: 'form-hint', textContent: ENCODING_HINTS.cl100k_base })
 
     const encodingGroup = createSegmentedGroup(ENCODINGS, value => {
       encodingHint.textContent = ENCODING_HINTS[value]

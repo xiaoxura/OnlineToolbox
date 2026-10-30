@@ -1,11 +1,6 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'shadow-gen',
-  name: 'CSS 阴影生成器',
-  description: '可视化调整并生成 box-shadow CSS 代码',
-  category: 'generator',
-  icon: 'json',
   render(container) {
     function createSliderGroup(labelText, id, min, max, defaultValue) {
       const input = createElement('input', {

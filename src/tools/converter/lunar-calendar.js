@@ -282,12 +282,6 @@ function yearOptions() {
 }
 
 export default {
-  id: 'lunar-calendar',
-  name: '农历 ↔ 公历',
-  description: '公历与农历互转，显示天干地支、生肖、节气与星期',
-  category: 'converter',
-  icon: 'timestamp',
-  keywords: ['农历', '公历', '阴历', '阳历', '干支', '生肖', '节气', 'lunar'],
   render(container) {
     const mode = createSegmentedGroup([
       { value: 'solar-to-lunar', label: '公历 → 农历' },

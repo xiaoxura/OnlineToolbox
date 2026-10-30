@@ -1,11 +1,6 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'case-convert',
-  name: '大小写转换',
-  description: '文本大小写和全角半角转换',
-  category: 'text',
-  icon: 'case-convert',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

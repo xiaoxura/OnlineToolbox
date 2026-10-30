@@ -49,12 +49,6 @@ const SAMPLE_URL = 'https://example.com/login?user=admin@example.com&next=http:/
 const SAMPLE_DEFANGED = 'hxxps[://]example[.]com/login?user=admin[@]example[.]com&next=hxxp[://]evil[.]test'
 
 export default {
-  id: 'url-defang',
-  name: 'URL 去毒化',
-  description: '将链接、域名、IP 与邮箱转换为不可点击的安全形式（defang/refang）',
-  category: 'network',
-  icon: 'shield-link',
-  keywords: ['defang', 'refang', '去毒', '安全分享', 'ioc', '威胁情报'],
   render(container) {
     let state
     const mode = createSegmentedGroup([

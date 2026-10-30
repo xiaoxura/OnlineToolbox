@@ -3,11 +3,6 @@ import "../../styles/tools/image-preview.css"
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'img-to-base64',
-  name: '图片转 Base64',
-  description: '将图片转换为 Base64 编码字符串',
-  category: 'image',
-  icon: 'base64',
   render(container) {
     const fullOutput = createElement('textarea', {
       className: 'textarea',

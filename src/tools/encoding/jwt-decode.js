@@ -2,11 +2,6 @@ import "../../styles/tools/jwt.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'jwt',
-  name: 'JWT 解析',
-  description: '解析 JWT Token，显示 Header、Payload 和 Signature',
-  category: 'encoding',
-  icon: 'jwt',
   render(container) {
     function base64UrlDecode(str) {
       let base64 = str.replace(/-/g, '+').replace(/_/g, '/')

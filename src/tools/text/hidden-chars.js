@@ -194,12 +194,6 @@ function statCard(label, value) {
 }
 
 export default {
-  id: 'hidden-chars',
-  name: '隐藏字符检测',
-  description: '检测并清除零宽字符、BOM、控制符与易混淆字符',
-  category: 'text',
-  icon: 'unicode',
-  keywords: ['zero width', '零宽', 'bom', '不可见字符', '同形字', 'homoglyph'],
   render(container) {
     let state
     let refresh = () => {}

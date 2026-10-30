@@ -69,11 +69,6 @@ function parseJson(value, label) {
 }
 
 export default {
-  id: 'json-patch',
-  name: 'JSON Patch 生成',
-  description: '对比两组 JSON，生成符合 RFC 6902 的 add、remove 和 replace 操作',
-  category: 'converter',
-  icon: 'json',
 
   render(container) {
     const sourceInput = createElement('textarea', {

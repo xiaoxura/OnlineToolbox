@@ -7,11 +7,6 @@ import {
 const money = value => `$${Number(value.toFixed(4))}`
 
 export default {
-  id: 'llm-models',
-  name: '大模型对照表',
-  description: '对比主流大模型的上下文窗口与每百万 token 价格',
-  category: 'ai',
-  icon: 'ai-model',
   render(container) {
     const tableHost = createElement('div')
     const notesHost = createElement('div')

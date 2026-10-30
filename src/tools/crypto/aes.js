@@ -2,11 +2,6 @@ import { createElement, createCopyButton, createSection, createSegmentedGroup } 
 import CryptoJS from 'crypto-js'
 
 export default {
-  id: 'aes',
-  name: 'AES 加解密',
-  description: 'AES 对称加密和解密',
-  category: 'crypto',
-  icon: 'aes',
   render(container) {
     let currentMode = 'CBC'
     let currentPadding = 'Pkcs7'

@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'xml',
-  name: 'XML 格式化',
-  description: 'XML 代码美化和压缩',
-  category: 'formatter',
-  icon: 'xml',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

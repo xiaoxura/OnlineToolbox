@@ -1,5 +1,6 @@
 import '../../styles/tools/word-frequency.css'
 import { createElement, createSection, createSegmentedGroup, createTableScroll } from '../../utils/dom.js'
+import { debounce } from '../../utils/debounce.js'
 
 // --- Word frequency ---------------------------------------------------------
 // Chinese has no word delimiters, so a CJK run is cut into overlapping
@@ -113,12 +114,6 @@ The toolbox runs fully offline, and offline tools keep your data local.`
 const BAR_LIMIT = 10
 
 export default {
-  id: 'word-frequency',
-  name: '词频统计',
-  description: '统计文本中词语出现次数、占比并排序',
-  category: 'text',
-  icon: 'char-count',
-  keywords: ['词频', '统计', 'word frequency', '分词', 'bigram'],
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',
@@ -259,7 +254,11 @@ export default {
       onClick: run
     })
 
-    input.addEventListener('input', run)
+    const scheduleRun = debounce(run)
+    input.addEventListener('input', () => {
+      if (input.value.length > 8000) scheduleRun()
+      else run()
+    })
     for (const control of [minLength, topN, stopwordBox, caseBox]) {
       control.addEventListener('change', run)
     }
@@ -298,5 +297,7 @@ export default {
     )
 
     run()
+
+    return () => scheduleRun.cancel()
   }
 }

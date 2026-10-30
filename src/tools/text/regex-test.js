@@ -3,11 +3,6 @@ import { createElement, createSection, createTableScroll } from '../../utils/dom
 import { escapeHtml } from '../../utils/html.js'
 
 export default {
-  id: 'regex',
-  name: '正则表达式测试',
-  description: '正则表达式在线测试和匹配',
-  category: 'text',
-  icon: 'regex',
   render(container) {
     const patternInput = createElement('input', {
       className: 'input',

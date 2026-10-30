@@ -2,11 +2,6 @@ import "../../styles/tools/drop-area.css"
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'data-url',
-  name: 'Data URL 生成',
-  description: '将本地文件转换为可嵌入 HTML 或 CSS 的 Data URL',
-  category: 'encoding',
-  icon: 'img-to-base64',
   render(container) {
     let activeReader = null
     let readVersion = 0

@@ -2,11 +2,6 @@ import { createElement, createSection, createCopyButton } from '../../utils/dom.
 import { escapeHtml } from '../../utils/html.js'
 
 export default {
-  id: 'text-replace',
-  name: '文本替换',
-  description: '批量查找和替换文本',
-  category: 'text',
-  icon: 'text-replace',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

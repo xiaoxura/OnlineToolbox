@@ -1,11 +1,6 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'text-dedup',
-  name: '文本去重',
-  description: '去除重复的行',
-  category: 'text',
-  icon: 'text-dedup',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

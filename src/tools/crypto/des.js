@@ -2,11 +2,6 @@ import { createElement, createCopyButton, createSection, createSegmentedGroup } 
 import CryptoJS from 'crypto-js'
 
 export default {
-  id: 'des',
-  name: 'DES 加解密',
-  description: 'DES/3DES 对称加密和解密',
-  category: 'crypto',
-  icon: 'des',
   render(container) {
     let currentAlgo = 'des'
     let currentMode = 'CBC'

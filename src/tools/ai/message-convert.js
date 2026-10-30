@@ -33,11 +33,6 @@ const SAMPLES = {
 const formatOptions = chatFormats.map(format => ({ value: format.id, label: format.label }))
 
 export default {
-  id: 'message-convert',
-  name: '对话格式互转',
-  description: '在 OpenAI、Anthropic、Gemini 三种消息格式之间互转，支持工具调用',
-  category: 'ai',
-  icon: 'ai-convert',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea large',

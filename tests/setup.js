@@ -27,6 +27,7 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
     putImageData: vi.fn(), createImageData: vi.fn(), setTransform: vi.fn(),
     save: vi.fn(), restore: vi.fn(), beginPath: vi.fn(), closePath: vi.fn(),
     moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(), fill: vi.fn(), arc: vi.fn(),
+    translate: vi.fn(), rotate: vi.fn(), scale: vi.fn(),
     measureText: vi.fn(() => ({ width: 0 })), fillText: vi.fn(), strokeText: vi.fn()
   }))
 })

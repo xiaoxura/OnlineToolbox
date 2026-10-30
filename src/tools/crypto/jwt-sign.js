@@ -325,12 +325,6 @@ function createKeyRow(labelText, select, hint) {
 }
 
 export default {
-  id: 'jwt-sign',
-  name: 'JWT 签发与验签',
-  description: '使用 HS256/HS384/HS512 或 RS256/ES256 签发并校验 JWT 令牌',
-  category: 'crypto',
-  icon: 'jwt',
-  keywords: ['jwt', 'jws', 'jose', '签名', '验签', 'hs256', 'rs256', 'es256', '令牌'],
   render(container) {
     // Cached demo material so 「示例数据」 can fill a working sign→verify pair.
     let demoKeys = null

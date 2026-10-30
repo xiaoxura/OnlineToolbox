@@ -158,11 +158,6 @@ function parseCron(expr) {
 }
 
 export default {
-  id: 'cron',
-  name: 'Cron 表达式解析',
-  description: '解析 Cron 表达式，显示各字段含义和下次执行时间',
-  category: 'devtool',
-  icon: 'timestamp',
   render(container) {
     // --- Input section ---
     const cronInput = createElement('input', {

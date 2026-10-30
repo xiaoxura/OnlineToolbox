@@ -292,12 +292,6 @@ function buildQuestionTabs() {
 }
 
 export default {
-  id: 'percentage',
-  name: '百分比计算器',
-  description: '计算百分比、增减幅度、占比与折扣',
-  category: 'math',
-  icon: 'calculator',
-  keywords: ['百分比', '百分数', '折扣', '占比', '百分点', 'percent'],
   render(container) {
     const tabs = createTabGroup(
       buildQuestionTabs().map(tab => ({ label: tab.label, content: tab.question.fill })),

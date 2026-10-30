@@ -1,5 +1,5 @@
 import "../../styles/tools/xpath.css"
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '../../utils/sanitize.js'
 import { createElement, createSection, createSegmentedGroup, createTableScroll } from '../../utils/dom.js'
 
 // XPath tester: parse an HTML/XML document, evaluate an expression against it
@@ -171,7 +171,7 @@ export function evaluateXPath(source, expression, mode = 'html') {
 export function highlightMatches(container, source, expression, mode = 'html') {
   container.replaceChildren()
   if (mode !== 'html') return 0
-  const clean = DOMPurify.sanitize(String(source ?? ''), {
+  const clean = sanitizeHtml(String(source ?? ''), {
     FORBID_TAGS: ['style', 'link', 'base', 'meta', 'title'],
     FORBID_ATTR: ['srcset']
   })
@@ -233,12 +233,6 @@ const SAMPLES = {
 }
 
 export default {
-  id: 'xpath-tester',
-  name: 'XPath 测试器',
-  description: '在 HTML 或 XML 上实时测试 XPath 表达式并高亮匹配结果',
-  category: 'devtool',
-  icon: 'json-path',
-  keywords: ['xpath', 'html', 'xml', '选择器', '爬虫'],
   render(container) {
     const documentInput = createElement('textarea', {
       className: 'textarea',

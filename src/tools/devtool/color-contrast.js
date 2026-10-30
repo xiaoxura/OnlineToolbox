@@ -35,11 +35,6 @@ function colorField(label, initial) {
 }
 
 export default {
-  id: 'color-contrast',
-  name: 'WCAG 颜色对比度',
-  description: '计算前景色与背景色对比度，检查 WCAG AA/AAA 标准',
-  category: 'devtool',
-  icon: 'color',
   render(container) {
     const foreground = colorField('前景色', '#1f2937')
     const background = colorField('背景色', '#ffffff')

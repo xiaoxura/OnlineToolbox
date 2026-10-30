@@ -10,7 +10,7 @@ export function permissionFromMode(mode) {
 }
 
 export default {
-  id: 'chmod-calculator', name: 'chmod 权限计算器', description: '可视化计算 Linux 文件权限和 chmod 命令', category: 'devtool', icon: 'linux-ref',
+
   render(container) {
     const modeInput = createElement('input', { className: 'input', value: '755', inputMode: 'numeric', maxlength: '3', placeholder: '755' })
     const command = createElement('input', { className: 'input', readOnly: true, 'aria-label': 'chmod 命令' })

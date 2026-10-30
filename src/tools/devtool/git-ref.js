@@ -122,11 +122,6 @@ const CATEGORIES = [
 ]
 
 export default {
-  id: 'git-ref',
-  name: 'Git 命令速查',
-  description: '常用 Git 命令参考，按分类查找并快速复制命令',
-  category: 'devtool',
-  icon: 'search',
   render(container) {
     const searchInput = createElement('input', {
       className: 'input',

@@ -55,11 +55,6 @@ function wrapLine(line, width, breakLongWords) {
 }
 
 export default {
-  id: 'text-wrap',
-  name: '文本自动换行',
-  description: '按指定列宽自动换行并保留段落结构',
-  category: 'text',
-  icon: 'lorem',
   render(container) {
     const width = createElement('input', { className: 'input', type: 'number', min: '10', max: '500', value: '80' })
     const breakLong = createElement('input', { type: 'checkbox', checked: true })

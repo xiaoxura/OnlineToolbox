@@ -2,11 +2,6 @@ import { createElement } from '../../utils/dom.js'
 import { renderTextTransform } from '../shared/text-transform.js'
 
 export default {
-  id: 'slugify',
-  name: 'Slug 生成器',
-  description: '将标题或文本转换为 URL 友好的 slug',
-  category: 'text',
-  icon: 'url-encode',
   render(container) {
     const separator = createElement('select', { className: 'select', 'aria-label': '分隔符' }, [
       createElement('option', { value: '-', textContent: '连字符 (-)' }),

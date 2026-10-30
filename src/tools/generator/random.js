@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createTabGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'random',
-  name: '随机数生成',
-  description: '生成随机数和随机字符串',
-  category: 'generator',
-  icon: 'random',
   render(container) {
     let currentTab = 'number'
 

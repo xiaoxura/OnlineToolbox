@@ -16,11 +16,6 @@ const IMPORTANT_HEADERS = [
 ]
 
 export default {
-  id: 'header-parse',
-  name: 'HTTP Headers 解析',
-  description: '解析原始 HTTP 请求/响应头',
-  category: 'network',
-  icon: 'search',
 
   render(container) {
     const inputGroup = createElement('div', { className: 'form-group' })

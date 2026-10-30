@@ -143,12 +143,6 @@ const SAMPLE_USERNAME = 'admin'
 const SAMPLE_PASSWORD = 'hunter2'
 
 export default {
-  id: 'htpasswd-generator',
-  name: 'htpasswd 生成器',
-  description: '生成 Apache htpasswd / HTTP Basic Auth 凭据，支持 bcrypt、SHA1、MD5 与明文格式',
-  category: 'devtool',
-  icon: 'jwt',
-  keywords: ['htpasswd', 'apache', 'basic auth', 'bcrypt', 'apr1', 'sha1'],
   render(container) {
     const usernameInput = createElement('input', {
       className: 'input',

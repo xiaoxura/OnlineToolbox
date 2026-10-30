@@ -78,11 +78,6 @@ function parseUA(ua) {
 }
 
 export default {
-  id: 'user-agent',
-  name: 'User-Agent 解析',
-  description: '解析 User-Agent 字符串，显示浏览器、操作系统和设备信息',
-  category: 'devtool',
-  icon: 'unicode',
   render(container) {
     const uaInput = createElement('textarea', {
       className: 'textarea',

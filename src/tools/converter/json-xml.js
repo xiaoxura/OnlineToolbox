@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'json-xml',
-  name: 'JSON ↔ XML 转换',
-  description: 'JSON 和 XML 格式相互转换',
-  category: 'converter',
-  icon: 'json-xml',
   render(container) {
     // Root element name input
     const rootLabel = createElement('label', { className: 'option-label', for: 'json-xml-root', textContent: 'XML 根元素名:' })

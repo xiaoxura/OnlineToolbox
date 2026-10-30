@@ -30,12 +30,6 @@ export function buildWifiPayload({ ssid = '', encryption = 'WPA', password = '',
 const SAMPLE = { ssid: 'Toolbox-5G', password: 'P@ss;word,1' }
 
 export default {
-  id: 'wifi-qr',
-  name: 'WiFi 二维码',
-  description: '生成包含 SSID 与密码的 WiFi 二维码，扫码即可连接',
-  category: 'generator',
-  icon: 'qrcode',
-  keywords: ['wifi', '无线网络', '二维码', 'ssid', 'qrcode'],
   render(container) {
     const ssidInput = createElement('input', {
       className: 'input',

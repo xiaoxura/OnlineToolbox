@@ -91,12 +91,6 @@ const SAMPLE_PASSWORD = 'hunter2'
 const SAMPLE_HASH = '$2b$10$abcdefghijklmnopqrstuu7gIUFBKrYXdzQy8HrouzMJyZ4cijAb2'
 
 export default {
-  id: 'bcrypt',
-  name: 'bcrypt 哈希',
-  description: '生成与校验 bcrypt 密码哈希，可调节计算成本',
-  category: 'crypto',
-  icon: 'hmac',
-  keywords: ['bcrypt', '哈希', 'hash', '密码', 'cost', 'salt'],
   render(container) {
     const generatePanel = createElement('div', { className: 'tool-stack' })
     const verifyPanel = createElement('div', { className: 'tool-stack', hidden: true })

@@ -3,11 +3,6 @@ import { createElement, createSection, createCopyButton } from '../../utils/dom.
 import { escapeHtml } from '../../utils/html.js'
 
 export default {
-  id: 'placeholder-img',
-  name: '占位图生成',
-  description: '生成自定义尺寸、颜色和文字的占位图片',
-  category: 'generator',
-  icon: 'img-to-base64',
   render(container) {
     const sizeRow = createElement('div', { className: 'form-row' }, [
       createElement('div', { className: 'form-group' }, [

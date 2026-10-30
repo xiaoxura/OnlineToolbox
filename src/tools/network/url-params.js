@@ -9,7 +9,7 @@ export function updateUrlParams(rawUrl, params) {
 }
 
 export default {
-  id: 'url-params', name: 'URL 参数编辑器', description: '可视化解析、添加、删除和重新生成 URL 查询参数', category: 'network', icon: 'url-encode',
+
   render(container) {
     const urlInput = createElement('input', { className: 'input', placeholder: 'https://example.com/search?q=tool&page=1' })
     const rows = createElement('div', { className: 'param-rows' })

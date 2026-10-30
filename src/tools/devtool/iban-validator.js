@@ -211,12 +211,6 @@ function statItem(label, value) {
 }
 
 export default {
-  id: 'iban-validator',
-  name: 'IBAN 校验',
-  description: '校验国际银行账号（IBAN）并解析国家、校验位与账号结构',
-  category: 'devtool',
-  icon: 'search',
-  keywords: ['iban', '银行账号', 'mod97', 'iso13616', '校验'],
   render(container) {
     const ibanInput = createElement('input', {
       className: 'input',

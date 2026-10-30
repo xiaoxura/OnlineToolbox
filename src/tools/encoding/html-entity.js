@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'html-entity',
-  name: 'HTML 实体编解码',
-  description: 'HTML 实体转义与反转义',
-  category: 'encoding',
-  icon: 'html-entity',
   render(container) {
     const escapeMap = {
       '&': '&amp;',

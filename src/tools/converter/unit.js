@@ -69,11 +69,6 @@ const unitCategories = {
 }
 
 export default {
-  id: 'unit',
-  name: '单位转换',
-  category: 'converter',
-  icon: 'unit',
-  description: '长度、重量、温度等单位转换',
   render(container) {
     const tabContainer = createElement('div')
     const contentContainer = createElement('div')

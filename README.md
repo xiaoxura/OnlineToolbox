@@ -2,52 +2,77 @@
 
 一个纯静态、轻量级的在线开发者工具箱，提供 157 个常用编解码、文本处理、格式化、生成器、转换器、AI 辅助等实用工具。无需账号或后端服务，绝大多数数据只在浏览器本地处理。
 
+**在线访问：[tools.xiaoxura.com](https://tools.xiaoxura.com/)** · [MIT License](./LICENSE) · [CI](https://github.com/xiaoxura/OnlineToolbox/actions/workflows/ci.yml)
+
+## 📸 界面预览
+
+<p align="center">
+  <a href="https://tools.xiaoxura.com/">
+    <img src="./docs/screenshots/home-light.png" alt="在线工具箱首页（浅色主题）" width="90%">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://tools.xiaoxura.com/#/base64">
+    <img src="./docs/screenshots/tool-base64.png" alt="Base64 编解码工具页" width="90%">
+  </a>
+</p>
+
+| 深色主题 | 移动端 |
+| :---: | :---: |
+| ![深色主题首页](./docs/screenshots/home-dark.png) | ![移动端首页](./docs/screenshots/mobile-dark.png) |
+
 ## ✨ 特性
 
 - **157 个实用工具** — 覆盖编码解码、哈希加密、文本处理、生成器、格式化、转换器、开发者参考、图片处理、网络工具、数学计算、AI 工具等 11 大分类
-- **工具按需加载** — 首页只加载工具元数据，进入工具后再下载对应实现及依赖，降低首屏 JS 体积
+- **工具按需加载** — 首页只加载工具元数据，进入工具后再下载对应实现及依赖；首屏约 39KB gzip
 - **纯静态部署** — 构建产物可部署到 EdgeOne Pages、GitHub Pages、Vercel、Netlify 等静态托管平台
 - **本地优先与隐私提示** — 绝大多数功能完全在本地运行；IP 查询仅在用户主动点击后请求第三方服务
-- **SEO 友好** — 构建时为每个工具生成独立静态落地页，并生成 `sitemap.xml` 与 `robots.txt`
+- **SEO 友好** — 构建时为每个工具和分类生成独立静态落地页，并生成 `sitemap.xml` 与 `robots.txt`
+- **可离线使用** — Service Worker 缓存应用外壳与访问过的工具，断网后仍可继续使用
+- **可分享的筛选状态** — 搜索词、分类与视图写入 URL（`?q=` / `?category=` / `?view=`），刷新与分享后仍能还原
 - **深浅色主题** — 支持手动切换、偏好持久化及跟随系统主题
 - **响应式与无障碍** — 适配桌面端和移动端，提供语义化结构、表单标签、键盘操作和焦点样式
 - **即时搜索与分类导航** — 支持按工具名称、描述及分类快速筛选
 - **一键复制** — 常用结果支持复制到剪贴板
+- **可维护的元数据** — `registry.js` 是唯一的工具元数据源，工具模块只实现 `render()`；`dom.js` 与入口逻辑已按职责拆分
 
 ## 🧰 工具列表
 
+<!-- TOOLS:START -->
 ### 编码/解码（11 个）
-Base64 编解码 · URL 编解码 · HTML 实体编解码 · Unicode 编解码 · Hex 编解码 · JWT 解析 · Base32 编解码 · Base58 编解码 · Punycode 编解码 · Data URL 生成 · 摩尔斯电码
+Base64 编解码 · URL 编解码 · HTML 实体编解码 · Unicode 编解码 · Hex 编解码 · JWT 解析 · Base58 编解码 · Base32 编解码 · Punycode 编解码 · Data URL 生成 · 摩尔斯电码
 
 ### 哈希/加密（14 个）
-MD5 哈希 · SHA 哈希（SHA-1/256/512） · AES 加解密 · DES/3DES 加解密 · HMAC 生成 · 文件哈希计算 · 2FA 验证码 · CRC 校验和（CRC-16/32/32C、Adler-32） · JWT 签发与验签 · 密钥对生成（RSA/ECDSA/Ed25519） · bcrypt 哈希 · 密码强度分析 · 经典密码（凯撒/ROT13/维吉尼亚/Atbash） · BIP39 助记词
+MD5 哈希 · SHA 哈希 · AES 加解密 · DES 加解密 · 文件哈希计算 · HMAC 生成 · 2FA 验证码 · CRC 校验和 · JWT 签发与验签 · 密钥对生成 · bcrypt 哈希 · 密码强度分析 · 经典密码 · BIP39 助记词
 
 ### 文本工具（20 个）
-字符统计 · 文本对比 · 大小写转换 · 文本去重 · 文本排序 · 正则表达式测试 · 文本替换 · 转义工具 · Markdown 预览 · 文本加密 · 文本集合运算 · Slug 生成 · 换行符转换 · 文本自动换行 · Markdown 表格生成 · 词频统计 · 文本提取器 · 隐藏字符检测 · 文本脱敏 · 列表工具
+字符统计 · 文本对比 · 大小写转换 · 文本去重 · 文本排序 · 正则表达式测试 · 文本替换 · 转义工具 · Markdown 预览 · 文本集合运算 · 文本加密 · Slug 生成器 · 换行符转换 · 文本自动换行 · Markdown 表格生成 · 词频统计 · 文本提取器 · 隐藏字符检测 · 文本脱敏 · 列表工具
 
 ### 生成器（13 个）
-UUID 生成 · ULID 生成 · UUID 生成与解析（v1/v3/v4/v5） · 随机密码生成 · 随机数生成 · Lorem ipsum 生成 · 二维码生成 · WiFi 二维码 · 条形码生成（Code128/EAN-13/UPC-A/Code39） · 占位图生成 · CSS 渐变生成器 · CSS 阴影生成器 · 调色板生成
+UUID 生成 · 随机密码生成 · 随机数生成 · Lorem ipsum 生成 · 二维码生成 · 占位图生成 · CSS 渐变生成器 · CSS 阴影生成器 · 调色板生成 · ULID 生成 · UUID 生成与解析 · 条形码生成 · WiFi 二维码
 
 ### 转换器（35 个）
-时间戳转换 · 时间长度转换 · 进制转换 · 数字格式化 · 颜色转换 · 单位转换 · JSON↔YAML · CPA / Sub2API 凭证转换器 · TOML↔JSON · JSON↔XML · JSONL↔JSON · JSON Pointer 查询 · JSON Patch 生成 · JSON 转 CSV · CSV 转 JSON · CSV 工具箱 · JSONPath 查询 · Markdown 转 HTML · Markdown 目录生成 · HTML 转 Markdown · HTML 转 JSX · CSS 转 JS 对象 · JSON 对比 · JSON 转 TypeScript · JSON 转代码（Go/Python/Java/C#/PHP/Rust） · JSON 扁平化 · JSON 键排序 · 时区转换 · 日期计算器 · 农历↔公历 · 中文大写金额 · 数字转英文 · MongoDB ObjectId · IEEE 754 浮点数 · 正则表达式可视化
+时间戳转换 · 进制转换 · 颜色转换 · 单位转换 · JSON ↔ YAML 转换 · CPA ↔ Sub2API 凭证转换 · TOML ↔ JSON 转换 · JSON ↔ XML 转换 · JSON 转 CSV · CSV 转 JSON · JSONPath 查询 · Markdown 转 HTML · HTML 转 JSX · CSS 转 JS 对象 · JSON 对比 · 时区转换 · 日期计算器 · JSON 转 TypeScript · 中文大写金额 · 正则表达式可视化 · HTML 转 Markdown · Markdown 目录生成 · CSV 工具箱 · JSON 转代码 · JSON 扁平化 · JSON 键排序 · MongoDB ObjectId · 数字转英文 · 农历 ↔ 公历 · IEEE 754 浮点数 · JSONL ↔ JSON 转换 · JSON Pointer 查询 · JSON Patch 生成 · 时间长度转换 · 数字格式化
 
 ### 格式化（5 个）
 JSON 格式化 · CSS 格式化 · HTML 格式化 · SQL 格式化 · XML 格式化
 
-### 开发者工具（28 个）
-Cron 表达式解析 · Cron 表达式构建器 · HTTP 状态码查询 · User-Agent 解析 · 正则表达式速查表 · XPath 测试器 · CSS 单位转换 · JSON Schema 生成 · Mock 数据生成 · Git 命令速查 · .gitignore 生成器 · Docker Run ↔ Compose · Linux 命令速查 · 身份证号校验 · 银行卡号校验 · 统一社会信用代码校验 · IBAN 校验 · 格式校验工具 · chmod 权限计算器 · SQL IN 参数生成 · WCAG 颜色对比度 · CSP 生成器 · SemVer 版本比较 · MIME 类型查询 · .env ↔ JSON · .properties ↔ JSON · 数据库连接串 · htpasswd 生成器
+### 开发者（28 个）
+Cron 表达式解析 · HTTP 状态码查询 · User-Agent 解析 · 正则表达式速查表 · CSS 单位转换 · JSON Schema 生成 · Mock 数据生成 · Git 命令速查 · Linux 命令速查 · 身份证号校验 · 银行卡号校验 · 统一社会信用代码校验 · chmod 权限计算器 · SQL IN 参数生成 · 格式校验工具 · WCAG 颜色对比度 · SemVer 版本比较 · MIME 类型查询 · .env ↔ JSON · .properties ↔ JSON · 数据库连接串 · htpasswd 生成器 · IBAN 校验 · Docker Run ↔ Compose · .gitignore 生成器 · Cron 表达式构建器 · CSP 生成器 · XPath 测试器
 
 ### 图片工具（5 个）
-图片转 Base64 · SVG 压缩 · 图片压缩与格式转换 · Favicon 生成 · 图片 EXIF
+图片压缩与格式转换 · 图片转 Base64 · SVG 压缩 · Favicon 生成 · 图片 EXIF
 
 ### 网络工具（12 个）
-IP 地址信息查询 · 端口说明查询 · URL 解析器 · HTTP Headers 解析 · Cookie 查看器 · IPv4/CIDR 计算器 · IPv6 地址解析 · CURL 命令生成器 · URL 参数编辑器 · Query String 转换 · URL 去毒化 · UTM 链接构建器
+IP 地址信息 · 端口说明查询 · URL 解析器 · HTTP Headers 解析 · IPv4/CIDR 计算器 · IPv6 地址解析 · CURL 命令生成器 · URL 参数编辑器 · Cookie 查看器 · Query String 转换 · URL 去毒化 · UTM 链接构建器
 
 ### 数学计算（4 个）
 科学计算器 · 大数计算器 · 百分比计算器 · 统计计算器
 
 ### AI 工具（10 个）
 Token 计数器 · 大模型成本估算 · 大模型对照表 · Prompt 模板填充 · 对话消息组装器 · 对话格式互转 · Function Schema 生成 · LLM 输出 JSON 修复 · 文本分块器 · 向量相似度计算
+<!-- TOOLS:END -->
 
 > 这一组全部离线运行：不会向任何模型服务发起请求，也不保存 API Key。Token 计数与按 token 分块使用 `gpt-tokenizer` 的真实 BPE 词表，词表作为静态资源按需下载（`o200k_base` 约 1.0 MB gzip、`cl100k_base` 约 440 KB gzip），只在首次使用时加载。模型价格与上下文窗口为官方标价的参考值（读取于 2026-09-15），厂商调价后可在成本估算器中手动修改单价。
 
@@ -77,12 +102,14 @@ npm run build
 
 - `dist/tools/{tool-id}/index.html`：157 个工具的独立 SEO 落地页
 - `dist/tools/{tool-id}/og.png`：每个工具的社交分享卡片（1200×630）
+- `dist/categories/{category-id}/index.html`：11 个分类落地页（含分类 OG 卡片）
+- `dist/sw.js`、`dist/icons/`：离线缓存脚本与 PWA 图标
 - `dist/og.png`：首页分享卡片
-- `dist/sitemap.xml`：首页及全部工具页的网站地图
+- `dist/sitemap.xml`：首页、分类页及全部工具页的网站地图
 - `dist/robots.txt`：爬虫规则、AI 爬虫策略和网站地图地址
 - `dist/llms.txt` / `dist/llms-full.txt`：供生成式 AI 引擎读取的工具索引
 
-默认站点地址为 `https://xiaoxura.github.io/OnlineToolbox/`。部署到其他域名时，请通过 `SITE_URL` 传入包含部署子路径的完整公开地址：
+默认 SEO 站点地址为 `https://tools.xiaoxura.com/`。部署到其他域名或子路径时，通过 `SITE_URL` 覆盖为完整公开地址：
 
 ```bash
 SITE_URL=https://example.com/ npm run build
@@ -94,13 +121,19 @@ SITE_URL=https://example.com/ npm run build
 ### 代码检查与测试
 
 ```bash
-npm run lint        # ESLint 静态检查
-npm test            # Vitest 单次测试
-npm run test:watch  # Vitest 监听模式
-npm run check       # 依次执行 lint、测试和生产构建
+npm run lint          # ESLint 静态检查
+npm test              # Vitest 单次测试
+npm run test:watch    # Vitest 监听模式
+npm run test:coverage # 覆盖率报告（阈值：语句 82%、分支 70%、函数 82%、行 85%）
+npm run check         # lint + README 同步检查 + 覆盖率测试 + 生产构建
+npm run verify:build  # 校验落地页数量、sitemap 与包体积预算
+npm run test:e2e      # Playwright 真实浏览器冒烟测试（使用本机 Chrome）
+npm run readme        # 根据注册表重新生成 README 工具列表
+npm run icons         # 从 public/favicon.svg 重新生成 PWA 图标
+npm run format        # Prettier 格式化
 ```
 
-测试覆盖工具注册表、全部 157 个工具的渲染冒烟测试、表单可访问名称、核心工具行为、Markdown XSS 防护、路由懒加载和主题偏好持久化。
+当前基线：35 个测试文件 / 1030 个测试，另有 5 个 Playwright 真实浏览器用例。覆盖工具注册表、全部 157 个工具的渲染冒烟测试、表单可访问名称、核心工具行为、Markdown XSS 防护、路由懒加载、URL 筛选状态、工具销毁回调和主题偏好持久化。
 
 ## 🔍 SEO 与 GEO
 
@@ -112,7 +145,7 @@ npm run check       # 依次执行 lint、测试和生产构建
 - 给工具加一个选项，它的落地页会在下次构建时自动更新，不会和实现脱节。
 - 「是否需要联网」不是写死的文案：构建脚本会扫描工具源码中的 `fetch` / `XMLHttpRequest` / `sendBeacon`，只有确实发起请求的工具才会出现联网提示（当前仅「IP 地址信息查询」）。
 
-**结构化数据**：每个工具页输出 `SoftwareApplication`、`BreadcrumbList` 和 `FAQPage` 三段 JSON-LD；首页输出 `WebSite`（含 `SearchAction`）、`ItemList` 和 `FAQPage`。工具页之间通过「同类工具」相互链接，避免出现孤立页面。
+**结构化数据**：每个工具页输出 `SoftwareApplication`、`BreadcrumbList` 和 `FAQPage` 三段 JSON-LD；每个分类页输出 `CollectionPage`、`ItemList`、`BreadcrumbList` 和 `FAQPage`；首页输出 `WebSite`（含已实现的 `SearchAction`）、`ItemList` 和 `FAQPage`。工具页之间通过「同类工具」相互链接，工具页的面包屑会指向所属分类页，避免出现孤立页面。
 
 **`llms.txt` 与 `llms-full.txt`**：`llms.txt` 是按分类组织的全量工具索引，`llms-full.txt` 额外包含每个工具的用途、输入输出、选项与联网说明。两者都在构建时生成。
 
@@ -135,17 +168,17 @@ IP 查询采用用户主动触发、超时取消和失败回退机制：
 
 ### EdgeOne Pages
 
-1. 在项目设置的环境变量中添加 `SITE_URL`（值为完整公开地址，需含结尾斜杠），例如 `https://tools.xiaoxura.com/`
+1. 默认构建已指向 `https://tools.xiaoxura.com/`；如使用其他域名，在项目设置的环境变量中添加 `SITE_URL`（完整公开地址，需含结尾斜杠）
 2. 设置正确的 `SITE_URL` 并执行 `npm run build`，或将构建命令设为 `npm run build`、输出目录设为 `dist` 交给平台构建
 3. 完成部署
 
 部署后建议自检 `https://你的域名/sitemap.xml`，确认 `<loc>` 使用的是你的域名——**未设置 `SITE_URL` 时构建不会报错**，而是会把 canonical、OG、sitemap 静默写成默认的 GitHub Pages 地址。
 
-`edgeone.json` 用于修正 `site.webmanifest` 的 `Content-Type`：EdgeOne Pages 对 `.webmanifest` 扩展名返回 `application/octet-stream`，而规范要求 `application/manifest+json`。该文件仅对 EdgeOne 生效，部署到其他平台时会被忽略。
+`edgeone.json` 除修正 `site.webmanifest` 的 `Content-Type` 外，还为哈希资源设置一年 immutable 缓存，并为 HTML / Service Worker 设置 no-cache；同时下发 CSP、`X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy`、COOP 与 HSTS 等安全响应头。该文件仅对 EdgeOne 生效，部署到其他平台时会被忽略。
 
 ### GitHub Pages
 
-项目默认 SEO 地址已适配 `https://xiaoxura.github.io/OnlineToolbox/`。运行 `npm run build` 后部署 `dist/`，也可使用 GitHub Actions 自动构建和发布。
+默认 SEO 地址为 `https://tools.xiaoxura.com/`。如部署到 GitHub Pages 且不使用自定义域名，请设置 `SITE_URL=https://<用户名>.github.io/OnlineToolbox/` 后构建。仓库内的 `.github/workflows/deploy-pages.yml` 提供手动触发的 GitHub Pages 构建与发布流程。
 
 ### Vercel / Netlify
 
@@ -157,12 +190,13 @@ IP 查询采用用户主动触发、超时取消和失败回退机制：
 - **语言**：原生 JavaScript（ES Modules）
 - **路由**：Hash 路由（如 `#/base64`）
 - **样式**：原生 CSS、CSS Variables 深浅色主题
-- **代码质量**：ESLint 9
-- **测试**：Vitest、jsdom
+- **代码质量**：ESLint 9、Prettier
+- **测试**：Vitest、jsdom、V8 覆盖率、Playwright（真实 Chrome）
 - **安全渲染**：DOMPurify
-- **功能依赖**：crypto-js、otpauth、qrcode、js-yaml、diff、marked、papaparse、smol-toml、ulid、gpt-tokenizer、bcryptjs、bwip-js、exifr
+- **离线能力**：自定义 Service Worker（应用外壳预缓存 + 哈希资源运行时缓存）
+- **功能依赖**：crypto-js、otpauth、qrcode、js-yaml、diff、marked、papaparse、smol-toml、ulid、gpt-tokenizer、bcryptjs、jsbarcode、exifr
 
-> 上述依赖均随所属工具按需加载，不进入首屏包。`bcryptjs`、`bwip-js`、`exifr` 体积较大（条形码约 258 KB gzip），只有打开对应工具时才会下载。
+> 上述依赖均随所属工具按需加载，不进入首屏包。`gpt-tokenizer` 的词表最大（`o200k_base` 约 1.0 MB gzip），只有打开 Token 计数 / 文本分块并选择对应编码时才会下载；条形码改用 JsBarcode 后约 14 KB gzip。
 
 ## 📁 项目结构
 
@@ -173,42 +207,49 @@ OnlineToolbox/
 ├── vite.config.js                # Vite 配置
 ├── vitest.config.js              # Vitest 配置
 ├── eslint.config.js              # ESLint 配置
-├── .github/workflows/ci.yml      # CI：lint、测试与生产构建
+├── .github/workflows/ci.yml      # CI：lint、覆盖率、构建、E2E（Node 20/22）
+├── .github/workflows/deploy-pages.yml # 手动触发的 GitHub Pages 发布
 ├── public/
 │   ├── favicon.svg               # 网站图标
+│   ├── icons/                    # 192/512/maskable PWA 图标
+│   ├── sw.js                     # Service Worker（离线缓存）
 │   └── site.webmanifest          # Web App Manifest
 ├── .seo-manifest.json            # 各落地页内容哈希与 lastmod，供增量更新判断
-├── edgeone.json                  # EdgeOne Pages 响应头配置（修正 webmanifest 的 MIME）
+├── edgeone.json                  # EdgeOne 缓存与安全响应头配置
+├── docs/screenshots/             # README 界面截图
 ├── scripts/
-│   ├── generate-seo-pages.mjs    # 落地页、OG 卡片、sitemap、robots、llms.txt 生成
+│   ├── generate-seo-pages.mjs    # 落地页、分类页、OG 卡片、sitemap、robots、llms.txt 生成
+│   ├── generate-icons.mjs        # 从 favicon.svg 生成 PWA PNG 图标
+│   ├── sync-readme.mjs           # 根据注册表同步 README 工具列表
+│   ├── verify-build.mjs          # 构建产物与包体积预算校验
 │   ├── tool-facts.mjs            # 在 jsdom 中渲染每个工具并提取其 UI 事实
 │   ├── og-image.mjs              # 零依赖 PNG 编码器，生成分享卡片
 │   └── css-stub.mjs              # Node 加载器钩子，使工具模块的 CSS 导入可被忽略
+├── e2e/                          # Playwright 真实浏览器冒烟测试
 ├── tests/                        # 注册表、冒烟、安全、路由及核心行为测试
 └── src/
-    ├── main.js                   # 入口、异步工具加载与页面渲染
+    ├── main.js                   # 入口、首页/工具页渲染与路由编排
+    ├── app/                      # URL 状态、工具生命周期、主题、存储、Service Worker
     ├── router.js                 # Hash 路由实现
     ├── icons.js                  # SVG 图标集
     ├── styles/                   # 全局、布局及主题样式
+    │   ├── tool.css              # 仅工具路由动态加载
     │   └── tools/                # 各工具按需加载的样式
     ├── utils/
-    │   ├── dom.js                # DOM、Tab 和无障碍辅助
+    │   ├── dom.js                # DOM/组件辅助的统一出口
+    │   ├── dom/                  # core / components / choices / a11y / layout / result-toolbar
     │   ├── html.js               # HTML 转义
+    │   ├── sanitize.js           # DOMPurify 封装与图片/外链加固
+    │   ├── debounce.js           # 大输入实时预览防抖
     │   ├── clipboard.js          # 剪贴板操作
     │   ├── download.js           # 文件下载
     │   └── toast.js              # 轻提示
     └── tools/
-        ├── registry.js           # 轻量元数据与动态 import 注册表
-        ├── encoding/
-        ├── crypto/
-        ├── text/
-        ├── generator/
-        ├── converter/
-        ├── formatter/
-        ├── devtool/
-        ├── image/
-        ├── network/
-        └── math/
+        ├── registry.js           # 唯一的工具元数据源与动态 import 注册表
+        ├── shared/               # 共享工具渲染骨架
+        ├── ai/ encoding/ crypto/ text/ generator/ converter/
+        ├── formatter/ devtool/ image/ network/ math/
+        └── ...
 ```
 
 ## 🤝 贡献
@@ -217,10 +258,10 @@ OnlineToolbox/
 
 ### 添加新工具
 
-1. 在对应的 `src/tools/` 分类目录下创建 `.js` 文件并默认导出工具对象。
-2. 在 `src/tools/registry.js` 添加工具的轻量元数据，以及指向实现文件的动态 `import()`。
+1. 在对应的 `src/tools/` 分类目录下创建 `.js` 文件并默认导出 `{ render(container) }`。
+2. 在 `src/tools/registry.js` 添加工具的唯一一份元数据，以及指向实现文件的动态 `import()`。
 3. 如需新图标，在 `src/icons.js` 添加 SVG 图标；也可以复用现有图标。
-4. 运行 `npm run check`，确认静态检查、全部工具测试和生产构建均通过。
+4. 运行 `npm run readme` 同步 README 工具列表，再运行 `npm run check`，确认静态检查、覆盖率、全部工具测试和生产构建均通过。
 
 注册表示例：
 
@@ -235,17 +276,12 @@ OnlineToolbox/
 }
 ```
 
-工具模块示例：
+工具模块只负责实现，元数据统一放在注册表中，避免两处维护：
 
 ```js
 export default {
-  id: 'my-tool',
-  name: '工具名称',
-  description: '工具描述',
-  category: 'converter',
-  icon: 'my-tool',
   render(container) {
-    // 渲染工具 UI
+    // 渲染工具 UI；可返回 dispose() 清理定时器/监听器
   }
 }
 ```

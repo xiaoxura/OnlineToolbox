@@ -2,11 +2,6 @@ import { createElement, createSection, createCopyButton } from '../../utils/dom.
 import { monotonicFactory } from 'ulid'
 
 export default {
-  id: 'ulid',
-  name: 'ULID 生成',
-  description: '生成按时间排序、适合分布式系统的 ULID 标识符',
-  category: 'generator',
-  icon: 'uuid',
   render(container) {
     const count = createElement('input', { className: 'input', type: 'number', min: '1', max: '100', step: '1', value: '5' })
     const options = createElement('div', { className: 'form-group' }, [

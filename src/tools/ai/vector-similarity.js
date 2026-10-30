@@ -74,11 +74,6 @@ function vectorSummary(label, vector) {
 }
 
 export default {
-  id: 'vector-similarity',
-  name: '向量相似度计算',
-  description: '计算两个 embedding 向量的余弦相似度、点积和欧氏距离',
-  category: 'ai',
-  icon: 'ai-vector',
   render(container) {
     const vectorA = createElement('textarea', {
       className: 'textarea',

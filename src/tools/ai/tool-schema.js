@@ -86,11 +86,6 @@ const SAMPLE = JSON.stringify({
 }, null, 2)
 
 export default {
-  id: 'tool-schema',
-  name: 'Function Schema 生成',
-  description: '根据参数示例 JSON 生成 OpenAI 或 Anthropic 的工具调用 Schema',
-  category: 'ai',
-  icon: 'ai-tool-schema',
   render(container) {
     const nameInput = createElement('input', { className: 'input', value: 'get_weather', placeholder: 'get_weather' })
     const descriptionInput = createElement('input', {

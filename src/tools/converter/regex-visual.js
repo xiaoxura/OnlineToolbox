@@ -33,11 +33,6 @@ const REGEX_COMPONENTS = [
 ]
 
 export default {
-  id: 'regex-visual',
-  name: '正则表达式可视化',
-  description: '测试和解释正则表达式',
-  category: 'converter',
-  icon: 'regex',
 
   render(container) {
     const inputGroup = createElement('div', { className: 'form-group' })

@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'json',
-  name: 'JSON 格式化',
-  description: 'JSON 美化、压缩和校验',
-  category: 'formatter',
-  icon: 'json',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

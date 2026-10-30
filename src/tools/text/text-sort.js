@@ -1,11 +1,6 @@
 import { createElement, createSection, createCopyButton } from '../../utils/dom.js'
 
 export default {
-  id: 'text-sort',
-  name: '文本排序',
-  description: '对文本行进行排序',
-  category: 'text',
-  icon: 'text-sort',
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

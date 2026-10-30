@@ -1,11 +1,6 @@
 import { createCopyButton, createElement, createSection, createTableScroll } from '../../utils/dom.js'
 
 export default {
-  id: 'url-parser',
-  name: 'URL 解析器',
-  description: '解析 URL 的各个组成部分',
-  category: 'network',
-  icon: 'url-encode',
 
   render(container) {
     const inputGroup = createElement('div', { className: 'form-group' })

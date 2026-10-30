@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'punycode',
-  name: 'Punycode 编解码',
-  description: 'Punycode 编解码，用于国际化域名(IDN)转换',
-  category: 'encoding',
-  icon: 'punycode',
   render(container) {
     let mode = 'text-to-punycode'
 

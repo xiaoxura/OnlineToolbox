@@ -236,12 +236,6 @@ function tableRow(label, value) {
 }
 
 export default {
-  id: 'uuid-converter',
-  name: 'UUID 生成与解析',
-  description: '生成与解析 UUID v1/v3/v4/v5，显示版本、变体与内嵌时间戳',
-  category: 'generator',
-  icon: 'uuid',
-  keywords: ['uuid', 'guid', 'v4', 'v5', 'v1', '唯一标识'],
   render(container) {
     let version = 'v4'
 

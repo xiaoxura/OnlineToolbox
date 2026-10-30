@@ -13,11 +13,6 @@ const TIMEZONES = [
 ]
 
 export default {
-  id: 'timezone',
-  name: '时区转换',
-  description: '在不同时区之间转换时间',
-  category: 'converter',
-  icon: 'timestamp',
 
   render(container) {
     const inputGroup = createElement('div', { className: 'form-group' })

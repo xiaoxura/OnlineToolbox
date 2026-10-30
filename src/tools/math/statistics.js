@@ -160,12 +160,6 @@ function buildGroups(stats) {
 }
 
 export default {
-  id: 'statistics',
-  name: '统计计算器',
-  description: '计算均值、中位数、众数、方差、标准差、分位数与离群值',
-  category: 'math',
-  icon: 'calculator',
-  keywords: ['统计', '均值', '方差', '标准差', '中位数', '众数', '分位数', '离群值', 'statistics'],
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',

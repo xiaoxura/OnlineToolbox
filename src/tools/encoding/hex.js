@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'hex',
-  name: 'Hex 编解码',
-  description: '文本与十六进制编码互相转换，支持数字进制转换',
-  category: 'encoding',
-  icon: 'hex',
   render(container) {
     let mode = 'text-to-hex' // 'text-to-hex', 'hex-to-text', 'hex-to-dec', 'dec-to-hex'
 

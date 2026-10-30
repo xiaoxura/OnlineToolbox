@@ -2,11 +2,6 @@ import "../../styles/tools/calculator.css"
 import { createElement, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'calculator',
-  name: '科学计算器',
-  description: '支持科学函数、键盘输入和计算历史的科学计算器',
-  category: 'math',
-  icon: 'unit',
   render(container) {
     // --- Display ---
     const exprEl = createElement('div', { className: 'stat-label', textContent: '' })
@@ -305,5 +300,7 @@ export default {
 
     renderHistory()
     updateDisplay()
+
+    return () => document.removeEventListener('keydown', handleKeydown)
   }
 }

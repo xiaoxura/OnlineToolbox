@@ -67,11 +67,6 @@ function renderCodeItem(item) {
 }
 
 export default {
-  id: 'http-status',
-  name: 'HTTP 状态码查询',
-  description: '查看所有 HTTP 状态码的含义和分类',
-  category: 'devtool',
-  icon: 'search',
   render(container) {
     let activePrefix = ''
 

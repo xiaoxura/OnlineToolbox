@@ -1,11 +1,6 @@
 import { createCopyButton, createElement, createSection, createTabGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'css-to-js',
-  name: 'CSS 转 JS 对象',
-  description: '将 CSS 样式转换为 JavaScript 对象、CSS Modules 或 styled-components',
-  category: 'converter',
-  icon: 'css',
 
   render(container) {
     // Input area

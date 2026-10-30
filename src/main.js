@@ -1,10 +1,15 @@
 import './styles/base.css'
 import './styles/app.css'
-import './styles/tool.css'
 
 import { $, cleanupFormAccessibility, createElement, enhanceFormAccessibility, applyTwoColumnLayout, enhanceResultSections } from './utils/dom.js'
 import { initRouter, registerRoute, navigate } from './router.js'
 import { categories, tools, getToolsByCategory, getToolsByCategoryAndSearch, getToolById, loadToolById } from './tools/registry.js'
+import { readStoredList, storeList } from './app/storage.js'
+import { createToolLifecycle } from './app/lifecycle.js'
+import { ensureToolStyles } from './app/tool-styles.js'
+import { readUrlState, syncUrlState } from './app/url-state.js'
+import { setupServiceWorker } from './app/service-worker.js'
+import { setupTheme } from './app/theme.js'
 import icons from './icons.js'
 
 const STORAGE = {
@@ -21,21 +26,10 @@ let homeScrollY = 0
 let renderRequestId = 0
 let searchRenderTimer = null
 let returnFocusToolId = null
-let favorites = readStoredList(STORAGE.favorites)
-let recentTools = readStoredList(STORAGE.recent)
-
-function readStoredList(key) {
-  try {
-    const value = JSON.parse(localStorage.getItem(key) || '[]')
-    return Array.isArray(value) ? value.filter(id => getToolById(id)) : []
-  } catch {
-    return []
-  }
-}
-
-function storeList(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)) } catch { /* Storage may be unavailable. */ }
-}
+const toolLifecycle = createToolLifecycle()
+const toolIdValidator = id => getToolById(id)
+let favorites = readStoredList(STORAGE.favorites, toolIdValidator)
+let recentTools = readStoredList(STORAGE.recent, toolIdValidator)
 
 function setPageMetadata(title, description) {
   document.title = title
@@ -55,31 +49,6 @@ function syncCategoryTabs() {
     button.classList.toggle('active', active)
     button.setAttribute('aria-pressed', String(active))
   })
-}
-
-function setupTheme() {
-  const button = $('#themeToggle')
-  const media = window.matchMedia('(prefers-color-scheme: dark)')
-  const updateButton = () => {
-    const isDark = document.documentElement.dataset.theme === 'dark'
-    button.setAttribute('aria-label', isDark ? '切换到浅色主题' : '切换到深色主题')
-    button.setAttribute('title', isDark ? '切换到浅色主题' : '切换到深色主题')
-    button.setAttribute('aria-pressed', String(isDark))
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#0e0f12' : '#f7f8fa')
-  }
-
-  button.addEventListener('click', () => {
-    const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
-    document.documentElement.dataset.theme = nextTheme
-    try { localStorage.setItem('theme', nextTheme) } catch { /* Storage may be unavailable. */ }
-    updateButton()
-  })
-  media.addEventListener?.('change', event => {
-    try { if (localStorage.getItem('theme')) return } catch { /* Follow system theme when storage is unavailable. */ }
-    document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
-    updateButton()
-  })
-  updateButton()
 }
 
 function cancelSearchRender() {
@@ -161,7 +130,8 @@ function setupCategoryNav() {
           item.classList.toggle('active', item === button)
           item.setAttribute('aria-pressed', String(item === button))
         })
-        button.scrollIntoView?.({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        button.scrollIntoView?.({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest', inline: 'center' })
         renderGrid()
       }
     }, [
@@ -438,6 +408,7 @@ function renderGrid(focusTarget = {}) {
   const focusElement = (focusSelector ? main.querySelector(focusSelector) : null)
     || (focusTarget.favoriteToolId ? main.querySelector(`.view-tab[data-view="${currentView}"]`) : null)
   focusElement?.focus({ preventScroll: true })
+  syncUrlState({ searchQuery, currentCategory, currentView })
 }
 
 function clearSearch() {
@@ -455,6 +426,7 @@ function recordRecent(toolId) {
 
 async function renderToolPage(toolId) {
   cancelSearchRender()
+  toolLifecycle.dispose()
   const tool = getToolById(toolId)
   if (!tool) { navigate('/'); return }
   returnFocusToolId = toolId
@@ -521,10 +493,11 @@ async function renderToolPage(toolId) {
     createElement('span', { textContent: '正在加载工具…' })
   ]))
   try {
+    await ensureToolStyles()
     const implementation = await loadToolById(toolId)
     if (requestId !== renderRequestId) return
     body.innerHTML = ''
-    implementation.render(body)
+    toolLifecycle.set(implementation.render(body))
     applyTwoColumnLayout(body)
     enhanceFormAccessibility(body)
     enhanceResultSections(body, { toolName: tool.id })
@@ -553,6 +526,7 @@ async function renderToolPage(toolId) {
 
 function renderHome() {
   cancelSearchRender()
+  toolLifecycle.dispose()
   const focusedCard = document.activeElement?.closest?.('.tool-card')
   const focusToolId = returnFocusToolId || focusedCard?.getAttribute('href')?.replace(/^#\//, '')
   renderRequestId += 1
@@ -577,6 +551,14 @@ function renderHome() {
 }
 
 function init() {
+  const initialState = readUrlState({
+    categories,
+    defaults: { searchQuery, currentCategory, currentView }
+  })
+  searchQuery = initialState.searchQuery
+  currentCategory = initialState.currentCategory
+  currentView = initialState.currentView
+  setupServiceWorker()
   setupTheme()
   setupHeader()
   setupCategoryNav()

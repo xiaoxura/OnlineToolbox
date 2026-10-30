@@ -7,7 +7,7 @@ export async function digestFile(file, algorithm = 'SHA-256') {
 }
 
 export default {
-  id: 'file-hash', name: '文件哈希计算', description: '在本地计算文件的 SHA-1、SHA-256 或 SHA-512 摘要', category: 'crypto', icon: 'sha',
+
   render(container) {
     const fileInput = createElement('input', { className: 'input', type: 'file', 'aria-label': '选择要计算哈希的文件' })
     const algorithm = createElement('select', { className: 'select', 'aria-label': '哈希算法' }, ['SHA-1', 'SHA-256', 'SHA-512'].map(value => createElement('option', { value, textContent: value })))

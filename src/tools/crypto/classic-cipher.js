@@ -72,12 +72,6 @@ const CIPHER_TYPES = [
 const SAMPLE_TEXT = 'Hello, World! Attack at dawn — 5201314'
 
 export default {
-  id: 'classic-cipher',
-  name: '经典密码',
-  description: 'ROT13、凯撒、维吉尼亚与 Atbash 古典密码加密解密',
-  category: 'crypto',
-  icon: 'escape',
-  keywords: ['rot13', '凯撒', 'caesar', '维吉尼亚', 'vigenere', 'atbash', '古典密码'],
   render(container) {
     let state
 

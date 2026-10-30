@@ -251,12 +251,6 @@ export function groupMetadata(metadata) {
 }
 
 export default {
-  id: 'exif',
-  name: '图片 EXIF',
-  description: '查看图片的拍摄参数与 GPS 信息，并可一键清除元数据',
-  category: 'image',
-  icon: 'search',
-  keywords: ['exif', '元数据', '拍摄参数', 'gps', '隐私', 'metadata'],
   render(container) {
     let currentFile = null
 

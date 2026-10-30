@@ -101,12 +101,6 @@ export function getSecondsRemaining(timestamp = Date.now(), period = DEFAULTS.pe
 }
 
 export default {
-  id: 'totp',
-  name: '2FA 验证码',
-  description: '输入 Base32 密钥，在浏览器本地生成 TOTP 动态验证码',
-  category: 'crypto',
-  icon: 'hmac',
-  keywords: ['2fa', 'totp', 'otp', 'authenticator', '动态口令'],
   render(container) {
     let currentConfig = null
     let timer = null
@@ -250,5 +244,7 @@ export default {
       })
       : null
     if (observer && document.body) observer.observe(document.body, { childList: true, subtree: true })
+
+    return cleanup
   }
 }

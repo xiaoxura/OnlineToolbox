@@ -174,12 +174,6 @@ function statItem(label, value) {
 export const SAMPLE_MNEMONIC = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
 
 export default {
-  id: 'bip39',
-  name: 'BIP39 助记词',
-  description: '生成与校验 BIP39 助记词，并推导种子',
-  category: 'crypto',
-  icon: 'random',
-  keywords: ['bip39', '助记词', 'mnemonic', '钱包', 'seed', '种子', 'pbkdf2'],
   render(container) {
     const wordCountSelect = createElement('select', { className: 'select' }, VALID_WORD_COUNTS.map(count => createElement('option', {
       value: String(count),

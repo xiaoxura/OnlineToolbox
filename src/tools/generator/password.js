@@ -2,11 +2,6 @@ import "../../styles/tools/password-strength.css"
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'password',
-  name: '随机密码生成',
-  description: '生成安全的随机密码',
-  category: 'generator',
-  icon: 'password',
   render(container) {
     const CHARS = {
       upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',

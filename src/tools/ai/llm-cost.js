@@ -28,11 +28,6 @@ function numberInput(value, placeholder) {
 }
 
 export default {
-  id: 'llm-cost',
-  name: '大模型成本估算',
-  description: '按 token 用量和模型单价估算 API 调用成本，支持缓存计价',
-  category: 'ai',
-  icon: 'ai-cost',
   render(container) {
     const modelSelect = createElement('select', { className: 'select', 'aria-label': '选择模型' })
     for (const provider of providers) {

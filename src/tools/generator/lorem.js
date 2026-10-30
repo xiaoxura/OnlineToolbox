@@ -1,11 +1,6 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
 
 export default {
-  id: 'lorem',
-  name: 'Lorem ipsum 生成',
-  description: '生成 Lorem ipsum 占位文本',
-  category: 'generator',
-  icon: 'lorem',
   render(container) {
     let currentTab = 'paragraph'
 

@@ -3,11 +3,6 @@ import { createElement } from '../../utils/dom.js'
 import QRCode from 'qrcode'
 
 export default {
-  id: 'qrcode',
-  name: '二维码生成',
-  description: '将文本或链接生成二维码',
-  category: 'generator',
-  icon: 'qrcode',
   render(container) {
     // Input textarea
     const inputLabel = createElement('label', { className: 'label' }, ['输入文本或链接'])

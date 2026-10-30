@@ -88,11 +88,6 @@ function formatNumber(num) {
 }
 
 export default {
-  id: 'css-unit',
-  name: 'CSS 单位转换',
-  description: '在 px、em、rem、vh、vw、%、cm、in、pt 等 CSS 单位之间互相转换',
-  category: 'devtool',
-  icon: 'unit',
   render(container) {
     const valueInput = createElement('input', {
       className: 'input',

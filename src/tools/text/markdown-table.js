@@ -17,11 +17,6 @@ function escapeCell(value) {
 }
 
 export default {
-  id: 'markdown-table',
-  name: 'Markdown 表格生成',
-  description: '将 CSV、TSV 或竖线分隔数据转换为 Markdown 表格',
-  category: 'text',
-  icon: 'json-csv',
   render(container) {
     const delimiter = createElement('select', { className: 'select', 'aria-label': '输入分隔符' }, [
       createElement('option', { value: ',', textContent: '逗号（CSV）' }),

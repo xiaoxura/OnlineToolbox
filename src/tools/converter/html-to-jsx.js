@@ -1,11 +1,6 @@
 import { createCopyButton, createElement, createSection } from '../../utils/dom.js'
 
 export default {
-  id: 'html-to-jsx',
-  name: 'HTML 转 JSX',
-  description: '将 HTML 代码转换为 React JSX 语法',
-  category: 'converter',
-  icon: 'html',
 
   render(container) {
     // Input area

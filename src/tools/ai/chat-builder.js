@@ -10,11 +10,6 @@ const ROLES = [
 const formatOptions = chatFormats.map(format => ({ value: format.id, label: format.label }))
 
 export default {
-  id: 'chat-builder',
-  name: '对话消息组装器',
-  description: '可视化拼装 system / user / assistant 消息，导出为各家 API 的消息格式',
-  category: 'ai',
-  icon: 'ai-chat',
   render(container) {
     const rowsHost = createElement('div')
     // A result box rather than a read-only textarea: the builder's "input" is a

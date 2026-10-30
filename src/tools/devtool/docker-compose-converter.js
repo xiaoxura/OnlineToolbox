@@ -416,12 +416,6 @@ const SAMPLE_COMPOSE = [
 ].join('\n')
 
 export default {
-  id: 'docker-compose-converter',
-  name: 'Docker Run ↔ Compose',
-  description: '在 docker run 命令与 docker-compose.yml 之间双向转换',
-  category: 'devtool',
-  icon: 'wrench',
-  keywords: ['docker', 'compose', 'docker run', 'docker-compose.yml', '容器'],
   render(container) {
     const input = createElement('textarea', {
       className: 'textarea',
