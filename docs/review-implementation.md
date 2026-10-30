@@ -7,7 +7,7 @@
 
 | 项 | 落地 |
 | --- | --- |
-| SW 运行时缓存从不清理 | `scripts/build-sw.mjs` 在每次构建后把构建哈希注入 `dist/sw.js`，并生成 `dist/asset-manifest.json`。缓存名带哈希，`activate` 时删除旧版本缓存，并按清单清理不在当前构建中的 `/assets/*` 条目。 |
+| SW 运行时缓存从不清理 | `scripts/build-sw.mjs` 在每次构建后把构建哈希注入 `dist/sw.js`，并生成 `dist/asset-manifest.json`。缓存名带哈希；`activate` 保留当前与上一版本（避免部署时仍打开的旧页面加载不到旧 chunk），清理更旧缓存，并按清单清理当前版本中的过期 `/assets/*` 条目。新 Worker 接管时页面自动刷新一次。 |
 | 离线只能用打开过的工具 | Worker `activate` 后以 4 个并发在后台预缓存清单中所有 ≤512 KB 的 chunk（大词典、Prettier/Terser 等按需下载），`Save-Data` 时跳过。E2E 覆盖“未访问过的 YAML 工具离线打开”。 |
 | 刷新/跳转后输入丢失 | `src/app/draft.js` 按工具 id 写入 `sessionStorage`，400 ms 防抖 + `pagehide` 兜底；恢复时提示“已恢复上次输入”并可一键清除。密码、JWT、AES、助记词等 13 个敏感工具默认关闭。 |
 | 文件哈希读入整文件 | `src/utils/hash.js` 使用 `@noble/hashes` 增量 API 按 4 MB 分块计算；`src/tools/crypto/file-hash.worker.js` 在 Worker 中处理 >8 MB 文件，带进度条；新增 MD5。 |

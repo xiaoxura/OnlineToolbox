@@ -34,6 +34,15 @@ test('renders a barcode on a real canvas', async ({ page }) => {
   expect(await canvas.evaluate(node => node.width)).toBeGreaterThan(0)
 })
 
+test('opens the WiFi QR tool and renders a real canvas', async ({ page }) => {
+  await page.goto('/#/wifi-qr')
+  await expect(page.locator('.tool-title')).toHaveText('WiFi 二维码')
+  await page.getByRole('button', { name: '示例数据' }).click()
+  const canvas = page.locator('canvas.qrcode-canvas')
+  await expect(canvas).toBeVisible()
+  expect(await canvas.evaluate(node => node.width)).toBeGreaterThan(0)
+})
+
 test('serves the cached app shell when offline', async ({ page, context }) => {
   await page.goto('/')
   await page.waitForFunction(() => navigator.serviceWorker?.controller !== null, null, { timeout: 20_000 })

@@ -1,10 +1,10 @@
 /* Offline shell + runtime cache for OnlineToolbox.
  *
  * The cache version and the list of build assets are injected by
- * scripts/build-sw.mjs after every Vite build. That gives each deployment a
- * fresh cache name (old ones are dropped on activate) and lets the worker
- * delete stale /assets/* entries that belong to a previous build instead of
- * letting them pile up forever.
+ * scripts/build-sw.mjs after every Vite build. Each deployment gets a fresh
+ * cache name. The previous build's cache is kept for one more version so a tab
+ * that is still running during a deploy can finish loading its hashed chunks;
+ * anything older is pruned, which keeps storage from growing without bound.
  *
  * All small build chunks are pre-cached in the background after activation so
  * an unvisited tool still opens offline. Large lazy chunks (BPE vocabularies,
@@ -15,6 +15,7 @@ const CACHE_VERSION = '__CACHE_VERSION__'
 const SHELL_CACHE = `toolbox-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `toolbox-runtime-${CACHE_VERSION}`
 const MANIFEST_URL = './asset-manifest.json'
+const CACHE_META = './__cache-meta__'
 const SHELL = ['./', './index.html', './site.webmanifest', './favicon.svg', './icons/icon-192.png', './icons/icon-512.png']
 
 // A chunk larger than this (uncompressed) is only fetched on demand. Keep this
@@ -34,6 +35,14 @@ async function loadManifest() {
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(SHELL_CACHE)
+    // Timestamp this build so activate can keep one previous version (for
+    // tabs that are mid-session during a deploy) and prune older ones.
+    if (!(await cache.match(CACHE_META))) {
+      await cache.put(CACHE_META, new Response(JSON.stringify({
+        version: CACHE_VERSION,
+        createdAt: Date.now()
+      }), { headers: { 'Content-Type': 'application/json' } }))
+    }
     await Promise.all(SHELL.map(async url => {
       try {
         const response = await fetch(url, { cache: 'reload' })
@@ -101,12 +110,50 @@ async function precacheBuildAssets() {
   await Promise.all(Array.from({ length: Math.min(4, queue.length) }, worker))
 }
 
-// Delete runtime entries that are not part of the current build, and any cache
-// belonging to an older version. This is what keeps the 3 MB tokenizer
-// vocabulary (and every previous hashed chunk) from accumulating forever.
-async function cleanStaleCaches(manifest) {
+async function cacheCreatedAt(version) {
+  try {
+    const cacheName = `toolbox-shell-${version}`
+    if (!(await caches.has(cacheName))) return 0
+    const cache = await caches.open(cacheName)
+    const response = await cache.match(CACHE_META)
+    if (!response) return 0
+    const meta = await response.json()
+    return Number(meta.createdAt) || 0
+  } catch {
+    return 0
+  }
+}
+
+// Keep the current version plus the single newest previous one. Older caches
+// (and unrelated cache entries) are removed. Retaining one previous build is
+// deliberate: deleting it immediately would break a tab that was open during a
+// deploy when it later imports a chunk whose hash only exists in the old build.
+async function pruneOldVersions() {
   const keys = await caches.keys()
-  await Promise.all(keys.filter(key => key !== SHELL_CACHE && key !== RUNTIME_CACHE).map(key => caches.delete(key)))
+  const versions = new Set()
+  for (const key of keys) {
+    const match = /^toolbox-(?:shell|runtime)-(.+)$/.exec(key)
+    if (match) versions.add(match[1])
+  }
+  versions.delete(CACHE_VERSION)
+  const previous = await Promise.all([...versions].map(async version => ({
+    version,
+    createdAt: await cacheCreatedAt(version)
+  })))
+  previous.sort((a, b) => b.createdAt - a.createdAt)
+  const keep = new Set([CACHE_VERSION, ...previous.slice(0, 1).map(item => item.version)])
+  await Promise.all(keys.filter(key => {
+    const match = /^toolbox-(?:shell|runtime)-(.+)$/.exec(key)
+    // Leave unrelated caches on the origin alone.
+    return Boolean(match) && !keep.has(match[1])
+  }).map(key => caches.delete(key)))
+}
+
+// Delete runtime entries that are not part of the current build. This keeps
+// the 3 MB tokenizer vocabulary (and every previous hashed chunk) from
+// accumulating inside one version.
+async function cleanStaleCaches(manifest) {
+  await pruneOldVersions()
   if (!manifest?.assets) return
   const current = new Set(manifest.assets.map(asset => {
     try {
@@ -162,10 +209,15 @@ async function networkFirst(request) {
     const response = await fetch(request)
     return cacheResponse(request, response)
   } catch {
+    // Prefer this build's shell. `caches.match` is global and the previous
+    // version's shell is retained on purpose, so an unqualified lookup could
+    // pair an old index with a chunk that only exists in the new build.
+    const currentShell = await caches.open(SHELL_CACHE)
+    const shell = await currentShell.match('./index.html')
+    if (shell) return shell
     const cached = await matchCached(request)
     if (cached) return cached
-    const shell = await caches.match('./index.html')
-    return shell || Response.error()
+    return Response.error()
   }
 }
 

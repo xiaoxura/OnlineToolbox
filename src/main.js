@@ -527,9 +527,9 @@ async function renderToolPage(toolId) {
     body.setAttribute('aria-busy', 'false')
     body.appendChild(createElement('div', { className: 'load-error', role: 'alert' }, [
       createElement('strong', { textContent: '工具加载失败' }),
-      createElement('p', { textContent: navigator.onLine === false ? '当前设备似乎处于离线状态，请联网后重试。' : '可能是网络波动或资源暂时不可用。' }),
+      createElement('p', { textContent: navigator.onLine === false ? '当前设备似乎处于离线状态，请联网后重试。' : '网络波动、资源暂时不可用，或页面版本已更新。请刷新后重试。' }),
       createElement('div', { className: 'btn-group' }, [
-        createElement('button', { className: 'btn btn-primary', type: 'button', textContent: '重新加载', onClick: () => renderToolPage(toolId) }),
+        createElement('button', { className: 'btn btn-primary', type: 'button', textContent: '刷新页面', onClick: () => window.location.reload() }),
         createElement('button', { className: 'btn btn-secondary', type: 'button', textContent: '返回首页', onClick: () => navigate('/') })
       ])
     ]))
