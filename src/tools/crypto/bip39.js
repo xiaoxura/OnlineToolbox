@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js'
+import { sha256 } from '@noble/hashes/sha2.js'
 import { createElement, createSection } from '../../utils/dom.js'
 import { WORDLIST } from './bip39-wordlist.js'
 
@@ -14,22 +14,8 @@ export function bytesToHex(bytes) {
   return [...bytes].map(byte => byte.toString(16).padStart(2, '0')).join('')
 }
 
-function bytesToWordArray(bytes) {
-  let text = ''
-  for (const byte of bytes) text += String.fromCharCode(byte)
-  return CryptoJS.enc.Latin1.parse(text)
-}
-
-function wordArrayToBytes(wordArray) {
-  const bytes = new Uint8Array(wordArray.sigBytes)
-  for (let i = 0; i < wordArray.sigBytes; i++) {
-    bytes[i] = (wordArray.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff
-  }
-  return bytes
-}
-
 export function sha256Bytes(bytes) {
-  return wordArrayToBytes(CryptoJS.SHA256(bytesToWordArray(bytes)))
+  return sha256(bytes)
 }
 
 export function bytesToBits(bytes) {

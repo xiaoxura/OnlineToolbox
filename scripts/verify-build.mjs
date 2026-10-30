@@ -54,8 +54,25 @@ const expectedUrls = tools.length + categoryEntries.length + 1
 if (sitemapUrls.length !== expectedUrls) failures.push(`sitemap has ${sitemapUrls.length} URLs, expected ${expectedUrls}`)
 notes.push(`sitemap URLs: ${sitemapUrls.length}`)
 
-for (const asset of ['sw.js', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png']) {
+for (const asset of ['sw.js', 'asset-manifest.json', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png']) {
   if (!await exists(resolve(dist, asset))) failures.push(`missing ${asset}`)
+}
+
+// The service worker must carry the exact build hash and the manifest must
+// describe every emitted chunk, otherwise stale assets survive a deploy or the
+// offline pre-cache silently misses a tool.
+if (await exists(resolve(dist, 'asset-manifest.json'))) {
+  const buildManifest = JSON.parse(await readFile(resolve(dist, 'asset-manifest.json'), 'utf8'))
+  if (!/^[0-9a-f]{12}$/.test(buildManifest.buildHash || '')) failures.push('asset-manifest buildHash is malformed')
+  if (!Array.isArray(buildManifest.assets) || !buildManifest.assets.length) failures.push('asset-manifest has no assets')
+  const sw = await readFile(resolve(dist, 'sw.js'), 'utf8')
+  if (sw.includes('__CACHE_VERSION__')) failures.push('sw.js still contains the cache version placeholder')
+  if (!sw.includes(buildManifest.buildHash)) failures.push('sw.js cache version does not match the build hash')
+  for (const asset of buildManifest.assets) {
+    const path = resolve(dist, asset.url.replace(/^\.\//, ''))
+    if (!await exists(path)) failures.push(`asset-manifest references missing ${asset.url}`)
+  }
+  notes.push(`asset manifest: ${buildManifest.assets.length} chunks, ${buildManifest.assets.filter(a => a.precache).length} pre-cached`)
 }
 
 const assets = await readdir(resolve(dist, 'assets'))

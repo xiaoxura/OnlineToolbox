@@ -1,0 +1,36 @@
+/* --- 上下文窗口：已用 / 预留 / 剩余三段条 --- */
+.cw-bar {
+  display: flex;
+  height: 20px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.cw-bar.cw-over {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 2px var(--color-danger-soft);
+}
+
+.cw-segment {
+  height: 100%;
+  min-width: 0;
+  transition: width 180ms ease;
+}
+
+.cw-used {
+  background: var(--color-primary);
+}
+.cw-reserved {
+  background: var(--color-warning);
+}
+.cw-remaining {
+  background: var(--color-success);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-segment {
+    transition: none;
+  }
+}

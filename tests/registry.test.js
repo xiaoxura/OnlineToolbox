@@ -21,7 +21,7 @@ describe('tool registry', () => {
   })
 
   it('filters by category and case-insensitive search', () => {
-    expect(getToolsByCategoryAndSearch('crypto', '')).toHaveLength(14)
+    expect(getToolsByCategoryAndSearch('crypto', '')).toHaveLength(15)
     expect(getToolsByCategoryAndSearch('all', 'base64').map(tool => tool.id)).toContain('base64')
     expect(getToolsByCategoryAndSearch('converter', 'JSON')).not.toHaveLength(0)
     expect(getToolsByCategoryAndSearch('all', 'token').map(tool => tool.id)).toContain('jwt')
@@ -33,7 +33,7 @@ describe('tool registry', () => {
       const { default: implementation } = await descriptor.load()
       // Registry metadata is the single source of truth; modules only implement
       // render(). Keeping this assertion prevents the metadata from creeping
-      // back into 157 files where it would immediately drift.
+      // back into 180 tool files where it would immediately drift.
       expect(implementation.id).toBeUndefined()
       expect(implementation.name).toBeUndefined()
       expect(implementation.render).toEqual(expect.any(Function))

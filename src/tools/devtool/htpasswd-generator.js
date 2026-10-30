@@ -1,10 +1,10 @@
-import CryptoJS from 'crypto-js'
 import bcrypt from 'bcryptjs'
+import { hashBytes, toBase64 } from '../../utils/hash.js'
 import { createElement, createSection } from '../../utils/dom.js'
 
 // Apache htpasswd / HTTP Basic Auth credential generator. bcrypt comes from
-// bcryptjs, SHA1 from crypto-js, and the Apache "$apr1$" MD5 crypt variant is
-// implemented locally (verified against `openssl passwd -apr1`).
+// bcryptjs, SHA1/MD5 from @noble/hashes, and the Apache "$apr1$" MD5 crypt
+// variant is implemented locally (verified against `openssl passwd -apr1`).
 
 export const FORMATS = [
   { value: 'bcrypt', label: 'bcrypt（-B）', hint: '以 $2b$ 开头，推荐用于新配置' },
@@ -24,29 +24,8 @@ export function generateApr1Salt(length = 8) {
   return salt
 }
 
-function toLatin1(value) {
-  const bytes = new TextEncoder().encode(value)
-  let out = ''
-  for (const byte of bytes) out += String.fromCharCode(byte)
-  return out
-}
-
-function bytesToWordArray(bytes) {
-  let text = ''
-  for (const byte of bytes) text += String.fromCharCode(byte)
-  return CryptoJS.enc.Latin1.parse(text)
-}
-
-function wordArrayToBytes(wordArray) {
-  const bytes = []
-  for (let i = 0; i < wordArray.sigBytes; i++) {
-    bytes.push((wordArray.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
-  }
-  return bytes
-}
-
 function md5Bytes(bytes) {
-  return wordArrayToBytes(CryptoJS.MD5(bytesToWordArray(bytes)))
+  return hashBytes('MD5', Uint8Array.from(bytes))
 }
 
 // Apache's apr1 MD5 crypt (apr_md5.c) — the same scheme as BSD md5crypt with
@@ -54,8 +33,8 @@ function md5Bytes(bytes) {
 export function apr1Crypt(password, salt) {
   const secret = String(password ?? '')
   const saltText = String(salt ?? '').slice(0, 8)
-  const pw = wordArrayToBytes(CryptoJS.enc.Latin1.parse(toLatin1(secret)))
-  const sa = wordArrayToBytes(CryptoJS.enc.Latin1.parse(toLatin1(saltText)))
+  const pw = new TextEncoder().encode(secret)
+  const sa = new TextEncoder().encode(saltText)
   const magic = [0x24, 0x61, 0x70, 0x72, 0x31, 0x24] // "$apr1$"
 
   let context = [...pw, ...magic, ...sa]
@@ -97,7 +76,7 @@ export function apr1Crypt(password, salt) {
 }
 
 export function sha1Htpasswd(password) {
-  const digest = CryptoJS.SHA1(String(password ?? '')).toString(CryptoJS.enc.Base64)
+  const digest = toBase64(hashBytes('SHA-1', new TextEncoder().encode(String(password ?? ''))))
   return `{SHA}${digest}`
 }
 
@@ -131,7 +110,7 @@ export function buildHtpasswdLine(username, password, format, options = {}) {
 
 export function basicAuthHeader(username, password) {
   const credentials = `${String(username ?? '').trim()}:${String(password ?? '')}`
-  const encoded = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(credentials))
+  const encoded = toBase64(new TextEncoder().encode(credentials))
   return `Authorization: Basic ${encoded}`
 }
 

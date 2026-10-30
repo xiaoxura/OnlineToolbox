@@ -1,37 +1,10 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
-import CryptoJS from 'crypto-js'
+import { aesCrypt, decodeCiphertext, deriveAesKey, encodeCiphertext, parseAesIv } from '../../utils/aes.js'
 
 export default {
   render(container) {
     let currentMode = 'CBC'
     let currentPadding = 'Pkcs7'
-
-    const modeMap = {
-      CBC: CryptoJS.mode.CBC,
-      ECB: CryptoJS.mode.ECB,
-      CTR: CryptoJS.mode.CTR
-    }
-
-    const paddingMap = {
-      Pkcs7: CryptoJS.pad.Pkcs7,
-      ZeroPadding: CryptoJS.pad.ZeroPadding,
-      NoPadding: CryptoJS.pad.NoPadding
-    }
-
-    // Derive a fixed 256-bit key from the passphrase so the explicit IV is
-    // actually honoured (passing a string key makes crypto-js generate its own
-    // salt + IV and silently ignore options.iv).
-    function deriveKey(passphrase) {
-      return CryptoJS.SHA256(passphrase)
-    }
-
-    // Accept a 32-char hex IV or a 16-character text IV.
-    function parseIv(value) {
-      if (/^[0-9a-fA-F]{32}$/.test(value)) return CryptoJS.enc.Hex.parse(value)
-      const wordArray = CryptoJS.enc.Utf8.parse(value)
-      if (wordArray.sigBytes !== 16) throw new Error('IV 必须是 16 字节（16 个字符或 32 位十六进制）')
-      return wordArray
-    }
 
     // Input
     const inputLabel = createElement('label', { className: 'label' }, ['输入文本'])
@@ -75,7 +48,7 @@ export default {
     }, { label: '加密模式' })
 
     // Padding tabs
-    const paddingLabel = createElement('label', { className: 'label' }, ['填充方式'])
+    const paddingLabel = createElement('label', { className: 'label' }, ['填充方式（CTR 不使用填充）'])
     const paddingTabs = createSegmentedGroup([
       { label: 'Pkcs7', value: 'Pkcs7' },
       { label: 'ZeroPadding', value: 'ZeroPadding' },
@@ -93,6 +66,7 @@ export default {
     })
 
     const copyBtn = createCopyButton(() => outputTextarea.value)
+    const effectivePadding = () => currentMode === 'CTR' ? 'NoPadding' : currentPadding
 
     // Encrypt button
     const encryptBtn = createElement('button', {
@@ -105,22 +79,25 @@ export default {
           return
         }
         try {
-          const options = {
-            mode: modeMap[currentMode],
-            padding: paddingMap[currentPadding]
-          }
+          let iv
           if (currentMode === 'CBC' || currentMode === 'CTR') {
             let ivValue = ivInput.value
             if (!ivValue) {
-              ivValue = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex)
+              const random = new Uint8Array(16)
+              crypto.getRandomValues(random)
+              ivValue = [...random].map(byte => byte.toString(16).padStart(2, '0')).join('')
               ivInput.value = ivValue
             }
-            options.iv = parseIv(ivValue)
+            iv = parseAesIv(ivValue)
           }
-          const encrypted = CryptoJS.AES.encrypt(text, deriveKey(key), options)
-          outputTextarea.value = encrypted.toString()
+          const encrypted = aesCrypt(
+            new TextEncoder().encode(text),
+            deriveAesKey(key),
+            { mode: currentMode, iv, padding: effectivePadding() }
+          )
+          outputTextarea.value = encodeCiphertext(encrypted)
         } catch (e) {
-          outputTextarea.value = '加密错误: ' + e.message
+          outputTextarea.value = '加密错误: ' + (e instanceof Error ? e.message : String(e))
         }
       }
     }, ['加密'])
@@ -136,23 +113,23 @@ export default {
           return
         }
         try {
-          const options = {
-            mode: modeMap[currentMode],
-            padding: paddingMap[currentPadding]
-          }
+          let iv
           if (currentMode === 'CBC' || currentMode === 'CTR') {
             const ivValue = ivInput.value
             if (!ivValue) {
               outputTextarea.value = 'CBC/CTR 模式解密需要提供 IV'
               return
             }
-            options.iv = parseIv(ivValue)
+            iv = parseAesIv(ivValue)
           }
-          const decrypted = CryptoJS.AES.decrypt(text, deriveKey(key), options)
-          const result = decrypted.toString(CryptoJS.enc.Utf8)
-          outputTextarea.value = result || '解密失败，请检查密钥和密文'
+          const decrypted = aesCrypt(
+            decodeCiphertext(text),
+            deriveAesKey(key),
+            { decrypt: true, mode: currentMode, iv, padding: effectivePadding() }
+          )
+          outputTextarea.value = new TextDecoder().decode(decrypted) || '解密失败，请检查密钥和密文'
         } catch (e) {
-          outputTextarea.value = '解密错误: ' + e.message
+          outputTextarea.value = '解密错误: ' + (e instanceof Error ? e.message : String(e))
         }
       }
     }, ['解密'])

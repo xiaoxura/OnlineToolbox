@@ -1,5 +1,5 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
-import CryptoJS from 'crypto-js'
+import { hashText } from '../../utils/hash.js'
 
 export default {
   render(container) {
@@ -38,7 +38,7 @@ export default {
         outputTextarea.value = ''
         return
       }
-      const hash = CryptoJS.MD5(text).toString()
+      const hash = hashText('MD5', text)
       outputTextarea.value = isUppercase ? hash.toUpperCase() : hash
     }
 

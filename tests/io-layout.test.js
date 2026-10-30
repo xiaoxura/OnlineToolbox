@@ -24,7 +24,12 @@ const EXPECT_SPLIT = new Set([
   // (llm-cost, llm-models) and the custom grid layouts (message-convert,
   // tool-schema) deliberately stay full-width.
   'token-counter', 'prompt-template', 'chat-builder', 'llm-json-repair',
-  'text-chunker', 'vector-similarity'
+  'text-chunker', 'vector-similarity',
+  // review.md additions that follow the same "paste input → read result" shape.
+  'javascript', 'yaml', 'toml', 'crontab-systemd', 'x509',
+  'json-schema-validator', 'sql-json', 'byte-truncate', 'zh-convert', 'pinyin',
+  'data-table', 'og-meta', 'embedding-cost', 'context-window', 'sse-parser',
+  'prompt-security'
 ])
 
 describe('two-column IO layout', () => {

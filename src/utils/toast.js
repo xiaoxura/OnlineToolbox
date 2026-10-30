@@ -11,8 +11,9 @@ export function showToast(message, duration = 2000) {
     toastEl.setAttribute('role', 'status')
     toastEl.setAttribute('aria-live', 'polite')
     toastEl.setAttribute('aria-atomic', 'true')
-    document.body.appendChild(toastEl)
   }
+  // Re-attach if the body was replaced (route re-render, document reset).
+  if (!toastEl.isConnected) document.body.appendChild(toastEl)
   clearTimeout(toastTimer)
   toastEl.textContent = message
   toastEl.classList.add('show')

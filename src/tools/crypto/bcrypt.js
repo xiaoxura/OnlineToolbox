@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { createElement, createSection, createSegmentedGroup } from '../../utils/dom.js'
+import { supportsWorker } from '../../utils/worker.js'
 
 // bcrypt hashing / verification backed by the bundled bcryptjs implementation.
 // The pure helpers below are exported so they can be unit-tested without a DOM.
@@ -69,6 +70,53 @@ function errorMessage(cause) {
   return cause instanceof Error ? cause.message : String(cause)
 }
 
+// Per-operation worker: bcrypt at cost 12 can take seconds, and keeping one
+// worker alive would retain its module state for the whole session.
+function runBcryptInWorker(payload) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL('./bcrypt.worker.js', import.meta.url), { type: 'module' })
+    const id = Date.now().toString(36)
+    const cleanup = () => worker.terminate()
+    worker.addEventListener('message', event => {
+      const message = event.data || {}
+      if (message.id !== id) return
+      cleanup()
+      if (message.type === 'done') resolve(message.result)
+      else reject(new Error(message.message || 'bcrypt 计算失败'))
+    })
+    worker.addEventListener('error', () => {
+      cleanup()
+      reject(new Error('bcrypt Worker 出错'))
+    })
+    worker.postMessage({ ...payload, id })
+  })
+}
+
+/** Worker-backed hash with a synchronous fallback for environments without Worker. */
+export async function hashPasswordAsync(password, cost = DEFAULT_COST, salt = '') {
+  if (!supportsWorker()) return hashPassword(password, cost, salt)
+  // Validate up front so a bad cost / salt produces the same message as the sync path.
+  const value = String(password ?? '')
+  if (!value) throw new Error('请输入要哈希的密码')
+  const customSalt = String(salt ?? '').trim()
+  if (customSalt && !SALT_PATTERN.test(customSalt)) {
+    throw new Error('自定义盐值格式无效，应形如 $2b$10$abcdefghijklmnopqrstuv')
+  }
+  const normalized = customSalt ? 10 : normalizeCost(cost)
+  return runBcryptInWorker({ type: 'hash', password: value, cost: normalized, salt: customSalt })
+}
+
+/** Worker-backed verification with a synchronous fallback. */
+export async function verifyPasswordAsync(password, hash) {
+  const value = String(password ?? '')
+  const target = String(hash ?? '').trim()
+  if (!value) throw new Error('请输入要校验的密码')
+  if (!target) throw new Error('请输入要校验的 bcrypt 哈希')
+  if (!isBcryptHash(target)) throw new Error('哈希格式无效，应为 60 个字符的 bcrypt 哈希（以 $2a$/$2b$/$2y$ 开头）')
+  if (!supportsWorker()) return verifyPassword(value, target)
+  return runBcryptInWorker({ type: 'verify', password: value, hash: target })
+}
+
 function createField(labelText, control, hintText = '') {
   const children = [
     createElement('label', { className: 'label', textContent: labelText }),
@@ -121,27 +169,39 @@ export default {
       placeholder: '生成的哈希将显示在此…'
     })
     const genStats = createElement('div', { className: 'stats-row' })
+    const genStatus = createElement('div', { className: 'form-hint', role: 'status', 'aria-live': 'polite' })
 
-    function runGenerate() {
+    function applyGenerated(hash) {
+      const info = parseHashInfo(hash)
+      genOutput.value = hash
+      genStats.replaceChildren(
+        statItem('算法版本', `$${info.version}$`),
+        statItem('计算成本', `cost = ${info.cost}`),
+        statItem('盐值', info.salt),
+        statItem('哈希长度', `${hash.length} 个字符`)
+      )
+      const bytes = utf8Length(genPassword.value)
+      if (bytes > MAX_PASSWORD_BYTES) {
+        genError.textContent = `密码为 ${bytes} 字节，超出 bcrypt 的 ${MAX_PASSWORD_BYTES} 字节上限，只有前 ${MAX_PASSWORD_BYTES} 字节参与计算`
+      }
+    }
+
+    async function runGenerate() {
       genError.textContent = ''
+      genStatus.textContent = ''
+      const worker = supportsWorker()
+      if (worker) genStatus.textContent = '正在后台计算 bcrypt…'
       try {
-        const hash = hashPassword(genPassword.value, genCost.value, genSalt.value)
-        const info = parseHashInfo(hash)
-        genOutput.value = hash
-        genStats.replaceChildren(
-          statItem('算法版本', `$${info.version}$`),
-          statItem('计算成本', `cost = ${info.cost}`),
-          statItem('盐值', info.salt),
-          statItem('哈希长度', `${hash.length} 个字符`)
-        )
-        const bytes = utf8Length(genPassword.value)
-        if (bytes > MAX_PASSWORD_BYTES) {
-          genError.textContent = `密码为 ${bytes} 字节，超出 bcrypt 的 ${MAX_PASSWORD_BYTES} 字节上限，只有前 ${MAX_PASSWORD_BYTES} 字节参与计算`
-        }
+        const hash = worker
+          ? await hashPasswordAsync(genPassword.value, genCost.value, genSalt.value)
+          : hashPassword(genPassword.value, genCost.value, genSalt.value)
+        applyGenerated(hash)
       } catch (cause) {
         genOutput.value = ''
         genStats.replaceChildren()
         genError.textContent = errorMessage(cause)
+      } finally {
+        genStatus.textContent = ''
       }
     }
 
@@ -170,6 +230,7 @@ export default {
         })
       ]),
       genError,
+      genStatus,
       createSection('哈希结果', createElement('div', { className: 'tool-stack' }, [genOutput, genStats]))
     )
 
@@ -189,12 +250,18 @@ export default {
     const verifyError = createElement('div', { className: 'error-text' })
     const verifyResult = createElement('div', { className: 'inline-result' })
     const verifyStats = createElement('div', { className: 'stats-row' })
+    const verifyStatus = createElement('div', { className: 'form-hint', role: 'status', 'aria-live': 'polite' })
 
-    function runVerify() {
+    async function runVerify() {
       verifyError.textContent = ''
+      verifyStatus.textContent = ''
+      const worker = supportsWorker()
+      if (worker) verifyStatus.textContent = '正在后台校验 bcrypt…'
       try {
         const hash = verifyHashInput.value.trim()
-        const matched = verifyPassword(verifyPasswordInput.value, hash)
+        const matched = worker
+          ? await verifyPasswordAsync(verifyPasswordInput.value, hash)
+          : verifyPassword(verifyPasswordInput.value, hash)
         const info = parseHashInfo(hash)
         verifyResult.replaceChildren(createElement('span', {
           className: 'result-value',
@@ -209,6 +276,8 @@ export default {
         verifyResult.replaceChildren()
         verifyStats.replaceChildren()
         verifyError.textContent = errorMessage(cause)
+      } finally {
+        verifyStatus.textContent = ''
       }
     }
 
@@ -234,6 +303,7 @@ export default {
         })
       ]),
       verifyError,
+      verifyStatus,
       createElement('div', { className: 'tool-stack' }, [
         createElement('div', { className: 'label', textContent: '校验结果' }),
         verifyResult,

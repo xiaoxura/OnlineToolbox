@@ -1,0 +1,126 @@
+/* --- 图片主色调提取 --- */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-sm);
+}
+
+.palette-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 96px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  text-align: left;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.palette-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.palette-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.palette-card-hex {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.palette-card-rgb {
+  font-size: var(--font-size-xs);
+  opacity: 0.82;
+}
+.palette-card-ratio {
+  margin-top: auto;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.palette-card-bar {
+  display: block;
+  height: 4px;
+  margin-top: 5px;
+  overflow: hidden;
+  background: currentColor;
+  border-radius: 999px;
+  opacity: 0.28;
+}
+
+.palette-card-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  opacity: 0.9;
+}
+
+.palette-ratio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.palette-ratio-row {
+  display: grid;
+  grid-template-columns: 10px 78px minmax(0, 1fr) 52px;
+  gap: 10px;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.palette-ratio-dot {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+}
+
+.palette-ratio-hex {
+  color: var(--color-text);
+}
+
+.palette-ratio-track {
+  height: 8px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border-radius: 999px;
+}
+
+.palette-ratio-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+.palette-ratio-value {
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.palette-generator-link {
+  align-self: flex-start;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.palette-generator-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 520px) {
+  .palette-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .palette-ratio-row {
+    grid-template-columns: 10px 64px minmax(0, 1fr) 46px;
+  }
+}

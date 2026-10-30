@@ -1,4 +1,5 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
+import { formatWithPrettier } from '../../utils/format.js'
 
 export default {
   render(container) {
@@ -95,14 +96,21 @@ export default {
       return result.trim()
     }
 
-    function process() {
+    async function process() {
       const text = input.value
       if (!text.trim()) {
         output.value = ''
         return
       }
       if (currentMode === 'beautify') {
-        output.value = beautifyCSS(text)
+        // Prettier understands nested rules, @media and custom properties. If it
+        // cannot parse the input, fall back to the tolerant hand-written pass
+        // instead of refusing to format at all.
+        try {
+          output.value = (await formatWithPrettier(text, 'css')).trimEnd()
+        } catch {
+          output.value = beautifyCSS(text)
+        }
       } else {
         output.value = minifyCSS(text)
       }

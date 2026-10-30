@@ -1,4 +1,5 @@
 import { createElement, createSection, createSegmentedGroup, createTableScroll } from '../../utils/dom.js'
+import { supportsWorker } from '../../utils/worker.js'
 
 // BPE encodings, loaded on demand. Each one pulls a ~1MB (gzip) vocabulary
 // chunk, so a run only pays for the encoding it actually asks for and the
@@ -35,6 +36,47 @@ function loadTokenizer(encoding) {
       : import('gpt-tokenizer/encoding/o200k_base')
   }
   return tokenizerPromises[encoding]
+}
+
+// One worker per encoding: each entry imports a single BPE vocabulary, so the
+// emitted chunk stays half the size of a shared worker that bundles both. The
+// worker is reused, which caches the parsed vocabulary between runs.
+const WORKER_FACTORIES = {
+  cl100k_base: () => new Worker(new URL('./token-counter-cl100k.worker.js', import.meta.url), { type: 'module' }),
+  o200k_base: () => new Worker(new URL('./token-counter-o200k.worker.js', import.meta.url), { type: 'module' })
+}
+const tokenizerWorkers = new Map()
+let tokenizerRequestId = 0
+const tokenizerRequests = new Map()
+
+function workerFor(encoding) {
+  if (!tokenizerWorkers.has(encoding)) {
+    const worker = WORKER_FACTORIES[encoding]()
+    worker.addEventListener('message', event => {
+      const message = event.data || {}
+      const request = tokenizerRequests.get(message.id)
+      if (!request) return
+      tokenizerRequests.delete(message.id)
+      if (message.type === 'done') request.resolve(message)
+      else request.reject(new Error(message.message || '分词失败'))
+    })
+    worker.addEventListener('error', () => {
+      for (const request of tokenizerRequests.values()) request.reject(new Error('分词 Worker 出错'))
+      tokenizerRequests.clear()
+      tokenizerWorkers.delete(encoding)
+    })
+    tokenizerWorkers.set(encoding, worker)
+  }
+  return tokenizerWorkers.get(encoding)
+}
+
+function runTokenizerInWorker(payload) {
+  const worker = workerFor(payload.encoding)
+  const id = ++tokenizerRequestId
+  return new Promise((resolve, reject) => {
+    tokenizerRequests.set(id, { resolve, reject })
+    worker.postMessage({ ...payload, id })
+  })
 }
 
 const VALID_ROLES = new Set(['system', 'user', 'assistant', 'tool', 'function', 'developer'])
@@ -137,42 +179,73 @@ export default {
         return
       }
 
-      let tokenizer
-      try {
-        status.textContent = '正在加载分词器…'
-        tokenizer = await loadTokenizer(encoding)
-      } catch (cause) {
-        status.textContent = ''
-        error.textContent = `分词器加载失败：${cause.message}`
-        return
-      }
-      // A slower earlier run must not overwrite a newer one.
-      if (id !== runId) return
-      status.textContent = ''
-
+      const LIMIT = 400
       let ids
       let stats
+      let pieces
       try {
-        if (mode === 'chat') {
-          const messages = parseChatMessages(text)
-          ids = tokenizer.encodeChat(messages, ENCODINGS.find(item => item.value === encoding).chatModel)
-          const plain = tokenizer.countTokens(messages.map(message => message.content).join('\n'))
-          stats = [
-            ['Token 数', ids.length],
-            ['消息数', messages.length],
-            ['纯拼接对比', plain],
-            ['每条消息开销', messages.length ? ((ids.length - plain) / messages.length).toFixed(2) : '—']
-          ]
+        let messages
+        if (mode === 'chat') messages = parseChatMessages(text)
+
+        if (supportsWorker()) {
+          status.textContent = '正在后台计数…'
+          const result = await runTokenizerInWorker({
+            encoding,
+            mode,
+            text,
+            messages,
+            chatModel: ENCODINGS.find(item => item.value === encoding).chatModel,
+            limit: LIMIT
+          })
+          if (id !== runId) return
+          ids = result.ids
+          pieces = result.pieces
+          if (mode === 'chat') {
+            stats = [
+              ['Token 数', ids.length],
+              ['消息数', messages.length],
+              ['纯拼接对比', result.plain],
+              ['每条消息开销', messages.length ? ((ids.length - result.plain) / messages.length).toFixed(2) : '—']
+            ]
+          } else {
+            stats = [
+              ['Token 数', ids.length],
+              ['字符数', [...text].length],
+              ['字节数(UTF-8)', utf8Bytes(text)],
+              ['字符 / Token', ids.length ? (([...text].length) / ids.length).toFixed(2) : '—']
+            ]
+          }
+          status.textContent = ''
         } else {
-          ids = tokenizer.encode(text)
-          stats = [
-            ['Token 数', ids.length],
-            ['字符数', [...text].length],
-            ['字节数(UTF-8)', utf8Bytes(text)],
-            ['字符 / Token', ids.length ? (([...text].length) / ids.length).toFixed(2) : '—']
-          ]
+          status.textContent = '正在加载分词器…'
+          const tokenizer = await loadTokenizer(encoding)
+          // A slower earlier run must not overwrite a newer one.
+          if (id !== runId) return
+          status.textContent = ''
+          let plain = 0
+          if (mode === 'chat') {
+            ids = tokenizer.encodeChat(messages, ENCODINGS.find(item => item.value === encoding).chatModel)
+            plain = tokenizer.countTokens(messages.map(message => message.content).join('\n'))
+            stats = [
+              ['Token 数', ids.length],
+              ['消息数', messages.length],
+              ['纯拼接对比', plain],
+              ['每条消息开销', messages.length ? ((ids.length - plain) / messages.length).toFixed(2) : '—']
+            ]
+          } else {
+            ids = tokenizer.encode(text)
+            stats = [
+              ['Token 数', ids.length],
+              ['字符数', [...text].length],
+              ['字节数(UTF-8)', utf8Bytes(text)],
+              ['字符 / Token', ids.length ? (([...text].length) / ids.length).toFixed(2) : '—']
+            ]
+          }
+          pieces = ids.slice(0, LIMIT).map(tokenId => tokenPiece(tokenizer, tokenId))
         }
       } catch (cause) {
+        if (id !== runId) return
+        status.textContent = ''
         error.textContent = cause instanceof Error ? cause.message : String(cause)
         return
       }
@@ -182,7 +255,6 @@ export default {
 
       // The per-token table is a debugging aid, not the headline — skip it for
       // inputs big enough that materializing every row would jank the page.
-      const LIMIT = 400
       if (ids.length > LIMIT) {
         tableHint.textContent = `共 ${ids.length} 个 token，仅显示前 ${LIMIT} 个。`
       }
@@ -199,7 +271,7 @@ export default {
         createElement('tbody', {}, rows.map((tokenId, index) => createElement('tr', {}, [
           createElement('td', { textContent: String(index + 1) }),
           createElement('td', { textContent: String(tokenId) }),
-          createElement('td', { className: 'code-text', textContent: tokenPiece(tokenizer, tokenId) })
+          createElement('td', { className: 'code-text', textContent: pieces[index] ?? '' })
         ])))
       )
       const host = createElement('div')

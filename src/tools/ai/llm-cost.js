@@ -1,6 +1,6 @@
 import { createElement, createSection, createTableScroll } from '../../utils/dom.js'
 import {
-  CACHE_WRITE_MULTIPLIER, cachedInputPrice, formatCost, formatTokens,
+  CACHE_WRITE_MULTIPLIER, DATA_UPDATED, cachedInputPrice, formatCost, formatTokens,
   modelById, models, modelsByProvider, providers
 } from './models.js'
 
@@ -161,7 +161,8 @@ export default {
       error,
       hint,
       createSection('估算结果', statsEl),
-      createSection('成本明细', tableHost)
+      createSection('成本明细', tableHost),
+      createElement('div', { className: 'form-hint', textContent: `预置单价读取于 ${DATA_UPDATED}；厂商调价后请手动修改单价。` })
     )
   }
 }

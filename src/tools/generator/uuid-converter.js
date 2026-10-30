@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js'
+import { hashBytes } from '../../utils/hash.js'
 import { createElement, createSection, createSegmentedGroup, createTableScroll } from '../../utils/dom.js'
 
 // UUID generation and inspection, RFC 9562 / RFC 4122.
@@ -6,7 +6,7 @@ import { createElement, createSection, createSegmentedGroup, createTableScroll }
 //   v3 — MD5(namespace bytes ‖ name)
 //   v4 — 122 random bits
 //   v5 — SHA-1(namespace bytes ‖ name)
-// MD5 and SHA-1 come from the bundled crypto-js so v3/v5 stay synchronous.
+// MD5 and SHA-1 come from @noble/hashes so v3/v5 stay synchronous.
 
 export const NAMESPACES = {
   dns: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
@@ -103,22 +103,6 @@ export function uuidV1() {
   return formatUuid(bytes)
 }
 
-function toWordArray(bytes) {
-  const words = []
-  for (let index = 0; index < bytes.length; index++) {
-    words[index >>> 2] = (words[index >>> 2] || 0) | (bytes[index] << (24 - (index % 4) * 8))
-  }
-  return CryptoJS.lib.WordArray.create(words, bytes.length)
-}
-
-function wordArrayToBytes(wordArray) {
-  const bytes = new Uint8Array(wordArray.sigBytes)
-  for (let index = 0; index < bytes.length; index++) {
-    bytes[index] = (wordArray.words[index >>> 2] >>> (24 - (index % 4) * 8)) & 0xff
-  }
-  return bytes
-}
-
 function resolveNamespace(namespace) {
   const value = String(namespace ?? '').trim()
   if (!value) throw new Error('请选择或填写命名空间 UUID')
@@ -133,8 +117,7 @@ function nameBasedUuid(version, namespace, name) {
   input.set(namespaceBytes, 0)
   input.set(nameBytes, namespaceBytes.length)
 
-  const hasher = version === 3 ? CryptoJS.algo.MD5 : CryptoJS.algo.SHA1
-  const digest = wordArrayToBytes(hasher.create().update(toWordArray(input)).finalize())
+  const digest = hashBytes(version === 3 ? 'MD5' : 'SHA-1', input)
   const bytes = digest.slice(0, 16)
   bytes[6] = (bytes[6] & 0x0f) | (version << 4)
   bytes[8] = (bytes[8] & 0x3f) | 0x80

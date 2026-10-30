@@ -1,5 +1,5 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
-import CryptoJS from 'crypto-js'
+import { decryptPassphrase, encryptPassphrase } from '../../utils/openssl-aes.js'
 
 export default {
   render(container) {
@@ -62,25 +62,19 @@ export default {
         }
         try {
           if (mode === 'encrypt') {
-            const encrypted = CryptoJS.AES.encrypt(text, key).toString()
-            outputTextarea.value = encrypted
+            outputTextarea.value = encryptPassphrase(text, key)
           } else {
-            // A wrong key can fail in two different ways depending on the random
-            // IV: the padding check may reject the block (leaving an empty
-            // result), or it may pass while the bytes are not valid UTF-8 (which
-            // makes toString() throw). Both mean "could not decrypt", so decode
-            // failures are folded into the same message instead of surfacing
-            // CryptoJS's raw error inconsistently.
-            let result = ''
+            // A wrong key can fail while unpadding or while decoding UTF-8.
+            // Both mean "could not decrypt", so they share one message instead
+            // of surfacing two different low-level errors.
             try {
-              result = CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8)
+              outputTextarea.value = decryptPassphrase(text, key) || '解密失败，请检查密钥和密文'
             } catch {
-              result = ''
+              outputTextarea.value = '解密失败，请检查密钥和密文'
             }
-            outputTextarea.value = result || '解密失败，请检查密钥和密文'
           }
         } catch (e) {
-          outputTextarea.value = (mode === 'encrypt' ? '加密' : '解密') + '错误: ' + e.message
+          outputTextarea.value = (mode === 'encrypt' ? '加密' : '解密') + '错误: ' + (e instanceof Error ? e.message : String(e))
         }
       }
     })

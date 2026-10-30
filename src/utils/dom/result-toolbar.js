@@ -3,6 +3,9 @@ import { flashCopied } from './components.js'
 import allIcons from '../../icons.js'
 import { downloadText } from '../download.js'
 import { copyToClipboard } from '../clipboard.js'
+import { showToast } from '../toast.js'
+import { openToolPicker } from '../../app/tool-picker.js'
+import { sendToTool } from '../../app/handoff.js'
 
 // Icons used by the result-section toolbar (sized by .btn-icon svg rules).
 const resultIcons = {
@@ -10,7 +13,8 @@ const resultIcons = {
   download: allIcons.download,
   wrap: allIcons.wrap,
   collapse: allIcons.collapse,
-  expand: allIcons.expand
+  expand: allIcons.expand,
+  send: allIcons.send
 }
 
 // --- Result section toolbar (copy / download / wrap / collapse) ------------
@@ -72,6 +76,27 @@ export function enhanceResultSections(container, { toolName = 'result' } = {}) {
     // Download.
     const filename = `${toolName.replace(/\s+/g, '-').toLowerCase() || 'result'}.txt`
     group.appendChild(toolbarButton(resultIcons.download, '下载为文件', () => downloadText(filename, getContent())))
+
+    // Send the result to another tool as its input (sessionStorage handoff).
+    group.appendChild(toolbarButton(resultIcons.send, '发送到其他工具', () => {
+      const content = String(getContent() ?? '')
+      if (!content.trim()) {
+        showToast('没有可发送的内容')
+        return
+      }
+      openToolPicker({
+        title: '发送到…',
+        placeholder: '搜索要接收内容的目标工具…',
+        exclude: [toolName],
+        onSelect: target => {
+          if (!sendToTool(target.id, content, toolName)) {
+            showToast('内容发送失败，请重试')
+            return
+          }
+          window.location.hash = `#/${target.id}`
+        }
+      })
+    }))
 
     // Wrap toggle (only meaningful for a result box / pre-wrap content).
     const box = body.querySelector('.result-box')

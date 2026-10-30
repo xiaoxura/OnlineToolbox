@@ -1,0 +1,72 @@
+/* --- Prompt 安全检查：风险徽章与严重度 --- */
+.ps-badge {
+  font-weight: 600;
+}
+
+.ps-badge::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  background: var(--color-text-muted);
+  border-radius: 50%;
+}
+
+.ps-badge.risk-low {
+  color: var(--color-success-text);
+  background: var(--color-success-soft);
+  border-color: var(--color-success-border);
+}
+
+.ps-badge.risk-low::before {
+  background: var(--color-success);
+}
+
+.ps-badge.risk-medium {
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+  border-color: var(--color-warning-border);
+}
+
+.ps-badge.risk-medium::before {
+  background: var(--color-warning);
+}
+
+.ps-badge.risk-high {
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+}
+
+.ps-badge.risk-high::before {
+  background: var(--color-danger);
+}
+
+.ps-severity {
+  display: inline-block;
+  min-width: 28px;
+  padding: 1px 6px;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.ps-severity-high {
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+}
+
+.ps-severity-medium {
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+  border-color: var(--color-warning-border);
+}
+
+.ps-severity-low {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+}

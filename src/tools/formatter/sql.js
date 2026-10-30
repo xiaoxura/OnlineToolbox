@@ -1,4 +1,5 @@
 import { createElement, createCopyButton, createSection } from '../../utils/dom.js'
+import { SQL_DIALECTS, formatSql } from '../../utils/format.js'
 
 export default {
   render(container) {
@@ -15,145 +16,67 @@ export default {
       readOnly: true
     })
 
-    const SQL_KEYWORDS = [
-      'SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'JOIN', 'LEFT', 'RIGHT',
-      'INNER', 'OUTER', 'CROSS', 'FULL', 'ON', 'GROUP BY', 'ORDER BY',
-      'HAVING', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'ALTER', 'DROP',
-      'INTO', 'VALUES', 'SET', 'AS', 'IN', 'NOT', 'NULL', 'IS',
-      'BETWEEN', 'LIKE', 'LIMIT', 'OFFSET', 'UNION', 'ALL', 'DISTINCT',
-      'EXISTS', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'BEGIN',
-      'COMMIT', 'ROLLBACK', 'TABLE', 'INDEX', 'VIEW', 'TRIGGER',
-      'PROCEDURE', 'FUNCTION', 'DECLARE', 'RETURN', 'RETURNS',
-      'PRIMARY', 'KEY', 'FOREIGN', 'REFERENCES', 'CONSTRAINT',
-      'DEFAULT', 'AUTO_INCREMENT', 'IF', 'REPLACE', 'TOP',
-      'WITH', 'RECURSIVE', 'OVER', 'PARTITION', 'ROW_NUMBER',
-      'RANK', 'DENSE_RANK', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX',
-      'COALESCE', 'CAST', 'CONVERT', 'TRIM', 'UPPER', 'LOWER',
-      'SUBSTRING', 'CONCAT', 'LENGTH', 'NOW', 'DATE', 'YEAR',
-      'MONTH', 'DAY', 'ASC', 'DESC', 'FETCH', 'NEXT', 'ROWS',
-      'ONLY', 'NATURAL', 'USING', 'BOTH', 'LEADING', 'TRAILING',
-      'TRUE', 'FALSE'
-    ]
+    const dialect = createElement('select', { className: 'select', 'aria-label': 'SQL 方言' },
+      SQL_DIALECTS.map(item => createElement('option', { value: item.value, textContent: item.label })))
+    dialect.value = 'sql'
 
-    // Major clauses that should start on a new line
-    const MAJOR_CLAUSES = [
-      'FROM', 'WHERE', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN',
-      'CROSS JOIN', 'FULL JOIN', 'OUTER JOIN', 'GROUP BY', 'ORDER BY',
-      'HAVING', 'LIMIT', 'OFFSET', 'UNION', 'UNION ALL', 'INTERSECT',
-      'EXCEPT', 'ON', 'VALUES', 'SET', 'INTO'
-    ]
-
-    function formatSQL(sql) {
-      // Normalize whitespace
-      let text = sql.replace(/\s+/g, ' ').trim()
-
-      // Tokenize: split by strings (single-quoted) and keywords
-      // First, protect string literals
-      const strings = []
-      text = text.replace(/'([^']*)'/g, (match) => {
-        strings.push(match)
-        return '___STRING_' + (strings.length - 1) + '___'
-      })
-
-      // Also protect backtick-quoted identifiers
-      text = text.replace(/`([^`]*)`/g, (match) => {
-        strings.push(match)
-        return '___STRING_' + (strings.length - 1) + '___'
-      })
-
-      // Normalize keywords: uppercase all known keywords
-      for (const kw of SQL_KEYWORDS) {
-        const regex = new RegExp('\\b' + kw.replace(/\s+/g, '\\s+') + '\\b', 'gi')
-        text = text.replace(regex, kw)
-      }
-
-      // Add newlines before major clauses. Use one longest-first alternation so
-      // compound clauses (LEFT JOIN) are handled before their suffix (JOIN).
-      const clausePattern = [...MAJOR_CLAUSES]
-        .sort((a, b) => b.length - a.length)
-        .map(clause => clause.replace(/\s+/g, '\\s+'))
-        .join('|')
-      text = text.replace(new RegExp('\\b(' + clausePattern + ')\\b', 'gi'), '\n$1')
-
-      // Handle commas: put each select column on its own line
-      // First, handle SELECT ... FROM (columns)
-      text = text.replace(/SELECT\s/gi, 'SELECT\n  ')
-      text = text.replace(/,\s*/g, ',\n  ')
-
-      // Handle subquery indentation: (SELECT ... )
-      // Simple approach: track parentheses depth
-      const lines = text.split('\n')
-      let formatted = ''
-      let depth = 0
-      const indentStr = '  '
-
-      for (let line of lines) {
-        line = line.trim()
-        if (!line) continue
-
-        // Count opening and closing parens to adjust depth
-        let openParens = 0
-        let closeParens = 0
-        for (const ch of line) {
-          if (ch === '(') openParens++
-          if (ch === ')') closeParens++
-        }
-
-        // If line starts with ), decrease depth before printing
-        if (line.startsWith(')')) {
-          depth = Math.max(0, depth - 1)
-        }
-
-        formatted += indentStr.repeat(depth) + line + '\n'
-
-        // Adjust depth for next line
-        depth += openParens - closeParens
-        if (depth < 0) depth = 0
-      }
-
-      // Clean up: remove extra indentation from commas that are part of column lists
-      formatted = formatted
-        .replace(/,\n(\s*)/g, ',\n  ')
-
-      // Restore strings
-      for (let i = 0; i < strings.length; i++) {
-        formatted = formatted.replace('___STRING_' + i + '___', strings[i])
-      }
-
-      // Final cleanup
-      return formatted
-        .split('\n')
-        .map(l => l.trimEnd())
-        .join('\n')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim()
-    }
+    const status = createElement('div', { className: 'form-hint', role: 'status', 'aria-live': 'polite' })
+    const error = createElement('div', { className: 'error-text' })
 
     const beautifyBtn = createElement('button', {
       className: 'btn btn-primary',
-      onClick: () => {
-        const text = input.value.trim()
-        if (!text) return
-        output.value = formatSQL(text)
-      }
-    }, ['美化 SQL'])
+      type: 'button',
+      textContent: '美化 SQL'
+    })
 
     const copyBtn = createCopyButton(() => output.value)
 
     const exampleBtn = createElement('button', {
       className: 'btn btn-secondary',
+      type: 'button',
       textContent: '示例数据'
     })
 
-    const btnGroup = createElement('div', {
-      className: 'btn-group'
-    }, [beautifyBtn, exampleBtn, copyBtn])
+    async function beautify() {
+      const text = input.value.trim()
+      error.textContent = ''
+      if (!text) return
+      beautifyBtn.disabled = true
+      status.textContent = '正在加载格式化器…'
+      try {
+        output.value = await formatSql(text, dialect.value)
+        status.textContent = ''
+      } catch (cause) {
+        output.value = ''
+        status.textContent = ''
+        error.textContent = `格式化失败：${cause instanceof Error ? cause.message : String(cause)}`
+      } finally {
+        beautifyBtn.disabled = false
+      }
+    }
+
+    beautifyBtn.addEventListener('click', beautify)
+    dialect.addEventListener('change', () => {
+      if (input.value.trim() && output.value) beautify()
+    })
+
+    const btnGroup = createElement('div', { className: 'btn-group' }, [beautifyBtn, exampleBtn, copyBtn])
+
+    const options = createElement('div', { className: 'form-row' }, [
+      createElement('div', { className: 'form-group' }, [
+        createElement('label', { className: 'label', textContent: 'SQL 方言' }),
+        dialect
+      ])
+    ])
 
     const inputSection = createSection('输入 SQL', input)
     const outputSection = createSection('输出结果', output, [copyBtn])
 
+    container.appendChild(options)
     container.appendChild(inputSection)
     container.appendChild(btnGroup)
+    container.appendChild(status)
+    container.appendChild(error)
     container.appendChild(outputSection)
 
     exampleBtn.addEventListener('click', () => {

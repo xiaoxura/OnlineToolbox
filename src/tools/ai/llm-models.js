@@ -65,6 +65,7 @@ export default {
     renderTable('all')
 
     container.append(
+      createElement('div', { className: 'form-hint', textContent: `数据日期：${DATA_UPDATED} · 共 ${models.length} 个模型，价格为官方标价（USD / 每百万 token）。` }),
       createElement('div', { className: 'form-group' }, [
         createElement('label', { className: 'label', textContent: '厂商' }),
         filterGroup

@@ -1,4 +1,5 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
+import { formatWithPrettier } from '../../utils/format.js'
 
 export default {
   render(container) {
@@ -138,14 +139,21 @@ export default {
       return result.trim()
     }
 
-    function process() {
+    async function process() {
       const text = input.value
       if (!text.trim()) {
         output.value = ''
         return
       }
       if (currentMode === 'beautify') {
-        output.value = beautifyHTML(text)
+        // Prettier handles nested/void/optional tags far better than the
+        // regex pass. Keep that pass as a tolerant fallback for fragments
+        // Prettier rejects.
+        try {
+          output.value = (await formatWithPrettier(text, 'html')).trimEnd()
+        } catch {
+          output.value = beautifyHTML(text)
+        }
       } else {
         output.value = minifyHTML(text)
       }

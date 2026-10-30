@@ -1,87 +1,212 @@
+// Cookie header / Set-Cookie parser.
+//
+// The old tool could only list document.cookie for this site — which is empty
+// for most visitors and useless for debugging a header copied from DevTools.
+// Parsing pasted Cookie / Set-Cookie strings is the actually useful job.
 import { createCopyButton, createElement, createSection, createTableScroll } from '../../utils/dom.js'
 
+const ATTRIBUTE_NAMES = new Set(['expires', 'max-age', 'domain', 'path', 'secure', 'httponly', 'samesite', 'partitioned', 'priority'])
+
+function splitIgnoringExpires(text) {
+  // A Set-Cookie Expires value contains a comma ("Wed, 21 Oct 2025 …"). Only
+  // treat a comma as a separator when the text after it does not continue a
+  // date ("21 Oct 2025 …").
+  const parts = []
+  let current = ''
+  for (let index = 0; index < text.length; index++) {
+    const char = text[index]
+    if (char === ',') {
+      const rest = text.slice(index + 1)
+      const continuesDate = /^\s*\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/.test(rest)
+      if (continuesDate && /;\s*expires\s*=/i.test(current)) {
+        current += char
+        continue
+      }
+      parts.push(current)
+      current = ''
+      continue
+    }
+    current += char
+  }
+  if (current.trim()) parts.push(current)
+  return parts.map(part => part.trim()).filter(Boolean)
+}
+
+function splitPairs(text) {
+  return text.split(';').map(part => part.trim()).filter(Boolean)
+}
+
+export function parseCookieHeader(text) {
+  return splitPairs(String(text ?? '').replace(/^cookie\s*:/i, ''))
+    .map(pair => {
+      const index = pair.indexOf('=')
+      if (index < 0) return { name: pair.trim(), value: '', attributes: {} }
+      return {
+        name: pair.slice(0, index).trim(),
+        value: pair.slice(index + 1).trim(),
+        attributes: {}
+      }
+    })
+    .filter(cookie => cookie.name)
+}
+
+export function parseSetCookie(text) {
+  const cookies = []
+  const blocks = String(text ?? '')
+    .split(/\r?\n/)
+    .flatMap(line => splitIgnoringExpires(line.replace(/^set-cookie\s*:/i, '')))
+  for (const block of blocks) {
+    const pairs = splitPairs(block)
+    if (!pairs.length) continue
+    const [first, ...rest] = pairs
+    const index = first.indexOf('=')
+    const cookie = index < 0
+      ? { name: first.trim(), value: '', attributes: {} }
+      : { name: first.slice(0, index).trim(), value: first.slice(index + 1).trim(), attributes: {} }
+    if (!cookie.name) continue
+    for (const pair of rest) {
+      const eq = pair.indexOf('=')
+      const key = (eq < 0 ? pair : pair.slice(0, eq)).trim().toLowerCase()
+      if (!ATTRIBUTE_NAMES.has(key)) continue
+      if (eq < 0) cookie.attributes[key] = true
+      else cookie.attributes[key] = pair.slice(eq + 1).trim()
+    }
+    cookies.push(cookie)
+  }
+  return cookies
+}
+
+/** Auto-detect the input shape: Set-Cookie when attributes are present. */
+export function parseCookies(text) {
+  const value = String(text ?? '').trim()
+  if (!value) return { kind: 'empty', cookies: [] }
+  const isSetCookie = /;\s*(expires|max-age|domain|path|secure|httponly|samesite)\b/i.test(value)
+    || /^set-cookie\s*:/i.test(value)
+  return { kind: isSetCookie ? 'set-cookie' : 'header', cookies: isSetCookie ? parseSetCookie(value) : parseCookieHeader(value) }
+}
+
+function attributeSummary(cookie) {
+  const attributes = cookie.attributes || {}
+  const flags = []
+  if (attributes.secure) flags.push('Secure')
+  if (attributes.httponly) flags.push('HttpOnly')
+  if (attributes.samesite) flags.push(`SameSite=${attributes.samesite}`)
+  if (attributes.path) flags.push(`Path=${attributes.path}`)
+  if (attributes.domain) flags.push(`Domain=${attributes.domain}`)
+  if (attributes['max-age']) flags.push(`Max-Age=${attributes['max-age']}`)
+  if (attributes.expires) flags.push(`Expires=${attributes.expires}`)
+  return flags.join(' · ') || '—'
+}
+
+function cookieTable(cookies) {
+  const table = createElement('table', { className: 'result-table' })
+  table.append(
+    createElement('thead', {}, [
+      createElement('tr', {}, ['名称', '值', '属性', '操作'].map(label => createElement('th', { textContent: label })))
+    ]),
+    createElement('tbody', {}, cookies.map(cookie => createElement('tr', {}, [
+      createElement('td', { className: 'code-text', textContent: cookie.name }),
+      createElement('td', { className: 'code-text', textContent: cookie.value }),
+      createElement('td', { textContent: attributeSummary(cookie) }),
+      createElement('td', {}, [createCopyButton(() => `${cookie.name}=${cookie.value}`)])
+    ])))
+  )
+  createTableScroll(table, 'Cookie 解析结果，可横向滚动')
+  return table
+}
+
+const SAMPLE_SET_COOKIE = 'session_id=abc123; Path=/; Domain=example.com; Expires=Wed, 21 Oct 2026 07:28:00 GMT; Secure; HttpOnly; SameSite=Lax\n'
+  + 'theme=dark; Path=/; Max-Age=31536000; SameSite=None; Secure'
+const SAMPLE_COOKIE_HEADER = 'session_id=abc123; theme=dark; lang=zh-CN'
+
 export default {
-
   render(container) {
-    const notice = createElement('div', {
-      className: 'privacy-notice',
-      textContent: '仅能查看当前页面中非 HttpOnly 的 Cookie。'
+    const input = createElement('textarea', {
+      className: 'textarea large',
+      placeholder: '粘贴 Cookie 请求头或 Set-Cookie 响应头，例如：\nsession_id=abc123; Path=/; HttpOnly\n\n也可以直接粘贴多条 Set-Cookie，每行一条。',
+      rows: 10
     })
+    const output = createElement('div', { className: 'tool-stack' })
+    const error = createElement('div', { className: 'error-text' })
+    const status = createElement('div', { className: 'form-hint', role: 'status', 'aria-live': 'polite' })
 
-    const btnGroup = createElement('div', { className: 'btn-group' })
-    const refreshBtn = createElement('button', {
-      className: 'btn btn-primary',
-      textContent: '刷新 Cookie'
-    })
-    const copyAllBtn = createCopyButton(() => document.cookie || '（无 Cookie）')
-    copyAllBtn.title = '复制全部 Cookie'
-    copyAllBtn.setAttribute('aria-label', '复制全部 Cookie')
-    btnGroup.appendChild(refreshBtn)
-    btnGroup.appendChild(copyAllBtn)
-
-    const resultContainer = createElement('div', { className: 'tool-stack' })
-    container.append(notice, btnGroup, resultContainer)
-
-    function parseCookies() {
-      resultContainer.innerHTML = ''
-      const cookieStr = document.cookie
-
-      if (!cookieStr || !cookieStr.trim()) {
-        const emptyMsg = createElement('div', {
-          className: 'stat-item',
-          textContent: '当前页面无 Cookie'
-        })
-        resultContainer.appendChild(createSection('Cookie 列表', emptyMsg))
+    function run() {
+      error.textContent = ''
+      output.replaceChildren()
+      const parsed = parseCookies(input.value)
+      if (parsed.kind === 'empty') {
+        status.textContent = '请输入 Cookie 字符串'
         return
       }
-
-      const cookiePairs = cookieStr.split(';').map(c => c.trim()).filter(Boolean)
-
-      const statsRow = createElement('div', { className: 'stats-row' })
-      const countItem = createElement('div', { className: 'stat-item' })
-      const countLabel = createElement('span', { className: 'stat-label', textContent: 'Cookie 数量' })
-      const countValue = createElement('span', {
-        className: 'stat-value',
-        textContent: String(cookiePairs.length)
-      })
-      countItem.appendChild(countLabel)
-      countItem.appendChild(countValue)
-      statsRow.appendChild(countItem)
-      resultContainer.appendChild(createSection('Cookie 摘要', statsRow))
-
-      const table = createElement('table', { className: 'result-table' })
-      const thead = createElement('thead')
-      thead.innerHTML = '<tr><th>名称</th><th>值</th><th>操作</th></tr>'
-      table.appendChild(thead)
-      const tbody = createElement('tbody')
-
-      cookiePairs.forEach(pair => {
-        const eqIndex = pair.indexOf('=')
-        const name = eqIndex > 0 ? pair.substring(0, eqIndex).trim() : pair.trim()
-        const value = eqIndex > 0 ? pair.substring(eqIndex + 1).trim() : ''
-
-        const tr = createElement('tr')
-        const tdName = createElement('td', { textContent: name })
-        const tdValue = createElement('td', { textContent: value })
-        const tdAction = createElement('td')
-
-        const copyBtn = createCopyButton(() => `${name}=${value}`)
-        tdAction.appendChild(copyBtn)
-        tr.appendChild(tdName)
-        tr.appendChild(tdValue)
-        tr.appendChild(tdAction)
-        tbody.appendChild(tr)
-      })
-
-      table.appendChild(tbody)
-      resultContainer.appendChild(createSection(
-        'Cookie 列表',
-        createTableScroll(table, 'Cookie 列表')
-      ))
+      if (!parsed.cookies.length) {
+        status.textContent = ''
+        error.textContent = '没有解析到 Cookie，请检查格式（name=value; 属性=值）'
+        return
+      }
+      status.textContent = `识别为 ${parsed.kind === 'set-cookie' ? 'Set-Cookie 响应头' : 'Cookie 请求头'} · ${parsed.cookies.length} 条`
+      output.append(
+        createSection('解析结果', cookieTable(parsed.cookies)),
+        createSection('复制', createElement('pre', {
+          className: 'code-block',
+          textContent: parsed.cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ')
+        }))
+      )
     }
 
-    refreshBtn.addEventListener('click', parseCookies)
+    const parseButton = createElement('button', {
+      className: 'btn btn-primary',
+      type: 'button',
+      textContent: '解析 Cookie',
+      onClick: run
+    })
+    const sampleButton = createElement('button', {
+      className: 'btn btn-secondary',
+      type: 'button',
+      textContent: '示例 Set-Cookie',
+      onClick: () => {
+        input.value = SAMPLE_SET_COOKIE
+        run()
+      }
+    })
+    const headerSampleButton = createElement('button', {
+      className: 'btn btn-secondary',
+      type: 'button',
+      textContent: '示例 Cookie 请求头',
+      onClick: () => {
+        input.value = SAMPLE_COOKIE_HEADER
+        run()
+      }
+    })
+    const readButton = createElement('button', {
+      className: 'btn btn-secondary',
+      type: 'button',
+      textContent: '读取本站 Cookie',
+      title: '仅能读取当前页面中非 HttpOnly 的 Cookie',
+      onClick: () => {
+        input.value = document.cookie || ''
+        run()
+      }
+    })
+    const clearButton = createElement('button', {
+      className: 'btn btn-secondary',
+      type: 'button',
+      textContent: '清空',
+      onClick: () => {
+        input.value = ''
+        output.replaceChildren()
+        error.textContent = ''
+        status.textContent = ''
+        input.focus()
+      }
+    })
 
-    parseCookies()
+    container.append(
+      createElement('div', { className: 'privacy-notice', textContent: '🔒 Cookie 字符串只在当前浏览器中解析，不会上传到服务器。' }),
+      input,
+      createElement('div', { className: 'btn-group form-action-row' }, [parseButton, sampleButton, headerSampleButton, readButton, clearButton]),
+      status,
+      error,
+      output
+    )
   }
 }

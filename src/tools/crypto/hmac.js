@@ -1,15 +1,18 @@
 import { createElement, createCopyButton, createSection, createSegmentedGroup } from '../../utils/dom.js'
-import CryptoJS from 'crypto-js'
+import { hmac } from '@noble/hashes/hmac.js'
+import { md5, sha1 } from '@noble/hashes/legacy.js'
+import { sha256, sha512 } from '@noble/hashes/sha2.js'
+import { toHex } from '../../utils/hash.js'
 
 export default {
   render(container) {
     let currentAlgo = 'sha256'
 
     const hmacFunctions = {
-      md5: CryptoJS.HmacMD5,
-      sha1: CryptoJS.HmacSHA1,
-      sha256: CryptoJS.HmacSHA256,
-      sha512: CryptoJS.HmacSHA512
+      md5: (message, key) => hmac(md5, key, message),
+      sha1: (message, key) => hmac(sha1, key, message),
+      sha256: (message, key) => hmac(sha256, key, message),
+      sha512: (message, key) => hmac(sha512, key, message)
     }
 
     function computeHmac() {
@@ -20,7 +23,8 @@ export default {
         return
       }
       const fn = hmacFunctions[currentAlgo]
-      outputTextarea.value = fn(message, key).toString()
+      const encoder = new TextEncoder()
+      outputTextarea.value = toHex(fn(encoder.encode(message), encoder.encode(key)))
     }
 
     // Message input

@@ -1,10 +1,13 @@
 import './styles/base.css'
 import './styles/app.css'
 
-import { $, cleanupFormAccessibility, createElement, enhanceFormAccessibility, applyTwoColumnLayout, enhanceResultSections } from './utils/dom.js'
+import { $, cleanupFormAccessibility, createElement, enhanceFormAccessibility, applyTwoColumnLayout, enhanceResultSections, showToast } from './utils/dom.js'
 import { initRouter, registerRoute, navigate } from './router.js'
-import { categories, tools, getToolsByCategory, getToolsByCategoryAndSearch, getToolById, loadToolById } from './tools/registry.js'
+import { categories, tools, getToolById, getToolsByCategoryAndSearch, getRelatedTools, loadToolById } from './tools/registry.js'
 import { readStoredList, storeList } from './app/storage.js'
+import { setupCommandPalette } from './app/command-palette.js'
+import { setupDraftPersistence } from './app/draft.js'
+import { fillHandoff, takeHandoff } from './app/handoff.js'
 import { createToolLifecycle } from './app/lifecycle.js'
 import { ensureToolStyles } from './app/tool-styles.js'
 import { readUrlState, syncUrlState } from './app/url-state.js'
@@ -27,6 +30,7 @@ let renderRequestId = 0
 let searchRenderTimer = null
 let returnFocusToolId = null
 const toolLifecycle = createToolLifecycle()
+let draftCleanup = null
 const toolIdValidator = id => getToolById(id)
 let favorites = readStoredList(STORAGE.favorites, toolIdValidator)
 let recentTools = readStoredList(STORAGE.recent, toolIdValidator)
@@ -100,7 +104,6 @@ function setupHeader() {
     const target = event.target
     const isTyping = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target?.isContentEditable
     const isSearchShortcut = event.key === '/' && !isTyping
-      || (event.key.toLowerCase() === 'k' && (event.ctrlKey || event.metaKey))
     if (!isSearchShortcut) return
     event.preventDefault()
     if (window.location.hash !== '#/' && window.location.hash !== '') navigate('/')
@@ -227,7 +230,7 @@ function renderToolSection(title, toolIds, {
 }
 
 function createRelatedTools(tool, max = 6) {
-  const related = getToolsByCategory(tool.category).filter(item => item.id !== tool.id).slice(0, max)
+  const related = getRelatedTools(tool, max)
   if (!related.length) return null
   const grid = createElement('div', { className: 'tool-grid compact related-tools-grid' })
   related.forEach(item => grid.appendChild(createToolCard(item)))
@@ -426,6 +429,8 @@ function recordRecent(toolId) {
 
 async function renderToolPage(toolId) {
   cancelSearchRender()
+  draftCleanup?.()
+  draftCleanup = null
   toolLifecycle.dispose()
   const tool = getToolById(toolId)
   if (!tool) { navigate('/'); return }
@@ -501,6 +506,13 @@ async function renderToolPage(toolId) {
     applyTwoColumnLayout(body)
     enhanceFormAccessibility(body)
     enhanceResultSections(body, { toolName: tool.id })
+    draftCleanup = setupDraftPersistence(body, tool.id)
+    const handoff = takeHandoff(tool.id)
+    if (handoff) {
+      const applied = fillHandoff(body, handoff)
+      const from = getToolById(handoff.fromId)?.name || '其他工具'
+      showToast(applied ? `已接收来自「${from}」的内容` : '该工具没有可接收文本的输入框')
+    }
     body.setAttribute('aria-busy', 'false')
 
     const related = createRelatedTools(tool)
@@ -526,6 +538,8 @@ async function renderToolPage(toolId) {
 
 function renderHome() {
   cancelSearchRender()
+  draftCleanup?.()
+  draftCleanup = null
   toolLifecycle.dispose()
   const focusedCard = document.activeElement?.closest?.('.tool-card')
   const focusToolId = returnFocusToolId || focusedCard?.getAttribute('href')?.replace(/^#\//, '')
@@ -561,6 +575,7 @@ function init() {
   setupServiceWorker()
   setupTheme()
   setupHeader()
+  setupCommandPalette()
   setupCategoryNav()
   registerRoute('/', () => { $('#categoryNav').style.display = ''; renderHome() })
   tools.forEach(tool => registerRoute(`/${tool.id}`, () => { $('#categoryNav').style.display = 'none'; renderToolPage(tool.id) }))

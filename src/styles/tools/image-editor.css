@@ -1,0 +1,45 @@
+/* --- 图片编辑器 --- */
+.image-editor-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  padding: var(--space-sm);
+  overflow: auto;
+  background:
+    linear-gradient(45deg, var(--color-bg-secondary) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-bg-secondary) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-bg-secondary) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-bg-secondary) 75%);
+  background-color: var(--color-surface);
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+  background-size: 16px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.image-editor-canvas {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(60vh, 520px);
+  border-radius: 2px;
+  box-shadow: var(--shadow-sm);
+}
+
+.image-editor-flips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+@media (max-width: 720px) {
+  .image-editor-preview {
+    min-height: 140px;
+  }
+}

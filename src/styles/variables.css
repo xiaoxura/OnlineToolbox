@@ -112,6 +112,7 @@
 [data-category='image'] { --category-color: #66832b; }
 [data-category='network'] { --category-color: #2b718e; }
 [data-category='math'] { --category-color: #95621e; }
+[data-category='ai'] { --category-color: #6d4fa1; }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -170,3 +171,4 @@
 :root[data-theme='dark'] [data-category='image'] { --category-color: #b8d66a; }
 :root[data-theme='dark'] [data-category='network'] { --category-color: #7bc5e0; }
 :root[data-theme='dark'] [data-category='math'] { --category-color: #e6b770; }
+:root[data-theme='dark'] [data-category='ai'] { --category-color: #c4a8ff; }

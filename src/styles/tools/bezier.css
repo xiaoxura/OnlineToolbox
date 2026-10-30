@@ -1,0 +1,97 @@
+/* --- 贝塞尔曲线编辑器 --- */
+.bezier-presets-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.bezier-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bezier-graph-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.bezier-graph {
+  width: min(100%, 340px);
+  height: auto;
+  overflow: visible;
+  touch-action: none;
+  user-select: none;
+}
+
+.bezier-grid line {
+  stroke: var(--color-border);
+  stroke-width: 0.6;
+}
+.bezier-guide {
+  stroke: var(--color-text-muted);
+  stroke-width: 0.8;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+.bezier-curve {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.bezier-handle {
+  fill: var(--color-surface);
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.bezier-handle:active {
+  cursor: grabbing;
+}
+.bezier-handle:focus-visible {
+  outline: none;
+  stroke: var(--color-primary-hover);
+  stroke-width: 3;
+}
+
+.bezier-track {
+  position: relative;
+  height: 44px;
+  padding: 0 18px;
+  background: linear-gradient(
+    90deg,
+    transparent 18px,
+    var(--color-border) 18px,
+    var(--color-border) calc(100% - 18px),
+    transparent calc(100% - 18px)
+  );
+  background-size: 100% 1px;
+  background-position: 0 center;
+  background-repeat: no-repeat;
+}
+
+.bezier-ball {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--color-primary-light);
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 520px) {
+  .bezier-graph-wrap {
+    padding: var(--space-sm);
+  }
+}

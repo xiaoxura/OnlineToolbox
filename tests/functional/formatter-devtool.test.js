@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   mountTool,
   editableTextareas,
@@ -56,13 +56,14 @@ describe('formatter tools - functional', () => {
     const c = await mountTool('css')
     setValue(editableTextareas(c)[0], 'a:hover{color:red}')
     clickPrimary(c)
-    expect(outputValue(c)).toContain('a:hover')
+    await vi.waitFor(() => expect(outputValue(c)).toContain('a:hover'))
   })
 
   it('html: beautifies markup with the expected tags', async () => {
     const c = await mountTool('html')
     setValue(editableTextareas(c)[0], '<div class="a"><p>Hello</p></div>')
     clickPrimary(c)
+    await vi.waitFor(() => expect(outputValue(c)).toContain('<p>Hello</p>'))
     const out = outputValue(c)
     expect(out).toContain('<p>Hello</p>')
     expect(out).toContain('<div class="a">')
@@ -79,6 +80,7 @@ describe('formatter tools - functional', () => {
     const c = await mountTool('sql')
     setValue(editableTextareas(c)[0], 'select id, name from users where age > 18')
     clickPrimary(c)
+    await vi.waitFor(() => expect(outputValue(c)).toContain('SELECT'))
     const out = outputValue(c)
     expect(out).toContain('SELECT')
     expect(out).toContain('FROM')
@@ -94,7 +96,7 @@ describe('formatter tools - functional', () => {
       "select * from users u left join orders o on u.id = o.user_id"
     )
     clickPrimary(c)
-    expect(outputValue(c)).toContain('LEFT JOIN')
+    await vi.waitFor(() => expect(outputValue(c)).toContain('LEFT JOIN'))
   })
 
   it('xml: beautifies a document', async () => {

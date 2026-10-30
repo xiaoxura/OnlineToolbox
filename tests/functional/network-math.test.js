@@ -14,6 +14,7 @@ import { calculateCidr } from '../../src/tools/network/cidr-calculator.js'
 import { calculateIPv6, compressIPv6, expandIPv6, parseIPv6 } from '../../src/tools/network/ipv6-calculator.js'
 import { updateUrlParams } from '../../src/tools/network/url-params.js'
 import { generateCurl } from '../../src/tools/network/curl-generator.js'
+import { parseCookieHeader, parseCookies, parseSetCookie } from '../../src/tools/network/cookie-viewer.js'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -399,24 +400,58 @@ describe('port-check', () => {
 // ---------------------------------------------------------------------------
 
 describe('cookie-viewer', () => {
-  it('renders cookies present on the document', async () => {
+  it('parses a Cookie request header, keeping = inside values', () => {
+    expect(parseCookieHeader('sid=abc123; token=a=b=c; theme=dark')).toEqual([
+      { name: 'sid', value: 'abc123', attributes: {} },
+      { name: 'token', value: 'a=b=c', attributes: {} },
+      { name: 'theme', value: 'dark', attributes: {} }
+    ])
+  })
+
+  it('parses Set-Cookie attributes including a comma inside Expires', () => {
+    const cookies = parseSetCookie('session_id=abc; Path=/; Domain=example.com; Expires=Wed, 21 Oct 2026 07:28:00 GMT; Secure; HttpOnly; SameSite=Lax')
+    expect(cookies).toHaveLength(1)
+    expect(cookies[0].name).toBe('session_id')
+    expect(cookies[0].attributes).toMatchObject({
+      path: '/',
+      domain: 'example.com',
+      expires: 'Wed, 21 Oct 2026 07:28:00 GMT',
+      secure: true,
+      httponly: true,
+      samesite: 'Lax'
+    })
+  })
+
+  it('detects header vs Set-Cookie input and splits multiple cookies', () => {
+    expect(parseCookies('a=1; b=2').kind).toBe('header')
+    const parsed = parseCookies('a=1; Path=/\nb=2; Max-Age=60; Secure')
+    expect(parsed.kind).toBe('set-cookie')
+    expect(parsed.cookies.map(cookie => cookie.name)).toEqual(['a', 'b'])
+    expect(parseCookies('')).toEqual({ kind: 'empty', cookies: [] })
+  })
+
+  it('renders a parsed table from pasted input', async () => {
+    const container = await mountTool('cookie-viewer')
+    setValue(container.querySelector('textarea'), 'sid=abc123; theme=dark; lang=zh-CN')
+    clickText(container, '解析 Cookie')
+    expect(container.querySelector('.form-hint[role="status"]').textContent).toContain('3 条')
+    const rows = [...container.querySelectorAll('tbody tr')].map(row => [
+      row.querySelectorAll('td')[0].textContent,
+      row.querySelectorAll('td')[1].textContent
+    ])
+    expect(rows).toEqual([['sid', 'abc123'], ['theme', 'dark'], ['lang', 'zh-CN']])
+  })
+
+  it('reads document.cookie on demand', async () => {
     document.cookie = 'sid=abc123'
     document.cookie = 'theme=dark'
     const container = await mountTool('cookie-viewer')
-    const map = statMap(container)
-    expect(map['Cookie 数量']).toBe('2')
-    const rows = [...container.querySelectorAll('tbody tr')].map(r => [
-      r.querySelectorAll('td')[0].textContent,
-      r.querySelectorAll('td')[1].textContent
+    clickText(container, '读取本站 Cookie')
+    const rows = [...container.querySelectorAll('tbody tr')].map(row => [
+      row.querySelectorAll('td')[0].textContent,
+      row.querySelectorAll('td')[1].textContent
     ])
     expect(rows).toEqual(expect.arrayContaining([['sid', 'abc123'], ['theme', 'dark']]))
-  })
-
-  it('splits values containing = correctly', async () => {
-    document.cookie = 'token=a=b=c'
-    const container = await mountTool('cookie-viewer')
-    const row = container.querySelector('tbody tr')
-    expect(row.querySelectorAll('td')[1].textContent).toBe('a=b=c')
   })
 })
 

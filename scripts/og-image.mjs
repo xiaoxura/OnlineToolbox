@@ -127,7 +127,7 @@ function fillRect(surface, x, y, w, h, color) {
 
 // --- Card composition -------------------------------------------------------
 
-// Per-category accents keep the 157 cards visually distinguishable while the
+// Per-category accents keep the 180 cards visually distinguishable while the
 // layout stays identical, so they read as one set.
 const CATEGORY_ACCENTS = {
   encoding: [129, 140, 248], crypto: [244, 114, 182], text: [52, 211, 153],

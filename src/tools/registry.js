@@ -1,5 +1,7 @@
 // Lightweight tool metadata registry. Tool implementations are loaded on demand.
 
+import { searchPinyin } from './search-index.js'
+
 export const categories = [
   { id: 'all', name: '全部', description: '按任务查找工具' },
   { id: 'encoding', name: '编码/解码', description: '文本、字节与令牌' },
@@ -25,11 +27,11 @@ export const tools = [
   { id: "base58", name: "Base58 编解码", description: "使用 Bitcoin 字母表进行 Base58 编码与解码", category: "encoding", icon: "base32", load: () => import("./encoding/base58.js") },
   { id: "base32", name: "Base32 编解码", description: "Base32 编码与解码（RFC 4648 字母表: A-Z2-7）", category: "encoding", icon: "base32", load: () => import("./encoding/base32.js") },
   { id: "punycode", name: "Punycode 编解码", description: "Punycode 编解码，用于国际化域名(IDN)转换", category: "encoding", icon: "punycode", load: () => import("./encoding/punycode.js") },
-  { id: "data-url", name: "Data URL 生成", description: "将本地文件转换为可嵌入 HTML 或 CSS 的 Data URL", category: "encoding", icon: "img-to-base64", keywords: ["data uri", "文件编码", "base64文件"], load: () => import("./encoding/data-url.js") },
+  { id: "data-url", name: "Data URL 生成", description: "将本地文件转换为 Data URL（图片请用图片转 Base64）", category: "encoding", icon: "img-to-base64", keywords: ["data uri", "文件编码", "base64文件"], load: () => import("./encoding/data-url.js") },
   { id: "morse-code", name: "摩尔斯电码", description: "文本与摩尔斯电码互转，支持音频播放与自定义分隔符", category: "encoding", icon: "unicode", keywords: ["morse","摩尔斯","电报","电码","摩斯","sos","音频","cw"], load: () => import("./encoding/morse-code.js") },
   { id: "md5", name: "MD5 哈希", description: "计算文本的 MD5 哈希值", category: "crypto", icon: "md5", load: () => import("./crypto/md5.js") },
   { id: "sha", name: "SHA 哈希", description: "计算 SHA-1/SHA-256/SHA-512 哈希值", category: "crypto", icon: "sha", load: () => import("./crypto/sha.js") },
-  { id: "aes", name: "AES 加解密", description: "AES 对称加密和解密", category: "crypto", icon: "aes", load: () => import("./crypto/aes.js") },
+  { id: "aes", name: "AES 加解密", description: "AES 对称加解密（口令加密请用文本加密）", category: "crypto", icon: "aes", load: () => import("./crypto/aes.js") },
   { id: "des", name: "DES 加解密", description: "DES/3DES 对称加密和解密", category: "crypto", icon: "des", load: () => import("./crypto/des.js") },
   { id: "file-hash", name: "文件哈希计算", description: "在本地计算文件的 SHA-1、SHA-256 或 SHA-512 摘要", category: "crypto", icon: "sha", load: () => import("./crypto/file-hash.js") },
   { id: "hmac", name: "HMAC 生成", description: "生成 HMAC 签名", category: "crypto", icon: "hmac", load: () => import("./crypto/hmac.js") },
@@ -46,29 +48,29 @@ export const tools = [
   { id: "case-convert", name: "大小写转换", description: "文本大小写和全角半角转换", category: "text", icon: "case-convert", load: () => import("./text/case-convert.js") },
   { id: "text-dedup", name: "文本去重", description: "去除重复的行", category: "text", icon: "text-dedup", load: () => import("./text/text-dedup.js") },
   { id: "text-sort", name: "文本排序", description: "对文本行进行排序", category: "text", icon: "text-sort", load: () => import("./text/text-sort.js") },
-  { id: "regex", name: "正则表达式测试", description: "正则表达式在线测试和匹配", category: "text", icon: "regex", load: () => import("./text/regex-test.js") },
+  { id: "regex", name: "正则表达式测试", description: "正则表达式在线匹配测试（语法可视化请用正则可视化）", category: "text", icon: "regex", load: () => import("./text/regex-test.js") },
   { id: "text-replace", name: "文本替换", description: "批量查找和替换文本", category: "text", icon: "text-replace", load: () => import("./text/text-replace.js") },
   { id: "escape", name: "转义工具", description: "JSON/JS/HTML 特殊字符转义", category: "text", icon: "escape", load: () => import("./text/escape.js") },
-  { id: "markdown", name: "Markdown 预览", description: "实时预览 Markdown 文本", category: "text", icon: "html", load: () => import("./text/markdown.js") },
+  { id: "markdown", name: "Markdown 预览", description: "实时预览 Markdown（需要 HTML 代码请用 Markdown 转 HTML）", category: "text", icon: "html", load: () => import("./text/markdown.js") },
   { id: "set-operations", name: "文本集合运算", description: "计算两组文本行的交集、并集、差集和对称差集", category: "text", icon: "text-diff", load: () => import("./text/set-operations.js") },
-  { id: "text-encrypt", name: "文本加密", description: "使用 AES 加密和解密文本", category: "text", icon: "aes", load: () => import("./text/text-encrypt.js") },
+  { id: "text-encrypt", name: "文本加密", description: "使用口令加解密文本（需要指定密钥/IV 请用 AES 加解密）", category: "text", icon: "aes", load: () => import("./text/text-encrypt.js") },
   { id: "slugify", name: "Slug 生成器", description: "将标题或文本转换为 URL 友好的 slug", category: "text", icon: "url-encode", keywords: ["slug", "url路径", "permalink"], load: () => import("./text/slugify.js") },
   { id: "line-endings", name: "换行符转换", description: "在 LF、CRLF 和 CR 换行格式之间转换文本", category: "text", icon: "text-sort", keywords: ["换行", "crlf", "lf", "eol"], load: () => import("./text/line-endings.js") },
   { id: "text-wrap", name: "文本自动换行", description: "按指定列宽自动换行并保留段落结构", category: "text", icon: "lorem", keywords: ["wrap", "列宽", "折行"], load: () => import("./text/text-wrap.js") },
-  { id: "markdown-table", name: "Markdown 表格生成", description: "将 CSV、TSV 或竖线分隔数据转换为 Markdown 表格", category: "text", icon: "json-csv", keywords: ["table", "表格", "csv to markdown"], load: () => import("./text/markdown-table.js") },
+  { id: "markdown-table", name: "Markdown 表格生成", description: "将 CSV、TSV 或竖线分隔数据转换为 Markdown 表格", category: "text", icon: "table", keywords: ["table", "表格", "csv to markdown"], load: () => import("./text/markdown-table.js") },
   { id: "word-frequency", name: "词频统计", description: "统计文本中词语出现次数、占比并排序", category: "text", icon: "char-count", keywords: ["词频","word count","frequency","分词","热词","统计","word frequency","bigram"], load: () => import("./text/word-frequency.js") },
-  { id: "text-extract", name: "文本提取器", description: "从文本中批量提取邮箱、URL、IP、手机号与话题标签", category: "text", icon: "search", keywords: ["提取","extract","邮箱","url","手机号","正则提取","ip","正则"], load: () => import("./text/text-extract.js") },
+  { id: "text-extract", name: "文本提取器", description: "从文本中批量提取邮箱、URL、IP、手机号与话题标签", category: "text", icon: "extract", keywords: ["提取","extract","邮箱","url","手机号","正则提取","ip","正则"], load: () => import("./text/text-extract.js") },
   { id: "hidden-chars", name: "隐藏字符检测", description: "检测并清除零宽字符、BOM、控制符与易混淆字符", category: "text", icon: "eye", keywords: ["零宽字符","隐藏字符","bom","不可见字符","同形字","清洗","zero width","零宽","homoglyph"], load: () => import("./text/hidden-chars.js") },
   { id: "text-mask", name: "文本脱敏", description: "对邮箱、手机号、身份证、银行卡与密钥进行掩码脱敏", category: "text", icon: "mask", keywords: ["脱敏","掩码","mask","打码","隐私","敏感信息","手机号","身份证"], load: () => import("./text/text-mask.js") },
   { id: "list-tools", name: "列表工具", description: "对文本行进行反转、打乱、分组、轮转、编号与包装", category: "text", icon: "text-sort", keywords: ["列表","行处理","反转","打乱","分组","编号","行操作","shuffle","rotate"], load: () => import("./text/list-tools.js") },
-  { id: "uuid", name: "UUID 生成", description: "生成 UUID v4 随机唯一标识符", category: "generator", icon: "uuid", load: () => import("./generator/uuid.js") },
+  { id: "uuid", name: "UUID 生成", description: "批量生成 UUID v4 随机标识符（v1/v3/v5 请用 UUID 生成与解析）", category: "generator", icon: "uuid", load: () => import("./generator/uuid.js") },
   { id: "password", name: "随机密码生成", description: "生成安全的随机密码", category: "generator", icon: "password", load: () => import("./generator/password.js") },
   { id: "random", name: "随机数生成", description: "生成随机数和随机字符串", category: "generator", icon: "random", load: () => import("./generator/random.js") },
   { id: "lorem", name: "Lorem ipsum 生成", description: "生成 Lorem ipsum 占位文本", category: "generator", icon: "lorem", load: () => import("./generator/lorem.js") },
   { id: "qrcode", name: "二维码生成", description: "将文本或链接生成二维码", category: "generator", icon: "qrcode", load: () => import("./generator/qrcode.js") },
   { id: "placeholder-img", name: "占位图生成", description: "生成自定义尺寸、颜色和文字的占位图片", category: "generator", icon: "img-to-base64", load: () => import("./generator/placeholder-img.js") },
   { id: "gradient-gen", name: "CSS 渐变生成器", description: "生成线性渐变和径向渐变的 CSS 代码", category: "generator", icon: "color", load: () => import("./generator/gradient-gen.js") },
-  { id: "shadow-gen", name: "CSS 阴影生成器", description: "可视化调整并生成 box-shadow CSS 代码", category: "generator", icon: "json", load: () => import("./generator/shadow-gen.js") },
+  { id: "shadow-gen", name: "CSS 阴影生成器", description: "可视化调整并生成 box-shadow CSS 代码", category: "generator", icon: "css", load: () => import("./generator/shadow-gen.js") },
   { id: "palette-gen", name: "调色板生成", description: "基于色彩理论生成互补色、三色组、类似色等配色方案", category: "generator", icon: "color", load: () => import("./generator/palette-gen.js") },
   { id: "ulid", name: "ULID 生成", description: "生成按时间排序、适合分布式系统的 ULID 标识符", category: "generator", icon: "uuid", keywords: ["sortable id", "分布式 id"], load: () => import("./generator/ulid.js") },
   { id: "uuid-converter", name: "UUID 生成与解析", description: "生成与解析 UUID v1/v3/v4/v5，显示版本、变体与内嵌时间戳", category: "generator", icon: "uuid", keywords: ["uuid","guid","v4","v5","v1","唯一标识"], load: () => import("./generator/uuid-converter.js") },
@@ -80,12 +82,12 @@ export const tools = [
   { id: "unit", name: "单位转换", description: "长度、重量、温度等单位转换", category: "converter", icon: "unit", load: () => import("./converter/unit.js") },
   { id: "json-yaml", name: "JSON ↔ YAML 转换", description: "JSON 和 YAML 格式相互转换", category: "converter", icon: "json-yaml", load: () => import("./converter/json-yaml.js") },
   { id: "codex-credential-converter", name: "CPA ↔ Sub2API 凭证转换", description: "CPA ↔ Sub2API，二者均可导出 auth.json", category: "converter", icon: "json-yaml", keywords: ["cpa", "cliproxyapi", "sub2api", "auth.json", "codex", "oauth"], load: () => import("./converter/codex-credential-converter.js") },
-  { id: "toml-json", name: "TOML ↔ JSON 转换", description: "在 TOML 配置与 JSON 对象之间双向转换，支持表和数组表", category: "converter", icon: "json", keywords: ["toml", "toml parser", "配置转换"], load: () => import("./converter/toml-json.js") },
+  { id: "toml-json", name: "TOML ↔ JSON 转换", description: "在 TOML 配置与 JSON 对象之间双向转换，支持表和数组表", category: "converter", icon: "toml", keywords: ["toml", "toml parser", "配置转换"], load: () => import("./converter/toml-json.js") },
   { id: "json-xml", name: "JSON ↔ XML 转换", description: "JSON 和 XML 格式相互转换", category: "converter", icon: "json-xml", load: () => import("./converter/json-xml.js") },
-  { id: "json-csv", name: "JSON 转 CSV", description: "将 JSON 数组转换为 CSV 格式，支持嵌套对象", category: "converter", icon: "json", load: () => import("./converter/json-csv.js") },
-  { id: "csv-json", name: "CSV 转 JSON", description: "将 CSV 格式转换为 JSON 数组，支持自动检测分隔符", category: "converter", icon: "json", load: () => import("./converter/csv-json.js") },
+  { id: "json-csv", name: "JSON 转 CSV", description: "将 JSON 数组转换为 CSV 格式，支持嵌套对象", category: "converter", icon: "table", load: () => import("./converter/json-csv.js") },
+  { id: "csv-json", name: "CSV 转 JSON", description: "将 CSV 格式转换为 JSON 数组，支持自动检测分隔符", category: "converter", icon: "table", load: () => import("./converter/csv-json.js") },
   { id: "json-path", name: "JSONPath 查询", description: "使用 JSONPath 表达式查询 JSON 数据，支持点击 JSON 树节点获取路径", category: "converter", icon: "search", load: () => import("./converter/json-path.js") },
-  { id: "md-to-html", name: "Markdown 转 HTML", description: "将 Markdown 文本实时转换为 HTML 代码", category: "converter", icon: "markdown", load: () => import("./converter/md-to-html.js") },
+  { id: "md-to-html", name: "Markdown 转 HTML", description: "将 Markdown 转换为 HTML 代码（实时预览请用 Markdown 预览）", category: "converter", icon: "markdown", load: () => import("./converter/md-to-html.js") },
   { id: "html-to-jsx", name: "HTML 转 JSX", description: "将 HTML 代码转换为 React JSX 语法", category: "converter", icon: "html", load: () => import("./converter/html-to-jsx.js") },
   { id: "css-to-js", name: "CSS 转 JS 对象", description: "将 CSS 样式转换为 JavaScript 对象、CSS Modules 或 styled-components", category: "converter", icon: "css", load: () => import("./converter/css-to-js.js") },
   { id: "json-diff", name: "JSON 对比", description: "对比两个 JSON 对象的差异，显示新增、删除和修改的内容", category: "converter", icon: "json-yaml", load: () => import("./converter/json-diff.js") },
@@ -93,10 +95,10 @@ export const tools = [
   { id: "date-calc", name: "日期计算器", description: "计算日期差和日期加减", category: "converter", icon: "timestamp", load: () => import("./converter/date-calc.js") },
   { id: "json-typescript", name: "JSON 转 TypeScript", description: "根据 JSON 自动生成 TypeScript interface 或 type", category: "converter", icon: "json", load: () => import("./converter/json-typescript.js") },
   { id: "amount-cn", name: "中文大写金额", description: "将数字金额转换为中文大写", category: "converter", icon: "radix", load: () => import("./converter/amount-cn.js") },
-  { id: "regex-visual", name: "正则表达式可视化", description: "测试和解释正则表达式", category: "converter", icon: "regex", load: () => import("./converter/regex-visual.js") },
+  { id: "regex-visual", name: "正则表达式可视化", description: "测试并逐步解释正则表达式（纯匹配测试请用正则表达式测试）", category: "converter", icon: "regex", load: () => import("./converter/regex-visual.js") },
   { id: "html-to-markdown", name: "HTML 转 Markdown", description: "将 HTML 转换为 Markdown，支持标题、列表、链接、表格与代码块", category: "converter", icon: "markdown", keywords: ["html2md","markdown","转换","文档","html","富文本"], load: () => import("./converter/html-to-markdown.js") },
   { id: "markdown-toc", name: "Markdown 目录生成", description: "为 Markdown 文档生成带锚点的可跳转目录", category: "converter", icon: "text-sort", keywords: ["toc","目录","锚点","outline","markdown"], load: () => import("./converter/markdown-toc.js") },
-  { id: "csv-toolbox", name: "CSV 工具箱", description: "CSV 转置、分隔符转换、列的增删与交换", category: "converter", icon: "json-csv", keywords: ["csv","tsv","转置","transpose","分隔符","列操作"], load: () => import("./converter/csv-toolbox.js") },
+  { id: "csv-toolbox", name: "CSV 工具箱", description: "CSV 转置、分隔符转换、列的增删与交换", category: "converter", icon: "table", keywords: ["csv","tsv","转置","transpose","分隔符","列操作"], load: () => import("./converter/csv-toolbox.js") },
   { id: "json-to-code", name: "JSON 转代码", description: "将 JSON 转换为 Go、Python、Java、C#、PHP 或 Rust 结构体代码", category: "converter", icon: "json", keywords: ["struct","pojo","dataclass","record","代码生成","go","rust","json"], load: () => import("./converter/json-to-code.js") },
   { id: "json-flatten", name: "JSON 扁平化", description: "在嵌套 JSON 与点号路径的扁平结构之间双向转换", category: "converter", icon: "json", keywords: ["flatten","unflatten","扁平化","路径","dot notation","展开"], load: () => import("./converter/json-flatten.js") },
   { id: "json-sort", name: "JSON 键排序", description: "递归排序 JSON 对象键名，可选保留数组顺序", category: "converter", icon: "json", keywords: ["sort","排序","键排序","key order","规范化","diff"], load: () => import("./converter/json-sort.js") },
@@ -114,48 +116,48 @@ export const tools = [
   { id: "html", name: "HTML 格式化", description: "HTML 代码美化和压缩", category: "formatter", icon: "html", load: () => import("./formatter/html.js") },
   { id: "sql", name: "SQL 格式化", description: "SQL 语句美化", category: "formatter", icon: "sql", load: () => import("./formatter/sql.js") },
   { id: "xml", name: "XML 格式化", description: "XML 代码美化和压缩", category: "formatter", icon: "xml", load: () => import("./formatter/xml.js") },
-  { id: "cron", name: "Cron 表达式解析", description: "解析 Cron 表达式，显示各字段含义和下次执行时间", category: "devtool", icon: "timestamp", load: () => import("./devtool/cron.js") },
-  { id: "http-status", name: "HTTP 状态码查询", description: "查看所有 HTTP 状态码的含义和分类", category: "devtool", icon: "search", load: () => import("./devtool/http-status.js") },
+  { id: "cron", name: "Cron 表达式解析", description: "解析 Cron 表达式并预测下次执行时间（可视化构建请用 Cron 构建器）", category: "devtool", icon: "timestamp", load: () => import("./devtool/cron.js") },
+  { id: "http-status", name: "HTTP 状态码查询", description: "查看所有 HTTP 状态码的含义和分类", category: "devtool", icon: "globe", load: () => import("./devtool/http-status.js") },
   { id: "user-agent", name: "User-Agent 解析", description: "解析 User-Agent 字符串，显示浏览器、操作系统和设备信息", category: "devtool", icon: "unicode", load: () => import("./devtool/user-agent.js") },
   { id: "regex-ref", name: "正则表达式速查表", description: "正则表达式语法参考，按分类查看常用模式、描述和示例", category: "devtool", icon: "regex", load: () => import("./devtool/regex-ref.js") },
   { id: "css-unit", name: "CSS 单位转换", description: "在 px、em、rem、vh、vw、%、cm、in、pt 等 CSS 单位之间互相转换", category: "devtool", icon: "unit", load: () => import("./devtool/css-unit.js") },
-  { id: "json-schema", name: "JSON Schema 生成", description: "根据 JSON 数据自动推断并生成 JSON Schema (draft-07)", category: "devtool", icon: "json", load: () => import("./devtool/json-schema.js") },
+  { id: "json-schema", name: "JSON Schema 生成", description: "根据 JSON 数据自动推断并生成 JSON Schema (draft-07)", category: "devtool", icon: "schema", load: () => import("./devtool/json-schema.js") },
   { id: "mock-data", name: "Mock 数据生成", description: "生成各类模拟数据：姓名、手机号、邮箱、身份证号、地址等", category: "devtool", icon: "random", load: () => import("./devtool/mock-data.js") },
-  { id: "git-ref", name: "Git 命令速查", description: "常用 Git 命令参考，按分类查找并快速复制命令", category: "devtool", icon: "search", load: () => import("./devtool/git-ref.js") },
-  { id: "linux-ref", name: "Linux 命令速查", description: "常用 Linux 命令参考，按分类查找并快速复制命令", category: "devtool", icon: "search", load: () => import("./devtool/linux-ref.js") },
-  { id: "id-card", name: "身份证号校验", description: "校验18位身份证号码，提取省份、生日、性别等信息", category: "devtool", icon: "search", load: () => import("./devtool/id-card.js") },
-  { id: "bank-card", name: "银行卡号校验", description: "使用 Luhn 算法校验银行卡号，识别发卡银行和卡类型", category: "devtool", icon: "search", load: () => import("./devtool/bank-card.js") },
-  { id: "credit-code", name: "统一社会信用代码校验", description: "校验18位统一社会信用代码，解析登记管理机关和机构类型", category: "devtool", icon: "search", load: () => import("./devtool/credit-code.js") },
-  { id: "chmod-calculator", name: "chmod 权限计算器", description: "可视化计算 Linux 文件权限和 chmod 命令", category: "devtool", icon: "search", load: () => import("./devtool/chmod-calculator.js") },
-  { id: "sql-in", name: "SQL IN 参数生成", description: "将多行数据转换为 SQL IN 或 NOT IN 条件", category: "devtool", icon: "sql", load: () => import("./devtool/sql-in.js") },
+  { id: "git-ref", name: "Git 命令速查", description: "常用 Git 命令参考，按分类查找并快速复制命令", category: "devtool", icon: "git", load: () => import("./devtool/git-ref.js") },
+  { id: "linux-ref", name: "Linux 命令速查", description: "常用 Linux 命令参考，按分类查找并快速复制命令", category: "devtool", icon: "terminal", load: () => import("./devtool/linux-ref.js") },
+  { id: "id-card", name: "身份证号校验", description: "校验18位身份证号码，提取省份、生日、性别等信息", category: "devtool", icon: "id-card", load: () => import("./devtool/id-card.js") },
+  { id: "bank-card", name: "银行卡号校验", description: "使用 Luhn 算法校验银行卡号，识别发卡银行和卡类型", category: "devtool", icon: "id-card", load: () => import("./devtool/bank-card.js") },
+  { id: "credit-code", name: "统一社会信用代码校验", description: "校验18位统一社会信用代码，解析登记管理机关和机构类型", category: "devtool", icon: "id-card", load: () => import("./devtool/credit-code.js") },
+  { id: "chmod-calculator", name: "chmod 权限计算器", description: "可视化计算 Linux 文件权限和 chmod 命令", category: "devtool", icon: "terminal", load: () => import("./devtool/chmod-calculator.js") },
+  { id: "sql-in", name: "SQL IN 参数生成", description: "将多行数据转换为 SQL IN 或 NOT IN 条件", category: "devtool", icon: "table", load: () => import("./devtool/sql-in.js") },
   { id: "format-check", name: "格式校验工具", description: "校验手机号、邮箱、身份证、URL、IP地址、MAC地址、日期等格式", category: "devtool", icon: "regex", load: () => import("./devtool/format-check.js") },
   { id: "color-contrast", name: "WCAG 颜色对比度", description: "计算前景色与背景色对比度，检查 WCAG AA/AAA 标准", category: "devtool", icon: "color", keywords: ["wcag", "contrast", "无障碍", "a11y"], load: () => import("./devtool/color-contrast.js") },
-  { id: "semver", name: "SemVer 版本比较", description: "校验、比较和升级语义化版本号", category: "devtool", icon: "json", keywords: ["semantic version", "版本号", "npm"], load: () => import("./devtool/semver.js") },
-  { id: "mime-types", name: "MIME 类型查询", description: "按文件扩展名快速查找常用 MIME Content-Type", category: "devtool", icon: "search", keywords: ["content type", "扩展名", "http header"], load: () => import("./devtool/mime-types.js") },
-  { id: "env-json", name: ".env ↔ JSON", description: "在 dotenv 文件与 JSON 对象之间双向转换", category: "devtool", icon: "json", keywords: ["dotenv","env","环境变量","配置文件"], load: () => import("./devtool/env-json.js") },
-  { id: "properties-json", name: ".properties ↔ JSON", description: "Java properties 文件与 JSON 双向转换，支持转义与 Unicode", category: "devtool", icon: "json", keywords: ["properties","java","配置","unicode 转义"], load: () => import("./devtool/properties-json.js") },
+  { id: "semver", name: "SemVer 版本比较", description: "校验、比较和升级语义化版本号", category: "devtool", icon: "tag", keywords: ["semantic version", "版本号", "npm"], load: () => import("./devtool/semver.js") },
+  { id: "mime-types", name: "MIME 类型查询", description: "按文件扩展名快速查找常用 MIME Content-Type", category: "devtool", icon: "file", keywords: ["content type", "扩展名", "http header"], load: () => import("./devtool/mime-types.js") },
+  { id: "env-json", name: ".env ↔ JSON", description: "在 dotenv 文件与 JSON 对象之间双向转换", category: "devtool", icon: "config", keywords: ["dotenv","env","环境变量","配置文件"], load: () => import("./devtool/env-json.js") },
+  { id: "properties-json", name: ".properties ↔ JSON", description: "Java properties 文件与 JSON 双向转换，支持转义与 Unicode", category: "devtool", icon: "config", keywords: ["properties","java","配置","unicode 转义"], load: () => import("./devtool/properties-json.js") },
   { id: "db-connection-string", name: "数据库连接串", description: "构建与解析 MySQL、PostgreSQL、MongoDB 与 Redis 连接字符串", category: "devtool", icon: "sql", keywords: ["connection string","dsn","mysql","postgres","mongodb","redis","uri"], load: () => import("./devtool/db-connection-string.js") },
   { id: "htpasswd-generator", name: "htpasswd 生成器", description: "生成 Apache htpasswd / HTTP Basic Auth 凭据，支持 bcrypt、SHA1、MD5 与明文格式", category: "devtool", icon: "jwt", keywords: ["htpasswd","basic auth","nginx","apache","apr1","bcrypt","sha1"], load: () => import("./devtool/htpasswd-generator.js") },
-  { id: "iban-validator", name: "IBAN 校验", description: "校验国际银行账号（IBAN）并解析国家、校验位与账号结构", category: "devtool", icon: "search", keywords: ["iban","银行账号","mod97","swift","国际汇款","iso13616","校验"], load: () => import("./devtool/iban-validator.js") },
+  { id: "iban-validator", name: "IBAN 校验", description: "校验国际银行账号（IBAN）并解析国家、校验位与账号结构", category: "devtool", icon: "bank", keywords: ["iban","银行账号","mod97","swift","国际汇款","iso13616","校验"], load: () => import("./devtool/iban-validator.js") },
   { id: "docker-compose-converter", name: "Docker Run ↔ Compose", description: "在 docker run 命令与 docker-compose.yml 之间双向转换", category: "devtool", icon: "wrench", keywords: ["docker","compose","docker run","容器","yaml","docker-compose.yml"], load: () => import("./devtool/docker-compose-converter.js") },
   { id: "gitignore-generator", name: ".gitignore 生成器", description: "按语言、框架、编辑器与操作系统勾选生成 .gitignore 文件", category: "devtool", icon: "text-sort", keywords: ["gitignore","git","忽略文件","模板","ignore","版本控制"], load: () => import("./devtool/gitignore-generator.js") },
-  { id: "cron-builder", name: "Cron 表达式构建器", description: "可视化构建 cron 表达式并生成人类可读的中文描述", category: "devtool", icon: "cron", keywords: ["cron","定时任务","crontab","调度","表达式"], load: () => import("./devtool/cron-builder.js") },
+  { id: "cron-builder", name: "Cron 表达式构建器", description: "可视化构建 cron 表达式（解析现有表达式请用 Cron 表达式解析）", category: "devtool", icon: "cron", keywords: ["cron","定时任务","crontab","调度","表达式"], load: () => import("./devtool/cron-builder.js") },
   { id: "csp-generator", name: "CSP 生成器", description: "勾选指令生成 Content-Security-Policy 响应头", category: "devtool", icon: "shield-link", keywords: ["csp","content security policy","安全响应头","xss","content-security-policy"], load: () => import("./devtool/csp-generator.js") },
   { id: "xpath-tester", name: "XPath 测试器", description: "在 HTML 或 XML 上实时测试 XPath 表达式并高亮匹配结果", category: "devtool", icon: "json-path", keywords: ["xpath","xml","html","选择器","解析","爬虫"], load: () => import("./devtool/xpath-tester.js") },
   { id: "image-compress", name: "图片压缩与格式转换", description: "在本地压缩图片、调整尺寸并转换为 JPEG、PNG 或 WebP", category: "image", icon: "base64", load: () => import("./image/image-compress.js") },
-  { id: "img-to-base64", name: "图片转 Base64", description: "将图片转换为 Base64 编码字符串", category: "image", icon: "base64", load: () => import("./image/img-to-base64.js") },
+  { id: "img-to-base64", name: "图片转 Base64", description: "将图片转换为 Base64 字符串（任意文件请用 Data URL 生成）", category: "image", icon: "base64", load: () => import("./image/img-to-base64.js") },
   { id: "svg-compress", name: "SVG 压缩", description: "压缩 SVG 代码，移除冗余内容", category: "image", icon: "html", load: () => import("./image/svg-compress.js") },
   { id: "favicon-generator", name: "Favicon 生成", description: "将图片转换为多尺寸 favicon PNG 与 ICO，并生成引用代码", category: "image", icon: "favicon", keywords: ["favicon","ico","图标","网站图标","manifest","site.webmanifest","apple-touch-icon"], load: () => import("./image/favicon-generator.js") },
   { id: "exif", name: "图片 EXIF", description: "查看图片的拍摄参数与 GPS 信息，并可一键清除元数据", category: "image", icon: "camera", keywords: ["exif","元数据","metadata","gps","隐私","清除元数据","拍摄参数"], load: () => import("./image/exif.js") },
   { id: "ip-info", name: "IP 地址信息", description: "查询本机 IP 或指定 IP 地址的地理位置和网络信息", category: "network", icon: "unicode", load: () => import("./network/ip-info.js") },
-  { id: "port-check", name: "端口说明查询", description: "查询常见网络端口号对应的服务和说明", category: "network", icon: "search", load: () => import("./network/port-check.js") },
+  { id: "port-check", name: "端口说明查询", description: "查询常见网络端口号对应的服务和说明", category: "network", icon: "plug", load: () => import("./network/port-check.js") },
   { id: "url-parser", name: "URL 解析器", description: "解析 URL 的各个组成部分", category: "network", icon: "url-encode", load: () => import("./network/url-parser.js") },
-  { id: "header-parse", name: "HTTP Headers 解析", description: "解析原始 HTTP 请求/响应头", category: "network", icon: "search", load: () => import("./network/header-parse.js") },
+  { id: "header-parse", name: "HTTP Headers 解析", description: "解析原始 HTTP 请求/响应头", category: "network", icon: "headers", load: () => import("./network/header-parse.js") },
   { id: "cidr-calculator", name: "IPv4/CIDR 计算器", description: "计算 IPv4 网段、子网掩码、广播地址和可用地址范围", category: "network", icon: "unicode", load: () => import("./network/cidr-calculator.js") },
   { id: "ipv6-calculator", name: "IPv6 地址解析", description: "解析 IPv6 地址并生成压缩、展开格式，支持 IPv4 尾段和 CIDR 前缀", category: "network", icon: "unicode", keywords: ["IPv6", "IP v6", "地址压缩", "地址展开"], load: () => import("./network/ipv6-calculator.js") },
   { id: "curl-generator", name: "CURL 命令生成器", description: "根据请求方法、Headers 和 Body 生成 CURL 命令", category: "network", icon: "url-encode", load: () => import("./network/curl-generator.js") },
   { id: "url-params", name: "URL 参数编辑器", description: "可视化解析、添加、删除和重新生成 URL 查询参数", category: "network", icon: "url-encode", load: () => import("./network/url-params.js") },
-  { id: "cookie-viewer", name: "Cookie 查看器", description: "查看当前页面的 Cookie 信息", category: "network", icon: "search", load: () => import("./network/cookie-viewer.js") },
+  { id: "cookie-viewer", name: "Cookie / Set-Cookie 解析", description: "解析粘贴的 Cookie 请求头或 Set-Cookie 响应头，显示属性与值", category: "network", icon: "cookie", keywords: ["cookie", "set-cookie", "解析", "http 头", "属性", "session"], load: () => import("./network/cookie-viewer.js") },
   { id: "query-string", name: "Query String 转换", description: "在 JSON 对象与 URL 查询字符串之间双向转换", category: "network", icon: "url-encode", keywords: ["query params", "url query", "search params"], load: () => import("./network/query-string.js") },
   { id: "url-defang", name: "URL 去毒化", description: "将链接、域名、IP 与邮箱转换为不可点击的安全形式（defang/refang）", category: "network", icon: "shield-link", keywords: ["defang","refang","去毒","安全分享","ioc","威胁情报"], load: () => import("./network/url-defang.js") },
   { id: "utm-builder", name: "UTM 链接构建器", description: "可视化拼装带 UTM 跟踪参数的投放链接", category: "network", icon: "url-encode", keywords: ["utm","campaign","投放链接","跟踪参数","marketing"], load: () => import("./network/utm-builder.js") },
@@ -173,6 +175,31 @@ export const tools = [
   { id: "llm-json-repair", name: "LLM 输出 JSON 修复", description: "从模型回复中提取 JSON，修复尾随逗号、单引号等常见错误", category: "ai", icon: "ai-json", keywords: ["json 修复", "parse", "markdown 代码块", "提取"], load: () => import("./ai/json-repair.js") },
   { id: "text-chunker", name: "文本分块器", description: "把长文本按字符或 token 切成带重叠的片段，用于 RAG 索引", category: "ai", icon: "ai-chunk", keywords: ["chunk", "分块", "rag", "重叠", "overlap"], load: () => import("./ai/text-chunker.js") },
   { id: "vector-similarity", name: "向量相似度计算", description: "计算两个 embedding 向量的余弦相似度、点积和欧氏距离", category: "ai", icon: "ai-vector", keywords: ["embedding", "cosine", "向量", "相似度"], load: () => import("./ai/vector-similarity.js") },
+
+  // --- review.md 新增工具 ---------------------------------------------------
+  { id: "javascript", name: "JavaScript / TypeScript 格式化", description: "用 Prettier 格式化 JS/TS，并用 Terser 压缩 JavaScript", category: "formatter", icon: "javascript", keywords: ["js", "ts", "prettier", "minify", "压缩", "美化", "typescript", "代码格式化"], load: () => import("./formatter/javascript.js") },
+  { id: "yaml", name: "YAML 格式化与校验", description: "格式化、校验 YAML 或将其转换为 JSON", category: "formatter", icon: "json-yaml", keywords: ["yaml", "yml", "配置文件", "校验", "格式化"], load: () => import("./formatter/yaml.js") },
+  { id: "toml", name: "TOML 格式化与校验", description: "格式化、校验 TOML 或将其转换为 JSON", category: "formatter", icon: "toml", keywords: ["toml", "cargo", "配置文件", "校验", "格式化"], load: () => import("./formatter/toml.js") },
+  { id: "nginx-config", name: "Nginx 配置生成器", description: "按反向代理、HTTPS、gzip 与 SPA 回退选项生成 nginx server 配置", category: "devtool", icon: "nginx", keywords: ["nginx", "反向代理", "reverse proxy", "ssl", "gzip", "spa", "server"], load: () => import("./devtool/nginx-config.js") },
+  { id: "crontab-systemd", name: "crontab ↔ systemd 定时器", description: "在 cron 表达式与 systemd timer 的 OnCalendar 之间互转", category: "devtool", icon: "terminal", keywords: ["crontab", "systemd", "timer", "oncalendar", "定时任务", "运维"], load: () => import("./devtool/crontab-systemd.js") },
+  { id: "x509", name: "X.509 证书解析", description: "解析 PEM/DER 证书，查看主体、颁发者、有效期、SAN、密钥用途与指纹", category: "crypto", icon: "certificate", keywords: ["x509", "证书", "pem", "der", "san", "fingerprint", "ssl", "tls", "ca"], load: () => import("./crypto/x509.js") },
+  { id: "json-schema-validator", name: "JSON Schema 校验", description: "使用 JSON Schema（draft-07 / 2020-12）校验数据并列出错误路径", category: "devtool", icon: "schema", keywords: ["json schema", "ajv", "draft-07", "2020-12", "数据校验", "schema"], load: () => import("./devtool/json-schema-validator.js") },
+  { id: "qr-scanner", name: "二维码识别", description: "上传或粘贴图片解码二维码，并识别链接、WiFi、vCard 等内容", category: "image", icon: "qr-scan", keywords: ["二维码识别", "扫码", "qr decode", "jsqr", "barcode"], load: () => import("./image/qr-scanner.js") },
+  { id: "sql-json", name: "SQL ↔ JSON / CSV", description: "将 INSERT 语句转换为 JSON/CSV，或把 JSON 生成 INSERT 语句", category: "converter", icon: "table", keywords: ["insert", "sql to json", "sql to csv", "建表数据", "数据库"], load: () => import("./converter/sql-json.js") },
+  { id: "byte-truncate", name: "UTF-8 字节截断", description: "按 UTF-8 字节数安全截断文本，不切坏中文和 emoji", category: "text", icon: "binary", keywords: ["字节", "截断", "utf-8", "varchar", "数据库字段", "byte"], load: () => import("./text/byte-truncate.js") },
+  { id: "zh-convert", name: "简繁转换", description: "简体与繁体（大陆 / 台湾 / 香港）互转，支持整段文本", category: "text", icon: "unicode", keywords: ["繁体", "简体", "简繁转换", "opencc", "台湾", "香港"], load: () => import("./text/zh-convert.js") },
+  { id: "pinyin", name: "中文转拼音", description: "将中文转为全拼、首字母或带声调拼音，非中文原样保留", category: "text", icon: "pinyin", keywords: ["拼音", "pinyin", "首字母", "声调", "中文转拼音"], load: () => import("./text/pinyin.js") },
+  { id: "data-table", name: "CSV / JSON 表格查看器", description: "以可排序、可筛选的表格查看 CSV 或 JSON 数据", category: "converter", icon: "table", keywords: ["表格", "table", "csv 查看", "json 表格", "排序", "筛选"], load: () => import("./converter/data-table.js") },
+  { id: "og-meta", name: "Open Graph 标签生成", description: "生成并预览 Open Graph、Twitter Card 与基础 SEO 标签", category: "devtool", icon: "meta", keywords: ["og", "open graph", "meta", "seo", "社交卡片", "twitter card"], load: () => import("./devtool/og-meta.js") },
+  { id: "image-editor", name: "图片裁剪、旋转与水印", description: "在本地裁剪、旋转、翻转图片并添加文字水印", category: "image", icon: "crop", keywords: ["图片裁剪", "旋转", "水印", "crop", "rotate", "watermark"], load: () => import("./image/image-editor.js") },
+  { id: "image-palette", name: "图片取色与主色调", description: "从图片提取主色调和配色比例，复制 HEX 色值", category: "image", icon: "palette", keywords: ["取色", "主色调", "调色板", "palette", "color picker"], load: () => import("./image/image-palette.js") },
+  { id: "svg-converter", name: "SVG 转 PNG / JSX / Data URI", description: "将 SVG 渲染为 PNG，或转换为 React JSX 与 Data URI", category: "image", icon: "svg", keywords: ["svg 转 png", "svg 转 jsx", "data uri", "矢量图"], load: () => import("./image/svg-converter.js") },
+  { id: "cubic-bezier", name: "Cubic Bezier 缓动编辑器", description: "可视化编辑 CSS cubic-bezier 缓动曲线并复制代码", category: "generator", icon: "bezier", keywords: ["贝塞尔", "easing", "缓动", "动画曲线", "css"], load: () => import("./generator/cubic-bezier.js") },
+  { id: "clamp-generator", name: "CSS clamp() 字号生成", description: "根据视口区间生成流体字号 clamp() 与行高 CSS", category: "generator", icon: "css", keywords: ["clamp", "流体字号", "响应式字号", "css"], load: () => import("./generator/clamp-generator.js") },
+  { id: "embedding-cost", name: "Embedding 维度与成本", description: "对照主流 embedding 模型的维度与价格，并估算成本与存储", category: "ai", icon: "ai-vector", keywords: ["embedding", "向量维度", "成本", "token 价格"], load: () => import("./ai/embedding-cost.js") },
+  { id: "context-window", name: "上下文窗口可视化", description: "统计 prompt 占用的 token，并用进度条展示上下文余量", category: "ai", icon: "context", keywords: ["上下文窗口", "context window", "token 占用"], load: () => import("./ai/context-window.js") },
+  { id: "sse-parser", name: "SSE 流式响应解析", description: "解析 SSE 数据流并拼回 OpenAI、Anthropic 或 Gemini 的完整消息", category: "ai", icon: "sse", keywords: ["sse", "stream", "流式", "data:", "chatgpt 流"], load: () => import("./ai/sse-parser.js") },
+  { id: "prompt-security", name: "System Prompt 安全检查", description: "检测提示词注入特征、隐藏字符与可疑指令并给出清洗结果", category: "ai", icon: "shield-link", keywords: ["提示词注入", "prompt injection", "越狱", "jailbreak", "隐藏字符"], load: () => import("./ai/prompt-security.js") },
 ]
 
 const searchAliases = {
@@ -188,7 +215,31 @@ const searchAliases = {
   'llm-models': ['模型列表', '模型对比', '窗口大小'], 'prompt-template': ['提示词', 'prompt 变量', '占位符填充'],
   'chat-builder': ['消息拼接', 'prompt 组装', 'system prompt'], 'message-convert': ['消息格式', 'openai 转 anthropic', 'gemini 格式'],
   'tool-schema': ['函数调用', 'tool use', 'tools 定义'], 'llm-json-repair': ['json 提取', '模型输出解析', '代码块提取'],
-  'text-chunker': ['文本切分', 'rag 分块', 'chunking'], 'vector-similarity': ['余弦相似度', 'embedding 对比', 'cosine']
+  'text-chunker': ['文本切分', 'rag 分块', 'chunking'], 'vector-similarity': ['余弦相似度', 'embedding 对比', 'cosine'],
+  // Tools added in the review.md pass.
+  javascript: ['js', 'ts', 'prettier', 'minify', '压缩', '美化', 'typescript', '代码格式化'],
+  yaml: ['yml', 'yaml 校验', 'yaml 格式化', '配置文件'],
+  toml: ['toml 校验', 'toml 格式化', 'cargo', '配置文件'],
+  'nginx-config': ['nginx', '反向代理', 'reverse proxy', 'ssl', 'gzip', 'spa'],
+  'crontab-systemd': ['crontab', 'systemd', 'timer', '定时器', 'oncalendar', '运维'],
+  x509: ['证书', 'pem', 'ssl', 'tls', 'san', '指纹', 'certificate', 'openssl', 'pki'],
+  'json-schema-validator': ['schema 校验', 'ajv', 'draft-07', 'json schema', '数据校验'],
+  'qr-scanner': ['二维码识别', '扫码', 'qr decode', 'jsqr', 'barcode'],
+  'sql-json': ['insert', 'sql 转 json', 'sql 转 csv', '建表数据'],
+  'byte-truncate': ['字节', '截断', 'utf-8', 'varchar', '数据库字段', 'byte'],
+  'zh-convert': ['繁体', '简体', '简繁转换', 'opencc', '台湾', '香港'],
+  pinyin: ['拼音', 'pinyin', '首字母', '声调', '中文转拼音'],
+  'data-table': ['表格', 'table', 'csv 查看', 'json 表格', '排序', '筛选'],
+  'og-meta': ['og', 'open graph', 'meta', 'seo', '社交卡片', 'twitter card'],
+  'image-editor': ['图片裁剪', '旋转', '水印', 'crop', 'rotate', 'watermark'],
+  'image-palette': ['取色', '主色调', '调色板', 'palette', 'color picker'],
+  'svg-converter': ['svg 转 png', 'svg 转 jsx', 'data uri', '矢量图'],
+  'cubic-bezier': ['贝塞尔', 'easing', '缓动', '动画曲线', 'css'],
+  'clamp-generator': ['clamp', '流体字号', '响应式字号', 'css'],
+  'embedding-cost': ['embedding', '向量维度', '成本', 'token 价格'],
+  'context-window': ['上下文窗口', 'context window', 'token 占用'],
+  'sse-parser': ['sse', 'stream', '流式', 'data:', 'chatgpt 流'],
+  'prompt-security': ['提示词注入', 'prompt injection', '越狱', 'jailbreak', '隐藏字符']
 }
 
 const toolById = new Map(tools.map(tool => [tool.id, tool]))
@@ -200,9 +251,10 @@ for (const tool of tools) {
 const searchFields = new Map(tools.map(tool => [tool.id, {
   name: tool.name.toLowerCase(),
   id: tool.id.toLowerCase(),
+  pinyin: searchPinyin[tool.id] || '',
   keywords: [...(tool.keywords || []), ...(searchAliases[tool.id] || [])].join(' ').toLowerCase(),
   description: tool.description.toLowerCase(),
-  haystack: [tool.name, tool.description, tool.id, tool.category, ...(tool.keywords || []), ...(searchAliases[tool.id] || [])].join(' ').toLowerCase()
+  haystack: [tool.name, tool.description, tool.id, tool.category, searchPinyin[tool.id] || '', ...(tool.keywords || []), ...(searchAliases[tool.id] || [])].join(' ').toLowerCase()
 }]))
 
 function matchesSearch(tool, query) {
@@ -220,9 +272,71 @@ function scoreTool(tool, query) {
   if (fields.name === normalized) score += 90
   if (fields.name.startsWith(normalized)) score += 55
   if (fields.id.startsWith(normalized)) score += 45
+  const pinyinTokens = fields.pinyin.split(' ').filter(Boolean)
+  if (pinyinTokens.includes(normalized)) score += 60
+  else if (pinyinTokens.some(token => token.startsWith(normalized))) score += 30
   if (fields.keywords.includes(normalized)) score += 25
   if (fields.description.includes(normalized)) score += 10
   return score
+}
+
+// Levenshtein distance with an early exit once a row exceeds the budget. Used
+// only as a last resort when the normal substring search returns nothing.
+function editDistance(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1
+  let previous = new Uint16Array(b.length + 1)
+  let current = new Uint16Array(b.length + 1)
+  for (let index = 0; index <= b.length; index++) previous[index] = index
+  for (let row = 1; row <= a.length; row++) {
+    current[0] = row
+    let rowMin = current[0]
+    for (let column = 1; column <= b.length; column++) {
+      const cost = a[row - 1] === b[column - 1] ? 0 : 1
+      current[column] = Math.min(
+        previous[column] + 1,
+        current[column - 1] + 1,
+        previous[column - 1] + cost
+      )
+      if (current[column] < rowMin) rowMin = current[column]
+    }
+    if (rowMin > max) return max + 1
+    const swap = previous
+    previous = current
+    current = swap
+  }
+  return previous[b.length]
+}
+
+function fuzzyDistance(tool, term) {
+  const fields = searchFields.get(tool.id)
+  if (!fields) return Number.MAX_SAFE_INTEGER
+  const tokens = [
+    fields.id,
+    ...fields.name.split(/[\s/·、，,—-]+/),
+    ...fields.pinyin.split(' ')
+  ].filter(Boolean)
+  let best = Number.MAX_SAFE_INTEGER
+  for (const token of tokens) {
+    const distance = editDistance(term, token.toLowerCase(), 2)
+    if (distance < best) best = distance
+    if (best === 0) break
+  }
+  return best
+}
+
+// Typo tolerance: "jsonn" → JSON, "timestmp" → timestamp. Only single-term
+// queries of 3+ characters are considered, and at most 8 suggestions return.
+function fuzzySearch(categoryId, query) {
+  const term = query.toLowerCase()
+  if (term.length < 3 || /\s/.test(term)) return []
+  const max = term.length >= 7 ? 2 : 1
+  const categoryTools = categoryId === 'all' ? tools : getToolsByCategory(categoryId)
+  return categoryTools
+    .map(tool => ({ tool, distance: fuzzyDistance(tool, term) }))
+    .filter(entry => entry.distance <= max)
+    .sort((a, b) => a.distance - b.distance || a.tool.name.length - b.tool.name.length || scoreTool(b.tool, query) - scoreTool(a.tool, query))
+    .slice(0, 8)
+    .map(entry => entry.tool)
 }
 
 export function getToolsByCategory(categoryId) {
@@ -233,7 +347,74 @@ export function getToolsByCategory(categoryId) {
 export function getToolsByCategoryAndSearch(categoryId, query) {
   const categoryTools = categoryId === 'all' ? tools : getToolsByCategory(categoryId)
   if (!query) return categoryTools
-  return categoryTools.filter(tool => matchesSearch(tool, query)).sort((a, b) => scoreTool(b, query) - scoreTool(a, query))
+  const matches = categoryTools.filter(tool => matchesSearch(tool, query))
+  if (matches.length) return matches.sort((a, b) => scoreTool(b, query) - scoreTool(a, query))
+  return fuzzySearch(categoryId, query)
+}
+
+// Hand-picked neighbours for the tools where "same category" is a poor signal
+// (the JSON formatter used to recommend the CSS formatter). Everything not
+// listed here falls back to keyword overlap within its category.
+const RELATED = {
+  json: ['json-yaml', 'json-typescript', 'json-path', 'json-diff', 'json-flatten', 'json-sort'],
+  javascript: ['json', 'css', 'html', 'xml', 'json-to-code'],
+  yaml: ['json-yaml', 'toml', 'toml-json', 'json'],
+  toml: ['toml-json', 'yaml', 'json-yaml', 'properties-json'],
+  'nginx-config': ['csp-generator', 'crontab-systemd', 'docker-compose-converter', 'url-defang'],
+  'crontab-systemd': ['cron', 'cron-builder', 'linux-ref'],
+  x509: ['key-pair-generator', 'jwt-sign', 'jwt', 'file-hash'],
+  'json-schema-validator': ['json-schema', 'tool-schema', 'json', 'format-check'],
+  'qr-scanner': ['qrcode', 'barcode', 'wifi-qr'],
+  'sql-json': ['json-csv', 'csv-json', 'sql', 'sql-in'],
+  'byte-truncate': ['char-count', 'text-wrap', 'text-mask', 'unicode'],
+  'zh-convert': ['pinyin', 'unicode', 'char-count'],
+  pinyin: ['zh-convert', 'slugify', 'char-count'],
+  'data-table': ['csv-json', 'json-csv', 'csv-toolbox', 'markdown-table'],
+  'og-meta': ['csp-generator', 'url-defang', 'favicon-generator'],
+  'image-editor': ['image-compress', 'image-palette', 'favicon-generator'],
+  'image-palette': ['palette-gen', 'color', 'image-editor', 'color-contrast'],
+  'svg-converter': ['svg-compress', 'img-to-base64', 'data-url', 'html-to-jsx'],
+  'cubic-bezier': ['clamp-generator', 'gradient-gen', 'shadow-gen'],
+  'clamp-generator': ['css-unit', 'cubic-bezier', 'css'],
+  'embedding-cost': ['vector-similarity', 'text-chunker', 'llm-cost', 'token-counter'],
+  'context-window': ['token-counter', 'text-chunker', 'llm-cost', 'llm-models'],
+  'sse-parser': ['message-convert', 'chat-builder', 'llm-json-repair'],
+  'prompt-security': ['hidden-chars', 'prompt-template', 'chat-builder'],
+  timestamp: ['timezone', 'date-calc', 'duration-converter', 'cron'],
+  uuid: ['uuid-converter', 'ulid', 'objectid', 'random'],
+  regex: ['regex-visual', 'regex-ref', 'text-extract', 'format-check'],
+  markdown: ['md-to-html', 'html-to-markdown', 'markdown-toc', 'markdown-table'],
+  aes: ['text-encrypt', 'des', 'hmac'],
+  cron: ['cron-builder', 'crontab-systemd', 'timestamp'],
+  'img-to-base64': ['data-url', 'image-compress', 'svg-converter'],
+  'uuid-converter': ['uuid', 'ulid', 'objectid'],
+  'regex-visual': ['regex', 'regex-ref'],
+  'md-to-html': ['markdown', 'html-to-markdown'],
+  'text-encrypt': ['aes', 'des', 'hmac'],
+  'cron-builder': ['cron', 'crontab-systemd'],
+  'cookie-viewer': ['header-parse', 'query-string', 'url-parser'],
+  'data-url': ['img-to-base64', 'svg-converter', 'mime-types']
+}
+
+const keywordSetOf = tool => new Set([...(tool.keywords || []), ...(searchAliases[tool.id] || [])].map(value => value.toLowerCase()))
+
+export function getRelatedTools(tool, max = 6) {
+  if (!tool) return []
+  const picked = (RELATED[tool.id] || []).map(id => toolById.get(id)).filter(item => item && item.id !== tool.id)
+  if (picked.length >= max) return picked.slice(0, max)
+  const targetKeywords = keywordSetOf(tool)
+  const scored = tools
+    .filter(item => item.id !== tool.id && !picked.some(entry => entry.id === item.id))
+    .map(item => {
+      let score = item.category === tool.category ? 2 : 0
+      for (const keyword of keywordSetOf(item)) {
+        if (targetKeywords.has(keyword)) score += 3
+      }
+      return { item, score }
+    })
+    .filter(entry => entry.score > 0)
+    .sort((a, b) => b.score - a.score)
+  return [...picked, ...scored.map(entry => entry.item)].slice(0, max)
 }
 
 export function getToolById(id) {

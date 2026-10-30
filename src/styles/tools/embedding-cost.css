@@ -1,0 +1,50 @@
+/* --- Embedding 成本：维度对比相对条 --- */
+.dim-compare {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.dim-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 28%) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+}
+
+.dim-name {
+  min-width: 0;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.dim-track {
+  height: 12px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border-radius: 999px;
+}
+
+.dim-fill {
+  height: 100%;
+  min-width: 2px;
+  background: var(--color-primary);
+  border-radius: 999px;
+}
+
+.dim-value {
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .dim-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .dim-track {
+    grid-column: 1 / -1;
+  }
+}

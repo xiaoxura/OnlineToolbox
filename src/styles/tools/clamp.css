@@ -1,0 +1,62 @@
+/* --- CSS clamp() 流体字号生成器 --- */
+.clamp-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.clamp-preview-text {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.clamp-ruler {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clamp-ruler-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
+  gap: 10px;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.clamp-ruler-viewport {
+  color: var(--color-text-muted);
+}
+.clamp-ruler-size {
+  color: var(--color-primary);
+  text-align: right;
+}
+
+.clamp-ruler-track {
+  height: 9px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.clamp-ruler-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: inherit;
+  transition: width 0.15s ease;
+}
+
+@media (max-width: 520px) {
+  .clamp-ruler-row {
+    grid-template-columns: 52px minmax(0, 1fr) 56px;
+  }
+}

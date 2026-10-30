@@ -1,0 +1,26 @@
+/* --- JSON Schema 校验：结果横幅 --- */
+
+.schema-validator-status {
+  padding: 9px 12px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+}
+
+.schema-validator-status:empty {
+  display: none;
+}
+
+.schema-validator-status.valid {
+  color: var(--color-success-text);
+  background: var(--color-success-soft);
+  border-color: var(--color-success-border);
+}
+
+.schema-validator-status.invalid {
+  color: var(--color-danger-text);
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+}
