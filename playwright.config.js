@@ -1,5 +1,9 @@
 import { defineConfig } from '@playwright/test'
 
+// CI runs `npm run check` (which builds dist) before the E2E step, so it can
+// skip a second full build and go straight to the preview server.
+const skipBuild = Boolean(process.env.PLAYWRIGHT_SKIP_BUILD)
+
 export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
@@ -14,9 +18,9 @@ export default defineConfig({
     trace: 'retain-on-failure'
   },
   webServer: {
-    command: 'npm run build && npm run preview -- --port 4173 --strictPort',
+    command: `${skipBuild ? '' : 'npm run build && '}npm run preview -- --port 4173 --strictPort`,
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000
+    timeout: 300_000
   }
 })

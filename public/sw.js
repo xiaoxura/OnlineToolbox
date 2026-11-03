@@ -138,6 +138,7 @@ async function precacheBuildAssets() {
   const effectiveType = self.navigator?.connection?.effectiveType
   if (effectiveType === 'slow-2g' || effectiveType === '2g') return
   const cache = await caches.open(RUNTIME_CACHE)
+  let lastRequestAt = 0
   for (const asset of manifest.assets) {
     if (!asset.precache || asset.size > PRECACHE_MAX_BYTES) continue
     const url = asset.url
@@ -148,7 +149,12 @@ async function precacheBuildAssets() {
         if (await isUsableAsset(url, cached)) continue
         await cache.delete(url, { ignoreVary: true })
       }
-      await sleep(PRECACHE_INTERVAL_MS)
+      // Space request *starts* at least PRECACHE_INTERVAL_MS apart. Sleeping a
+      // fixed amount after each response made slow origins (EdgeOne is ~300 ms
+      // per asset) take twice as long as necessary.
+      const wait = PRECACHE_INTERVAL_MS - (Date.now() - lastRequestAt)
+      if (lastRequestAt && wait > 0) await sleep(wait)
+      lastRequestAt = Date.now()
       const response = await fetch(url)
       if (isUsableAsset(url, response)) await cache.put(url, response)
     } catch {

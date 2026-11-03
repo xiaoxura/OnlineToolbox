@@ -171,7 +171,9 @@ async function importSigningKey(config, key) {
   if (label && label.includes('PUBLIC KEY')) {
     throw new Error('签发需要私钥，请粘贴 PKCS#8 私钥 PEM（-----BEGIN PRIVATE KEY-----）')
   }
-  const der = pemToArrayBuffer(key)
+  // Wrap in a Uint8Array: under Node 20 + jsdom the ArrayBuffer can come from
+  // another realm, which SubtleCrypto rejects even though the bytes are valid.
+  const der = new Uint8Array(pemToArrayBuffer(key))
   try {
     return await crypto.subtle.importKey('pkcs8', der, config.importAlgorithm, false, ['sign'])
   } catch (cause) {
@@ -188,7 +190,7 @@ async function importVerificationKey(config, key) {
   if (label && label.includes('PRIVATE KEY')) {
     throw new Error('验签需要公钥，请粘贴 SPKI 公钥 PEM（-----BEGIN PUBLIC KEY-----）')
   }
-  const der = pemToArrayBuffer(key)
+  const der = new Uint8Array(pemToArrayBuffer(key))
   try {
     return await crypto.subtle.importKey('spki', der, config.importAlgorithm, false, ['verify'])
   } catch (cause) {

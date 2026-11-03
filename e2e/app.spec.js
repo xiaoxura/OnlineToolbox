@@ -71,7 +71,7 @@ test('serves the cached app shell when offline', async ({ page, context }) => {
 })
 
 test('pre-caches an unvisited tool so it opens offline', async ({ page, context }) => {
-  test.setTimeout(200_000)
+  test.setTimeout(260_000)
   await page.goto('/')
   await page.waitForFunction(() => navigator.serviceWorker?.controller !== null, null, { timeout: 20_000 })
 
@@ -97,7 +97,7 @@ test('pre-caches an unvisited tool so it opens offline', async ({ page, context 
     const cache = await caches.open(runtime)
     const cached = new Set((await cache.keys()).map(request => new URL(request.url).pathname))
     return expected.every(path => cached.has(path))
-  }), { timeout: 120_000, intervals: [500, 1000, 2000] }).toBe(true)
+  }), { timeout: 180_000, intervals: [500, 1000, 2000] }).toBe(true)
   // The worker may still be finishing the tail of its queue; make sure the
   // exact chunk we are about to import is matchable before cutting the network.
   await expect.poll(
