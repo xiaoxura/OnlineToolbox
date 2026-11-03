@@ -1,5 +1,6 @@
 import "../../styles/tools/calculator.css"
 import { createElement, createSection } from '../../utils/dom.js'
+import { evaluateExpression } from './expression.js'
 
 export default {
   render(container) {
@@ -29,7 +30,7 @@ export default {
           resultEl.textContent = formatNumber(Number(currentExpr))
           return
         }
-        resultEl.textContent = formatNumber(evaluateExpr(currentExpr))
+        resultEl.textContent = formatNumber(evaluateExpression(currentExpr))
       } catch {
         resultEl.textContent = currentExpr ? '...' : '0'
       }
@@ -44,34 +45,6 @@ export default {
         return parseFloat(s).toString()
       }
       return String(n)
-    }
-
-    function evaluateExpr(expr) {
-      // Replace display symbols with JS equivalents
-      let js = expr
-        .replace(/×/g, '*')
-        .replace(/÷/g, '/')
-        .replace(/−/g, '-')
-        .replace(/π/g, '(Math.PI)')
-        .replace(/e(?![a-zA-Z])/g, '(Math.E)')
-        .replace(/sin\(/g, 'Math.sin(')
-        .replace(/cos\(/g, 'Math.cos(')
-        .replace(/tan\(/g, 'Math.tan(')
-        .replace(/log\(/g, 'Math.log10(')
-        .replace(/ln\(/g, 'Math.log(')
-        .replace(/√\(/g, 'Math.sqrt(')
-        .replace(/\^/g, '**')
-
-      // A trailing % is a postfix percentage (50% → 50/100); a % between two
-      // operands stays the modulo operator.
-      js = js.replace(/%+$/, match => '/100'.repeat(match.length))
-
-      // Safety check: only allow math characters
-      if (/[^0-9+\-*/().%,\s]|Math\.\w+/.test(js.replace(/Math\.\w+/g, ''))) {
-        // Allow Math.* functions but block anything else suspicious
-      }
-
-      return Function('"use strict"; return (' + js + ')')()
     }
 
     function appendToExpr(value) {
@@ -135,7 +108,7 @@ export default {
           return
         case 'equals':
           try {
-            const val = evaluateExpr(currentExpr)
+            const val = evaluateExpression(currentExpr)
             const result = formatNumber(val)
             history.unshift({ expr: currentExpr, result })
             if (history.length > 20) history.pop()
