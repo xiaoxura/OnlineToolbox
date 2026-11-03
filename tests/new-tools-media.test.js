@@ -246,7 +246,9 @@ describe('农历 ↔ 公历', () => {
     expect(getZodiac(2023)).toBe('兔')
   })
 
-  it('公历—农历在 1950-2050 年间逐日往返一致', () => {
+  // ~37k iterations; CI with coverage instrumentation needs well over the
+  // default 20 s budget on Node 20/22.
+  it('公历—农历在 1950-2050 年间逐日往返一致', { timeout: 90_000 }, () => {
     for (let time = Date.UTC(1950, 0, 1); time <= Date.UTC(2050, 11, 31); time += 86400000) {
       const date = new Date(time)
       const lunar = solarToLunar(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
