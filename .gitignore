@@ -12,6 +12,7 @@ dist
 coverage
 dist-ssr
 *.local
+.build-info.json
 
 # Editor directories and files
 .vscode/*

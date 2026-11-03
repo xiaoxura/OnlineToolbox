@@ -1,7 +1,23 @@
+import { readFileSync } from 'node:fs'
 import { test, expect } from '@playwright/test'
 import { tools } from '../src/tools/registry.js'
+import { formatBuildTime } from '../src/build-info.js'
 
 const ENCODING_COUNT = tools.filter(tool => tool.category === 'encoding').length
+const BUILD_INFO = JSON.parse(readFileSync(new URL('../.build-info.json', import.meta.url), 'utf8'))
+
+test('footer shows the build update date and the deployment metadata', async ({ page, request }) => {
+  await page.goto('/')
+  const updated = page.locator('.site-footer time.site-footer-updated')
+  await expect(updated).toHaveText(`更新于 ${formatBuildTime(BUILD_INFO.builtAt)}`)
+  await expect(updated).toHaveAttribute('datetime', BUILD_INFO.builtAt)
+  await expect.poll(() => updated.getAttribute('title')).toContain('北京时间')
+
+  const version = await (await request.get('/version.json')).json()
+  expect(version.builtAt).toBe(BUILD_INFO.builtAt)
+  expect(version.commitShort).toBe(BUILD_INFO.commitShort)
+  expect(version.buildHash).toMatch(/^[0-9a-f]{12}$/)
+})
 
 test('home page renders every tool and filters through the URL', async ({ page }) => {
   await page.goto('/')
@@ -55,7 +71,7 @@ test('serves the cached app shell when offline', async ({ page, context }) => {
 })
 
 test('pre-caches an unvisited tool so it opens offline', async ({ page, context }) => {
-  test.setTimeout(90_000)
+  test.setTimeout(200_000)
   await page.goto('/')
   await page.waitForFunction(() => navigator.serviceWorker?.controller !== null, null, { timeout: 20_000 })
 
@@ -66,7 +82,11 @@ test('pre-caches an unvisited tool so it opens offline', async ({ page, context 
     const manifest = await (await fetch('./asset-manifest.json')).json()
     return manifest.assets.find(asset => /\/yaml-[^/]+\.js$/.test(asset.url))?.url
   })
-  await page.waitForFunction(async () => {
+  // The warm-up is intentionally paced (one request every 150 ms) so it does
+  // not trip edge bot protection, which means the full set takes ~40 s. Poll
+  // from Node instead of waitForFunction: an async predicate is not awaited by
+  // that helper and would resolve immediately on its Promise object.
+  await expect.poll(async () => page.evaluate(async () => {
     const manifest = await (await fetch('./asset-manifest.json')).json()
     const expected = manifest.assets
       .filter(asset => asset.precache && asset.size <= (manifest.precacheMaxBytes || 512 * 1024))
@@ -77,7 +97,7 @@ test('pre-caches an unvisited tool so it opens offline', async ({ page, context 
     const cache = await caches.open(runtime)
     const cached = new Set((await cache.keys()).map(request => new URL(request.url).pathname))
     return expected.every(path => cached.has(path))
-  }, null, { timeout: 60_000 })
+  }), { timeout: 120_000, intervals: [500, 1000, 2000] }).toBe(true)
   // The worker may still be finishing the tail of its queue; make sure the
   // exact chunk we are about to import is matchable before cutting the network.
   await expect.poll(
@@ -91,6 +111,34 @@ test('pre-caches an unvisited tool so it opens offline', async ({ page, context 
   await expect(page.locator('.tool-title')).toHaveText('YAML 格式化与校验')
   await expect(page.locator('.tool-section').first()).toBeVisible()
   await context.setOffline(false)
+})
+
+test('heals a challenge page cached under a tool chunk URL', async ({ page }) => {
+  await page.goto('/')
+  await page.waitForFunction(() => navigator.serviceWorker?.controller !== null, null, { timeout: 20_000 })
+
+  const yamlChunk = await page.evaluate(async () => {
+    const manifest = await (await fetch('./asset-manifest.json')).json()
+    return new URL(manifest.assets.find(asset => /\/yaml-[^/]+\.js$/.test(asset.url)).url, location.href).href
+  })
+  // Edge protection can answer a burst with a 200 text/html challenge page.
+  // Older workers cached it under the hashed script URL, which permanently
+  // broke that tool. Seed that state and make sure the current worker heals it.
+  await page.evaluate(async url => {
+    const runtime = (await caches.keys()).find(name => name.startsWith('toolbox-runtime-'))
+    const cache = await caches.open(runtime)
+    await cache.put(url, new Response('<!doctype html><title>challenge</title>', {
+      headers: { 'Content-Type': 'text/html' }
+    }))
+  }, yamlChunk)
+
+  await page.goto('/#/yaml')
+  await expect(page.locator('.tool-title')).toHaveText('YAML 格式化与校验')
+  await expect(page.locator('.load-error')).toHaveCount(0)
+  await expect.poll(
+    () => page.evaluate(async url => (await caches.match(url))?.headers.get('content-type') || '', yamlChunk),
+    { timeout: 10_000 }
+  ).not.toContain('text/html')
 })
 
 test('command palette switches tools from any page', async ({ page }) => {

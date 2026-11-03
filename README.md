@@ -118,6 +118,7 @@ npm run build
 - `dist/categories/{category-id}/index.html`：11 个分类落地页（含分类 OG 卡片）
 - `dist/sw.js`：注入构建哈希的离线缓存脚本
 - `dist/asset-manifest.json`：本次构建的 chunk 清单与预缓存标记
+- `dist/version.json`：本次部署的构建时间、提交与构建哈希（页脚更新日期的机器可读版本）
 - `dist/icons/`：PWA 图标
 - `dist/og.png`：首页分享卡片
 - `dist/sitemap.xml`：首页、分类页及全部工具页的网站地图
@@ -191,7 +192,15 @@ IP 查询采用用户主动触发、超时取消和失败回退机制：
 
 部署后建议自检 `https://你的域名/sitemap.xml`，确认 `<loc>` 使用的是你的域名——**未设置 `SITE_URL` 时构建不会报错**，而是会把 canonical、OG、sitemap 静默写成默认的 GitHub Pages 地址。
 
-`edgeone.json` 除修正 `site.webmanifest` 的 `Content-Type` 外，还为哈希资源设置一年 immutable 缓存，并为 HTML / Service Worker 设置 no-cache；同时下发 CSP、`X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy`、COOP 与 HSTS 等安全响应头。该文件仅对 EdgeOne 生效，部署到其他平台时会被忽略。
+站点页脚会显示本次构建的更新日期（北京时间），鼠标悬停可看到精确构建时间与提交短哈希；每个静态落地页也会带上同一日期。想直接确认线上版本时，访问 `https://你的域名/version.json` 即可看到部署的提交、分支与构建时间，与本地 `git log -1` 对照即可判断是否已是最新版本：
+
+```bash
+curl -s https://tools.xiaoxura.com/version.json
+```
+
+`edgeone.json` 除修正 `site.webmanifest` 的 `Content-Type` 外，还为哈希资源设置一年 immutable 缓存，并为 HTML / Service Worker / `version.json` 设置 no-cache；同时下发 CSP、`X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy`、COOP 与 HSTS 等安全响应头。该文件仅对 EdgeOne 生效，部署到其他平台时会被忽略。
+
+> **EdgeOne Bot 防护提示**：开启 Bot 管理或频次控制后，短时间内大量资源请求可能收到 `200 text/html` 的 JS 挑战页。Service Worker 现在会校验每个资源的 `Content-Type`（不把挑战页当脚本/样式缓存）、清理旧版本中已被污染的缓存，并把离线预缓存限速为每 150 ms 一个请求。若仍有工具偶发加载失败，请优先检查 EdgeOne 控制台的 Bot / 频次规则，再把 `/assets/*` 加入放行名单。
 
 ### GitHub Pages
 

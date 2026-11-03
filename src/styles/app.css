@@ -720,12 +720,25 @@
   margin: 0 auto;
   padding: 18px 24px 28px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   border-top: 1px solid var(--color-border);
+}
+
+.site-footer-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.site-footer-updated {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .site-footer a:hover {

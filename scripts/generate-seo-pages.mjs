@@ -15,6 +15,7 @@ import { createHash } from 'node:crypto'
 import { resolve } from 'node:path'
 import { collectToolFacts, detectNetworkUsage } from './tool-facts.mjs'
 import { renderOgCard } from './og-image.mjs'
+import { formatBuildTime } from '../src/build-info.js'
 
 register('./css-stub.mjs', import.meta.url)
 
@@ -26,6 +27,14 @@ const siteUrl = (process.env.SITE_URL || 'https://tools.xiaoxura.com/').replace(
 const siteName = '在线工具箱'
 const repoUrl = 'https://github.com/xiaoxura/OnlineToolbox'
 const today = new Date().toISOString().slice(0, 10)
+
+// The landing pages are standalone HTML, so they carry the same build stamp as
+// the app footer instead of asking the client to fill it in.
+const buildInfo = existsSync(resolve('.build-info.json'))
+  ? JSON.parse(await readFile(resolve('.build-info.json'), 'utf8'))
+  : { builtAt: new Date().toISOString() }
+const buildTime = formatBuildTime(buildInfo.builtAt)
+const buildIso = buildInfo.builtAt
 
 const categoryNames = new Map(categories.map(category => [category.id, category.name]))
 const toolsByCategory = new Map()
@@ -46,6 +55,19 @@ const jsonLd = value => JSON.stringify(value).replaceAll('<', '\\u003c')
 const toolUrl = tool => `${siteUrl}tools/${encodeURIComponent(tool.id)}/`
 const categoryUrl = category => `${siteUrl}categories/${encodeURIComponent(category.id)}/`
 const appUrl = tool => `../../index.html#/${encodeURIComponent(tool.id)}`
+
+// The footer build stamp changes on every deploy but is not page content.
+// Normalise it (and the site URL) out before hashing so sitemap lastmod only
+// moves when the copy, options or examples actually change.
+function contentHash(html) {
+  const normalized = html
+    .split(siteUrl).join('{{SITE_URL}}')
+    // Remove the whole footer stamp, not just the timestamp: the element itself
+    // is new markup, and treating it as content would bump every lastmod on the
+    // first deploy and again on every date change.
+    .replace(/\s*·\s*<time datetime="[^"]*">更新于 [^<]*<\/time>/g, '')
+  return createHash('sha256').update(normalized).digest('hex').slice(0, 16)
+}
 const categoryName = tool => categoryNames.get(tool.category) || '在线工具'
 
 const facts = await collectToolFacts(tools)
@@ -331,7 +353,7 @@ ${faq.map(item => `    <details>
 
     <footer>
       <p>${escapeHtml(siteName)} · ${escapeHtml(categoryName(tool))} · 浏览器本地运行 · 无需登录</p>
-      <p><a href="${escapeHtml(repoUrl)}" rel="noopener">MIT 开源项目</a></p>
+      <p><a href="${escapeHtml(repoUrl)}" rel="noopener">MIT 开源项目</a> · <time datetime="${escapeHtml(buildIso)}">更新于 ${escapeHtml(buildTime)}</time></p>
     </footer>
   </main>
 </body>
@@ -453,7 +475,7 @@ ${faq.map(item => `    <details>
 
     <footer>
       <p>${escapeHtml(siteName)} · ${escapeHtml(category.name)} · 浏览器本地运行 · 无需登录</p>
-      <p><a href="${escapeHtml(repoUrl)}" rel="noopener">MIT 开源项目</a></p>
+      <p><a href="${escapeHtml(repoUrl)}" rel="noopener">MIT 开源项目</a> · <time datetime="${escapeHtml(buildIso)}">更新于 ${escapeHtml(buildTime)}</time></p>
     </footer>
   </main>
 </body>
@@ -484,10 +506,7 @@ for (const tool of tools) {
   // OG tag, so building the same content for a different domain (a preview
   // deployment, or a local build without SITE_URL set) would otherwise look
   // like a full-site content change and reset every lastmod.
-  const hash = createHash('sha256')
-    .update(html.split(siteUrl).join('{{SITE_URL}}'))
-    .digest('hex')
-    .slice(0, 16)
+  const hash = contentHash(html)
   const previous = manifest[tool.id]
   const lastmod = previous && previous.hash === hash ? previous.lastmod : today
   nextManifest[tool.id] = { hash, lastmod }
@@ -502,10 +521,7 @@ for (const category of categories.filter(item => item.id !== 'all')) {
   await mkdir(directory, { recursive: true })
   await writeFile(resolve(directory, 'index.html'), html)
   await writeFile(resolve(directory, 'og.png'), renderOgCard({ id: `category-${category.id}`, category: category.id }))
-  const hash = createHash('sha256')
-    .update(html.split(siteUrl).join('{{SITE_URL}}'))
-    .digest('hex')
-    .slice(0, 16)
+  const hash = contentHash(html)
   const key = `category:${category.id}`
   const previous = manifest[key]
   const lastmod = previous && previous.hash === hash ? previous.lastmod : today

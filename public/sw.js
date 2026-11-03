@@ -10,7 +10,14 @@
  * an unvisited tool still opens offline. Large lazy chunks (BPE vocabularies,
  * OpenCC dictionaries, Prettier/Terser) are deliberately left out: fetching
  * them eagerly would cost megabytes for a tool most users never open. They are
- * cached on first use instead. */
+ * cached on first use instead.
+ *
+ * Edge protection (EdgeOne bot management, for example) can answer a burst of
+ * asset requests with a 200 text/html JavaScript challenge. Such a response is
+ * never a valid script or stylesheet: caching it would permanently break that
+ * tool for the visitor, so every write and every read validates the response
+ * content type first. Pre-caching is also paced to stay below the rate that
+ * triggers those challenges. */
 const CACHE_VERSION = '__CACHE_VERSION__'
 const SHELL_CACHE = `toolbox-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `toolbox-runtime-${CACHE_VERSION}`
@@ -21,6 +28,60 @@ const SHELL = ['./', './index.html', './site.webmanifest', './favicon.svg', './i
 // A chunk larger than this (uncompressed) is only fetched on demand. Keep this
 // in sync with the `precache` flag in scripts/build-sw.mjs.
 const PRECACHE_MAX_BYTES = 512 * 1024
+// EdgeOne starts returning a bot challenge when dozens of cache-miss assets are
+// requested at once. One request every 150 ms (~6.7 rps) stayed well below the
+// threshold in production tests; the 255 small chunks still finish in ~40 s.
+const PRECACHE_INTERVAL_MS = 150
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+// Returns the content type an asset URL must have, or null for unknown types.
+function expectedContentType(url) {
+  const pathname = new URL(url, self.location.href).pathname.toLowerCase()
+  if (pathname.endsWith('.js') || pathname.endsWith('.mjs')) return /(?:java|ecma)script/
+  if (pathname.endsWith('.css')) return /text\/css/
+  if (pathname.endsWith('.json')) return /application\/json/
+  if (/\.(png|jpe?g|gif|webp|avif|svg|ico)$/.test(pathname)) return /image\//
+  if (/\.(woff2?|ttf|otf)$/.test(pathname)) return /font\//
+  if (pathname.endsWith('.webmanifest')) return /application\/(?:manifest\+)?json/
+  return null
+}
+
+function isUsableAsset(url, response) {
+  if (!response?.ok) return false
+  const expected = expectedContentType(url)
+  if (!expected) return true
+  const contentType = (response.headers.get('content-type') || '').toLowerCase()
+  return expected.test(contentType)
+}
+
+// Distinguishes the real app shell from a bot-challenge HTML page.
+async function isAppShell(response) {
+  if (!response?.ok) return false
+  if (!/text\/html/i.test(response.headers.get('content-type') || '')) return false
+  try {
+    const html = await response.clone().text()
+    return /id=["']app["']/.test(html) && /\/assets\//.test(html)
+  } catch {
+    return false
+  }
+}
+
+async function fetchShellAsset(cache, url) {
+  try {
+    const response = await fetch(url, { cache: 'reload' })
+    if (!response.ok) return
+    const pathname = new URL(url, self.location.href).pathname
+    const valid = /\/$|\/index\.html$/.test(pathname)
+      ? await isAppShell(response)
+      : isUsableAsset(url, response)
+    if (valid) await cache.put(url, response)
+  } catch {
+    // A missing optional asset must not block the service worker install.
+  }
+}
 
 async function loadManifest() {
   try {
@@ -43,32 +104,18 @@ self.addEventListener('install', event => {
         createdAt: Date.now()
       }), { headers: { 'Content-Type': 'application/json' } }))
     }
-    await Promise.all(SHELL.map(async url => {
-      try {
-        const response = await fetch(url, { cache: 'reload' })
-        if (response.ok) await cache.put(url, response)
-      } catch {
-        // A missing optional asset must not block the service worker install.
-      }
-    }))
+    await Promise.all(SHELL.map(url => fetchShellAsset(cache, url)))
 
     // The hashed entry JS/CSS are only discoverable from the HTML. Without
     // them the cached shell would render an empty page when offline.
     try {
       const indexResponse = await fetch('./index.html', { cache: 'reload' })
-      if (indexResponse.ok) {
+      if (await isAppShell(indexResponse)) {
         await cache.put('./index.html', indexResponse.clone())
         await cache.put('./', indexResponse.clone())
         const html = await indexResponse.text()
         const assets = [...html.matchAll(/(?:src|href)="([^"]*\/assets\/[^"]+)"/g)].map(match => match[1])
-        await Promise.all(assets.map(async url => {
-          try {
-            const response = await fetch(url, { cache: 'reload' })
-            if (response.ok) await cache.put(url, response)
-          } catch {
-            // Keep the shell despite a single failed asset.
-          }
-        }))
+        await Promise.all(assets.map(url => fetchShellAsset(cache, url)))
       }
     } catch {
       // The app shell is still usable from the network when this fails.
@@ -80,6 +127,9 @@ self.addEventListener('install', event => {
 
 // Fetch every small build chunk once the worker is idle. Failures are ignored:
 // this is a best-effort offline upgrade, never a prerequisite for using the app.
+// Requests are sequential with a small gap: a parallel warm-up of 250+ chunks
+// looks like a bot burst to edge protection and would get challenged instead of
+// cached.
 async function precacheBuildAssets() {
   const manifest = await loadManifest()
   if (!manifest?.assets?.length) return
@@ -88,26 +138,23 @@ async function precacheBuildAssets() {
   const effectiveType = self.navigator?.connection?.effectiveType
   if (effectiveType === 'slow-2g' || effectiveType === '2g') return
   const cache = await caches.open(RUNTIME_CACHE)
-  const pending = []
   for (const asset of manifest.assets) {
     if (!asset.precache || asset.size > PRECACHE_MAX_BYTES) continue
-    pending.push(asset.url)
-  }
-  if (!pending.length) return
-  const queue = [...pending]
-  const worker = async () => {
-    while (queue.length) {
-      const url = queue.shift()
-      try {
-        if (await cache.match(url, { ignoreVary: true })) continue
-        const response = await fetch(url)
-        if (response.ok && response.type === 'basic') await cache.put(url, response)
-      } catch {
-        // Offline or quota exceeded: the chunk stays network-only.
+    const url = asset.url
+    try {
+      const cached = await cache.match(url, { ignoreVary: true })
+      if (cached) {
+        // Drop entries left by an older worker that cached a challenge page.
+        if (await isUsableAsset(url, cached)) continue
+        await cache.delete(url, { ignoreVary: true })
       }
+      await sleep(PRECACHE_INTERVAL_MS)
+      const response = await fetch(url)
+      if (isUsableAsset(url, response)) await cache.put(url, response)
+    } catch {
+      // Offline or quota exceeded: the chunk stays network-only.
     }
   }
-  await Promise.all(Array.from({ length: Math.min(4, queue.length) }, worker))
 }
 
 async function cacheCreatedAt(version) {
@@ -149,11 +196,29 @@ async function pruneOldVersions() {
   }).map(key => caches.delete(key)))
 }
 
-// Delete runtime entries that are not part of the current build. This keeps
-// the 3 MB tokenizer vocabulary (and every previous hashed chunk) from
-// accumulating inside one version.
+// Delete runtime entries that are not part of the current build, plus entries
+// that cannot be the asset they are stored under (a challenge page cached by an
+// older worker). This keeps the 3 MB tokenizer vocabulary and every previous
+// hashed chunk from accumulating inside one version.
 async function cleanStaleCaches(manifest) {
   await pruneOldVersions()
+  const shellCache = await caches.open(SHELL_CACHE)
+  const shell = await shellCache.match('./index.html')
+  if (shell && !(await isAppShell(shell))) {
+    await shellCache.delete('./index.html')
+    await shellCache.delete('./')
+  }
+  // Heal the previous build's runtime cache too. It is intentionally retained
+  // for tabs that are mid-session during a deploy, and an older worker may have
+  // stored challenge pages there. Valid old chunks stay available.
+  const runtimeNames = (await caches.keys()).filter(name => name.startsWith('toolbox-runtime-'))
+  await Promise.all(runtimeNames.map(async name => {
+    const cache = await caches.open(name)
+    for (const request of await cache.keys()) {
+      const response = await cache.match(request, { ignoreVary: true })
+      if (response && !(await isUsableAsset(request.url, response))) await cache.delete(request)
+    }
+  }))
   if (!manifest?.assets) return
   const current = new Set(manifest.assets.map(asset => {
     try {
@@ -165,16 +230,21 @@ async function cleanStaleCaches(manifest) {
   current.add(new URL(MANIFEST_URL, self.location.href).pathname)
   const cache = await caches.open(RUNTIME_CACHE)
   const requests = await cache.keys()
-  await Promise.all(requests.map(request => {
+  await Promise.all(requests.map(async request => {
     let pathname
     try {
       pathname = new URL(request.url).pathname
     } catch {
-      return undefined
+      return
     }
     // Only prune build output; icons / shell files live in the shell cache.
-    if (!pathname.includes('/assets/')) return undefined
-    return current.has(pathname) ? undefined : cache.delete(request)
+    if (!pathname.includes('/assets/')) return
+    if (!current.has(pathname)) {
+      await cache.delete(request)
+      return
+    }
+    const response = await cache.match(request, { ignoreVary: true })
+    if (response && !(await isUsableAsset(request.url, response))) await cache.delete(request)
   }))
 }
 
@@ -190,9 +260,13 @@ self.addEventListener('activate', event => {
 })
 
 async function cacheResponse(request, response) {
-  if (response.ok && response.type === 'basic') {
-    const cache = await caches.open(RUNTIME_CACHE)
-    await cache.put(request, response.clone())
+  if (response.type === 'basic' && isUsableAsset(request.url, response)) {
+    try {
+      const cache = await caches.open(RUNTIME_CACHE)
+      await cache.put(request, response.clone())
+    } catch {
+      // Quota or storage errors must not turn a successful fetch into a failure.
+    }
   }
   return response
 }
@@ -204,19 +278,45 @@ async function matchCached(request) {
   return await caches.match(request, { ignoreVary: true }) || await caches.match(request.url, { ignoreVary: true })
 }
 
+// A poisoned entry can live in the previous build's cache, which is retained
+// for tabs that are mid-session during a deploy. Evict it everywhere so a
+// later lookup cannot keep returning it.
+async function deleteCachedResponse(request) {
+  const names = await caches.keys()
+  await Promise.all(names.map(async name => {
+    const cache = await caches.open(name)
+    await cache.delete(request, { ignoreVary: true })
+  }))
+}
+
 async function networkFirst(request) {
   try {
     const response = await fetch(request)
-    return cacheResponse(request, response)
+    // Cache navigations only when they really are the app shell; a bot
+    // challenge page must never become the offline fallback.
+    if (await isAppShell(response)) {
+      try {
+        const currentShell = await caches.open(SHELL_CACHE)
+        await currentShell.put('./index.html', response.clone())
+        await currentShell.put('./', response.clone())
+      } catch {
+        // A full quota must not prevent the live page from loading.
+      }
+    }
+    return response
   } catch {
     // Prefer this build's shell. `caches.match` is global and the previous
     // version's shell is retained on purpose, so an unqualified lookup could
     // pair an old index with a chunk that only exists in the new build.
     const currentShell = await caches.open(SHELL_CACHE)
     const shell = await currentShell.match('./index.html')
-    if (shell) return shell
+    if (shell && await isAppShell(shell)) return shell
     const cached = await matchCached(request)
-    if (cached) return cached
+    if (cached) {
+      const usable = request.mode === 'navigate' ? await isAppShell(cached) : await isUsableAsset(request.url, cached)
+      if (usable) return cached
+      await deleteCachedResponse(request)
+    }
     return Response.error()
   }
 }
@@ -224,7 +324,12 @@ async function networkFirst(request) {
 async function cacheFirst(request) {
   try {
     const cached = await matchCached(request)
-    if (cached) return cached
+    if (cached) {
+      if (await isUsableAsset(request.url, cached)) return cached
+      // A challenge page stored under an asset URL by an older worker. Evict it
+      // and let this request heal from the network.
+      await deleteCachedResponse(request)
+    }
     // A hashed URL can still be missing after a redeploy; fall back to the
     // network rather than failing the tool outright.
     const response = await fetch(request)

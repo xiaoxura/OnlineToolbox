@@ -31,11 +31,17 @@ async function walk(dir, prefix = '') {
 const files = await walk(assetsDir)
 if (!files.length) throw new Error('build-sw: dist/assets is empty; run vite build first')
 
+const swPath = resolve(dist, 'sw.js')
+const swSource = await readFile(swPath, 'utf8')
+
 const hash = createHash('sha256')
 for (const file of files) {
   hash.update(file.relative)
   hash.update(await readFile(resolve(assetsDir, file.relative)))
 }
+// Include the worker source: a fix to the caching logic must invalidate the
+// edge/client cache even when none of the hashed assets changed.
+hash.update(swSource)
 const buildHash = hash.digest('hex').slice(0, 12)
 
 const assets = files.map(file => ({
@@ -52,10 +58,27 @@ const manifest = {
 }
 await writeFile(resolve(dist, 'asset-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
 
-const swPath = resolve(dist, 'sw.js')
-const source = await readFile(swPath, 'utf8')
-if (!source.includes('__CACHE_VERSION__')) throw new Error('build-sw: dist/sw.js is missing the __CACHE_VERSION__ placeholder')
-const stamped = source.replaceAll('__CACHE_VERSION__', buildHash)
+// Public deployment metadata. The footer shows the same build date; this file
+// makes it possible to verify the deployed commit directly:
+//   curl https://tools.xiaoxura.com/version.json
+let buildInfo = {}
+try {
+  buildInfo = JSON.parse(await readFile(resolve('.build-info.json'), 'utf8'))
+} catch {
+  // A direct `vite build` may not have stamped .build-info.json.
+}
+const version = {
+  buildHash,
+  builtAt: buildInfo.builtAt || manifest.generatedAt,
+  commit: buildInfo.commit || '',
+  commitShort: buildInfo.commitShort || '',
+  commitDate: buildInfo.commitDate || '',
+  branch: buildInfo.branch || ''
+}
+await writeFile(resolve(dist, 'version.json'), `${JSON.stringify(version, null, 2)}\n`)
+
+if (!swSource.includes('__CACHE_VERSION__')) throw new Error('build-sw: dist/sw.js is missing the __CACHE_VERSION__ placeholder')
+const stamped = swSource.replaceAll('__CACHE_VERSION__', buildHash)
 await writeFile(swPath, stamped)
 
 const bytes = assets.reduce((total, asset) => total + asset.size, 0)

@@ -5,6 +5,7 @@ import { readFile, readdir, stat } from 'node:fs/promises'
 import { gzipSync } from 'node:zlib'
 import { resolve } from 'node:path'
 import { categories, tools } from '../src/tools/registry.js'
+import { formatBuildTime } from '../src/build-info.js'
 
 const dist = resolve('dist')
 const failures = []
@@ -25,6 +26,25 @@ async function gzipSize(path) {
 
 const indexHtml = await readFile(resolve(dist, 'index.html'), 'utf8')
 if (indexHtml.includes('%TOOL_COUNT%')) failures.push('dist/index.html still contains %TOOL_COUNT%')
+if (indexHtml.includes('%BUILD_')) failures.push('dist/index.html still contains build placeholders')
+
+let buildInfo = {}
+try {
+  buildInfo = JSON.parse(await readFile(resolve('.build-info.json'), 'utf8'))
+} catch {
+  // `verify:build` can run on an artifact-only checkout; version.json carries
+  // the same timestamp.
+  try {
+    buildInfo = JSON.parse(await readFile(resolve(dist, 'version.json'), 'utf8'))
+  } catch {
+    // The checks below are skipped when no build stamp is available at all.
+  }
+}
+const expectedBuildTime = formatBuildTime(buildInfo.builtAt || '')
+if (buildInfo.builtAt) {
+  if (!indexHtml.includes(`datetime="${buildInfo.builtAt}"`)) failures.push('dist/index.html is missing the build timestamp')
+  if (expectedBuildTime && !indexHtml.includes(`更新于 ${expectedBuildTime}`)) failures.push('dist/index.html is missing the rendered update date')
+}
 
 const manifest = await readFile(resolve(dist, 'site.webmanifest'), 'utf8')
 if (manifest.includes('%TOOL_COUNT%')) failures.push('dist/site.webmanifest still contains %TOOL_COUNT%')
@@ -35,6 +55,9 @@ for (const tool of tools) {
   if (!await exists(resolve(dist, 'tools', tool.id, 'index.html'))) failures.push(`missing landing page for ${tool.id}`)
   if (!await exists(resolve(dist, 'tools', tool.id, 'og.png'))) failures.push(`missing OG card for ${tool.id}`)
 }
+
+const sampleLanding = await readFile(resolve(dist, 'tools', tools[0].id, 'index.html'), 'utf8')
+if (expectedBuildTime && !sampleLanding.includes(`更新于 ${expectedBuildTime}`)) failures.push('tool landing pages are missing the update date')
 
 const categoryEntries = categories.filter(category => category.id !== 'all')
 const categoryDirs = (await readdir(resolve(dist, 'categories'), { withFileTypes: true })).filter(entry => entry.isDirectory())
@@ -54,7 +77,7 @@ const expectedUrls = tools.length + categoryEntries.length + 1
 if (sitemapUrls.length !== expectedUrls) failures.push(`sitemap has ${sitemapUrls.length} URLs, expected ${expectedUrls}`)
 notes.push(`sitemap URLs: ${sitemapUrls.length}`)
 
-for (const asset of ['sw.js', 'asset-manifest.json', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png']) {
+for (const asset of ['sw.js', 'asset-manifest.json', 'version.json', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png']) {
   if (!await exists(resolve(dist, asset))) failures.push(`missing ${asset}`)
 }
 
@@ -73,6 +96,19 @@ if (await exists(resolve(dist, 'asset-manifest.json'))) {
     if (!await exists(path)) failures.push(`asset-manifest references missing ${asset.url}`)
   }
   notes.push(`asset manifest: ${buildManifest.assets.length} chunks, ${buildManifest.assets.filter(a => a.precache).length} pre-cached`)
+}
+
+// version.json is the machine-readable counterpart of the footer date and is
+// what a deploy check can curl.
+if (await exists(resolve(dist, 'version.json'))) {
+  const version = JSON.parse(await readFile(resolve(dist, 'version.json'), 'utf8'))
+  if (!/^[0-9a-f]{12}$/.test(version.buildHash || '')) failures.push('version.json buildHash is malformed')
+  if (Number.isNaN(Date.parse(version.builtAt || ''))) failures.push('version.json builtAt is not a valid timestamp')
+  if (await exists(resolve(dist, 'asset-manifest.json'))) {
+    const buildManifest = JSON.parse(await readFile(resolve(dist, 'asset-manifest.json'), 'utf8'))
+    if (version.buildHash !== buildManifest.buildHash) failures.push('version.json buildHash does not match the asset manifest')
+  }
+  notes.push(`version: ${version.builtAt}${version.commitShort ? ` · ${version.commitShort}` : ''}`)
 }
 
 const assets = await readdir(resolve(dist, 'assets'))
