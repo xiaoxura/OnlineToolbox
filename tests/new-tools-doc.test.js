@@ -323,6 +323,16 @@ describe('word-frequency', () => {
     expect([...root.querySelectorAll('tbody tr td:nth-child(2)')].map(cell => cell.textContent))
       .toEqual(['banana', 'cherry'])
   })
+
+  it('defaults to 50 rows and still offers the full list', () => {
+    wordFrequency.render(root)
+    editableTextarea().value = Array.from({ length: 60 }, (_, i) => `word${i}`).join(' ')
+    runPrimaryAction()
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(50)
+
+    setValue(root.querySelector('select'), '0')
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(60)
+  })
 })
 
 describe('text-extract', () => {

@@ -67,11 +67,20 @@ export function applyTwoColumnLayout(container) {
   }
   if (inputIndex < 0) return false
 
+  // Tools often render several result blocks (stats + table + list). Split at
+  // the first result block after the input instead of only at the very last
+  // node, otherwise the table stays in the input column and the output column
+  // holds just a short summary.
+  let splitIndex = outputIndex
+  for (let i = inputIndex + 1; i <= outputIndex; i++) {
+    if (isOutputNode(children[i])) { splitIndex = i; break }
+  }
+
   // Everything strictly before the input run (e.g. a mode segmented group that
   // should span full width above the split) stays put.
   const head = children.slice(0, inputIndex)
-  const inputNodes = children.slice(inputIndex, outputIndex)
-  const outputNodes = children.slice(outputIndex)
+  const inputNodes = children.slice(inputIndex, splitIndex)
+  const outputNodes = children.slice(splitIndex)
   if (!inputNodes.length || !outputNodes.length) return false
 
   // A lone label immediately before the input run belongs inside the input

@@ -136,12 +136,14 @@ export default {
       { value: 'latin', label: '仅英文' }
     ], () => run(), { label: '统计范围' })
 
+    // Default to a bounded list: an "all words" default turns a normal article
+    // into thousands of rows and makes the result table unusable.
     const topN = createElement('select', { className: 'select', 'aria-label': '显示条数' }, [
-      createElement('option', { value: '0', textContent: '不限' }),
+      createElement('option', { value: '50', textContent: '前 50 条' }),
       createElement('option', { value: '10', textContent: '前 10 条' }),
       createElement('option', { value: '20', textContent: '前 20 条' }),
-      createElement('option', { value: '50', textContent: '前 50 条' }),
-      createElement('option', { value: '100', textContent: '前 100 条' })
+      createElement('option', { value: '100', textContent: '前 100 条' }),
+      createElement('option', { value: '0', textContent: '不限' })
     ])
 
     const stopwordBox = createElement('input', { type: 'checkbox', checked: true })

@@ -859,12 +859,25 @@ input[type='range'].input {
   min-width: 0;
 }
 
-/* [tabindex=0][role=region] 包裹,横向滚动 */
+/* [tabindex=0][role=region] 包裹,横向滚动。纵向也设上限：结果表动辄几百行，
+   不封顶会把整页拉到上万像素，右栏也会淹没输入区。 */
 .table-scroll {
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
+  max-height: min(60vh, 540px);
+  overflow: auto;
+  overscroll-behavior: contain;
   border-radius: var(--radius-sm);
+}
+
+/* Keep the column labels visible while scrolling a long result table. */
+.table-scroll .result-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-bg);
+  background-clip: padding-box;
+  box-shadow: inset 0 -1px 0 var(--color-border);
 }
 
 /* Pre-formatted code output */

@@ -276,7 +276,7 @@ export default {
       )
       const host = createElement('div')
       host.appendChild(table)
-      createTableScroll(table, 'Token 明细表，可横向滚动')
+      createTableScroll(table, 'Token 明细表，可滚动查看')
       tableHost.replaceChildren(host)
     }
 

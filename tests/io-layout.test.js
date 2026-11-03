@@ -61,6 +61,23 @@ describe('two-column IO layout', () => {
     })
   }
 
+  it('moves every result block into the output column', async () => {
+    const checks = [
+      ['token-counter', '.stats-row'],
+      ['word-frequency', '.stats-row'],
+      ['text-extract', '.result-table']
+    ]
+    for (const [id, selector] of checks) {
+      const tool = await loadToolById(id)
+      const container = document.createElement('main')
+      document.body.replaceChildren(container)
+      tool.render(container)
+      expect(applyTwoColumnLayout(container), `${id} should split`).toBe(true)
+      expect(container.querySelector(`.tool-io-output ${selector}`), `${id}: result is in the output column`).not.toBeNull()
+      expect(container.querySelector(`.tool-io-input ${selector}`), `${id}: result must not stay in the input column`).toBeNull()
+    }
+  })
+
   it('keeps the toolbox split coverage within the expected band', async () => {
     let split = 0
     for (const descriptor of tools) {

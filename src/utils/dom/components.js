@@ -51,7 +51,7 @@ export function createSection(title, contentEl, actions = []) {
   return createElement('section', { className: 'tool-section', 'aria-labelledby': headingId }, [header, body])
 }
 
-export function createTableScroll(table, label = '可横向滚动的数据表格') {
+export function createTableScroll(table, label = '可滚动的数据表格') {
   const wrapper = createElement('div', {
     className: 'table-scroll',
     tabindex: '0',
